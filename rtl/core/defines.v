@@ -128,13 +128,20 @@
 `define INST_BGEU   3'b111
 
 // CSR inst
-`define INST_CSR    7'b1110011
+`define INST_SYS    7'b1110011
+//fun3
 `define INST_CSRRW  3'b001
 `define INST_CSRRS  3'b010
 `define INST_CSRRC  3'b011
 `define INST_CSRRWI 3'b101
 `define INST_CSRRSI 3'b110
 `define INST_CSRRCI 3'b111
+//特殊指令fun3=0,inst_i[31:15]
+`define INST_SI     3'b000
+`define INST_ECALL  17'h0
+`define INST_EBREAK 17'b000000000001_00000
+`define INST_MRET   17'b0011000_00010_00000
+`define INST_WFI    17'b0001000_00101_00000
 
 // CSR reg addr
 `define CSR_CYCLE   12'hc00
@@ -151,6 +158,7 @@
 `define MemNum 4096  // memory depth(how many words)
 `define MemBus 31:0
 `define MemAddrBus 31:0
+`define CsrAddrBus 11:0
 
 `define InstBus 31:0
 `define InstAddrBus 31:0

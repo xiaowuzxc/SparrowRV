@@ -77,7 +77,7 @@ module regs(
 			regs[31] <= 32'h0;
 		end
 		else begin
-			if ((we_i == `WriteEnable) && (waddr_i != `ZeroReg)) begin
+			if ((we_i == 1) && (waddr_i != 0)) begin
 				regs[waddr_i] <= wdata_i;
 			end
 		end
@@ -85,8 +85,8 @@ module regs(
 
 	// 读寄存器1
 	always @ (*) begin
-		if (raddr1_i == `ZeroReg) begin
-			rdata1_o = `ZeroWord;
+		if (raddr1_i == 0) begin
+			rdata1_o = 0;
 		// 如果读地址等于写地址，并且正在写操作，则直接返回写数据
 		end else begin
 			rdata1_o = regs[raddr1_i];
@@ -95,18 +95,18 @@ module regs(
 
 	// 读寄存器2
 	always @ (*) begin
-		if (raddr2_i == `ZeroReg) begin
-			rdata2_o = `ZeroWord;
+		if (raddr2_i == 0) begin
+			rdata2_o = 0;
 		// 如果读地址等于写地址，并且正在写操作，则直接返回写数据
 		end else begin
 			rdata2_o = regs[raddr2_i];
 		end
 	end
 
-	// jtag读寄存器
+	// bus读寄存器
 	always @ (*) begin
-		if (bus_raddr_i == `ZeroReg) begin
-			bus_data_o = `ZeroWord;
+		if (bus_raddr_i == 0) begin
+			bus_data_o = 0;
 		end else begin
 			bus_data_o = regs[bus_raddr_i];
 		end
