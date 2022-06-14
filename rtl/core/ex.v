@@ -53,6 +53,7 @@ module ex(
 	output reg[`MemBus] mem_wdata_o,        //写内存数据
 	output reg[`MemAddrBus] mem_addr_o,     //访问内存地址，复用读
 	output reg mem_we_o,                    //写内存使能
+	output reg[3:0] mem_wem_o,              //写内存掩码
 	output reg mem_en_o,                    //访问内存使能，复用读
 		//PC
 	output reg[`InstAddrBus] pc_n_o,        //下一条指令地址
@@ -60,7 +61,7 @@ module ex(
 	output reg ecall_o,                     //指令中断使能
 	output reg ebreak_o,                    //指令中断使能
 	output reg wfi_o,                       //中断等待使能
-
+	output reg inst_err_o,                  //指令出错
 	//直连输入通道
 	input wire[`RegBus] mepc                //mepc寄存器
 
@@ -156,9 +157,9 @@ assign csr_waddr_o = csr_waddr_i;
 always @ (*) begin
 	//外部接口
 	csr_raddr_o = 0;    //读CSR地址
-	dividend_o = 0;     //被除数
-	divisor_o = 0;      //除数
-	div_op_o = 0;       //除法指令标志
+	dividend_o = reg_rdata1_i;     //被除数直连
+	divisor_o = reg_rdata2_i;      //除数直连
+	div_op_o = funct3;       //除法指令直连
 	div_start_o = 0;    //除法运算开始标志
 	reg_wdata_o = 0;    //写寄存器数据
 	reg_we_o = 0;       //是否要写通用寄存器
@@ -169,20 +170,22 @@ always @ (*) begin
 	mem_wdata_o = 0;    //写内存数据
 	mem_addr_o = 0;     //访问内存地址，复用读
 	mem_we_o = 0;       //写内存使能
+	mem_wem_o = 4'h0;   //写内存掩码
 	mem_en_o = 0;       //访问内存使能，复用读
 	pc_n_o = 0;         //下一条指令地址
 	ecall_o = 0;        //指令中断使能
 	ebreak_o = 0;       //指令中断使能
 	wfi_o = 0;          //中断等待使能
+	inst_err_o = 0;     //指令出错
 	//复用运算单元
-	add1_in1 = 0;        //加法器1输入1
-	add1_in2 = 0;        //加法器1输入2
-	add2_in1 = 0;        //加法器2输入1
-	add2_in2 = 0;        //加法器2输入2
-	mul_in1 = 0;         //乘法器有符号33位输入1
-	mul_in2 = 0;         //乘法器有符号33位输入2
-	op_in1 = 0;              //比较器输入1
-	op_in2 = 0;              //比较器输入1
+	add1_in1 = 0;       //加法器1输入1
+	add1_in2 = 0;       //加法器1输入2
+	add2_in1 = 0;       //加法器2输入1
+	add2_in2 = 0;       //加法器2输入2
+	mul_in1 = 0;        //乘法器有符号33位输入1
+	mul_in2 = 0;        //乘法器有符号33位输入2
+	op_in1 = 0;         //比较器输入1
+	op_in2 = 0;         //比较器输入1
 	//读寄存器
 	reg_raddr1_o = inst_i[19:15];   //读rs1地址
 	reg_raddr2_o = inst_i[24:20];   //读rs2地址
@@ -197,7 +200,7 @@ always @ (*) begin
 					reg_wdata_o = add1_res;
 					add2_in1 = pc_i;
 					add2_in2 = 4;
-					pc_n_o = add2_res;
+					pc_n_o = add2_res;//PC+4
 				end
 				`INST_SLTI: begin
 					op_in1 = reg_rdata1_i;
@@ -207,7 +210,7 @@ always @ (*) begin
 					reg_wdata_o = {31'h0 , (~op_sres)};
 					add2_in1 = pc_i;
 					add2_in2 = 4;
-					pc_n_o = add2_res;
+					pc_n_o = add2_res;//PC+4
 				end
 				`INST_SLTIU: begin
 					op_in1 = reg_rdata1_i;
@@ -217,7 +220,7 @@ always @ (*) begin
 					reg_wdata_o = {31'h0 , (~op_ures)};
 					add2_in1 = pc_i;
 					add2_in2 = 4;
-					pc_n_o = add2_res;
+					pc_n_o = add2_res;//PC+4
 				end
 				`INST_XORI: begin
 					reg_we_o = 1;
@@ -225,7 +228,7 @@ always @ (*) begin
 					reg_wdata_o = reg_rdata1_i ^ imm12i;
 					add2_in1 = pc_i;
 					add2_in2 = 4;
-					pc_n_o = add2_res;
+					pc_n_o = add2_res;//PC+4
 				end
 				`INST_ORI: begin
 					reg_we_o = 1;
@@ -233,7 +236,7 @@ always @ (*) begin
 					reg_wdata_o = reg_rdata1_i | imm12i;
 					add2_in1 = pc_i;
 					add2_in2 = 4;
-					pc_n_o = add2_res;
+					pc_n_o = add2_res;//PC+4
 				end
 				`INST_ANDI: begin
 					reg_we_o = 1;
@@ -241,7 +244,7 @@ always @ (*) begin
 					reg_wdata_o = reg_rdata1_i & imm12i;
 					add2_in1 = pc_i;
 					add2_in2 = 4;
-					pc_n_o = add2_res;
+					pc_n_o = add2_res;//PC+4
 				end
 				`INST_SLLI: begin
 					reg_we_o = 1;
@@ -249,22 +252,22 @@ always @ (*) begin
 					reg_wdata_o = reg_rdata1_i << imm12i[4:0];
 					add2_in1 = pc_i;
 					add2_in2 = 4;
-					pc_n_o = add2_res;
+					pc_n_o = add2_res;//PC+4
 				end
 				`INST_SRI: begin
 					reg_we_o = 1;
 					reg_waddr_o = rd;
-					if (inst_i[30] == 1'b1) begin
+					if (inst_i[30] == 1'b1) begin//SRAI
 						reg_wdata_o = (reg_rdata1_i >> shamt) | ({32{reg_rdata1_i[31]}} & (~(32'hffffffff >> shamt)));
-					end else begin
+					end else begin//SRLI
 						reg_wdata_o = reg_rdata1_i >> shamt;
 					end
 					add2_in1 = pc_i;
 					add2_in2 = 4;
-					pc_n_o = add2_res;
+					pc_n_o = add2_res;//PC+4
 				end
 				default: begin
-
+					inst_err_o = 1;     //指令出错
 				end
 			endcase
 		end
@@ -272,371 +275,337 @@ always @ (*) begin
 			if ((funct7 == 7'b0000000) || (funct7 == 7'b0100000)) begin
 				case (funct3)
 					`INST_ADD_SUB: begin
-						jump_flag = `JumpDisable;
-						hold_flag = `HoldDisable;
-						jump_addr = `ZeroWord;
-						mem_wdata_o = `ZeroWord;
-						mem_raddr_o = `ZeroWord;
-						mem_waddr_o = `ZeroWord;
-						mem_we = `WriteDisable;
-						if (inst_i[30] == 1'b0) begin
-							reg_wdata = op1_add_op2_res;
-						end else begin
-							reg_wdata = op1_i - op2_i;
+						add1_in1 = reg_rdata1_i;
+						add1_in2 = reg_rdata2_i;
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						
+
+						if (inst_i[30] == 1'b0) begin//ADD
+							reg_wdata_o = add1_res;
+						end else begin//SUB
+							reg_wdata_o = reg_rdata1_i - reg_rdata2_i;
 						end
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					`INST_SLL: begin
-						jump_flag = `JumpDisable;
-						hold_flag = `HoldDisable;
-						jump_addr = `ZeroWord;
-						mem_wdata_o = `ZeroWord;
-						mem_raddr_o = `ZeroWord;
-						mem_waddr_o = `ZeroWord;
-						mem_we = `WriteDisable;
-						reg_wdata = op1_i << op2_i[4:0];
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						reg_wdata_o = reg_rdata1_i << reg_rdata2_i[4:0];
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					`INST_SLT: begin
-						jump_flag = `JumpDisable;
-						hold_flag = `HoldDisable;
-						jump_addr = `ZeroWord;
-						mem_wdata_o = `ZeroWord;
-						mem_raddr_o = `ZeroWord;
-						mem_waddr_o = `ZeroWord;
-						mem_we = `WriteDisable;
-						reg_wdata = {32{(~op1_ge_op2_signed)}} & 32'h1;
+						op_in1 = reg_rdata1_i;
+						op_in2 = reg_rdata2_i;
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						reg_wdata_o = {31'h0 , (~op_sres)};
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					`INST_SLTU: begin
-						jump_flag = `JumpDisable;
-						hold_flag = `HoldDisable;
-						jump_addr = `ZeroWord;
-						mem_wdata_o = `ZeroWord;
-						mem_raddr_o = `ZeroWord;
-						mem_waddr_o = `ZeroWord;
-						mem_we = `WriteDisable;
-						reg_wdata = {32{(~op1_ge_op2_unsigned)}} & 32'h1;
+						op_in1 = reg_rdata1_i;
+						op_in2 = reg_rdata2_i;
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						reg_wdata_o = {31'h0 , (~op_ures)};
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					`INST_XOR: begin
-						jump_flag = `JumpDisable;
-						hold_flag = `HoldDisable;
-						jump_addr = `ZeroWord;
-						mem_wdata_o = `ZeroWord;
-						mem_raddr_o = `ZeroWord;
-						mem_waddr_o = `ZeroWord;
-						mem_we = `WriteDisable;
-						reg_wdata = op1_i ^ op2_i;
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						reg_wdata_o = reg_rdata1_i ^ reg_rdata2_i;
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					`INST_SR: begin
-						jump_flag = `JumpDisable;
-						hold_flag = `HoldDisable;
-						jump_addr = `ZeroWord;
-						mem_wdata_o = `ZeroWord;
-						mem_raddr_o = `ZeroWord;
-						mem_waddr_o = `ZeroWord;
-						mem_we = `WriteDisable;
-						if (inst_i[30] == 1'b1) begin
-							reg_wdata = (sr_shift & sr_shift_mask) | ({32{reg1_rdata_i[31]}} & (~sr_shift_mask));
-						end else begin
-							reg_wdata = reg1_rdata_i >> reg2_rdata_i[4:0];
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						if (inst_i[30] == 1'b1) begin//SRAI
+							reg_wdata_o = (reg_rdata1_i >> reg_rdata2_i[4:0]) | ({32{reg_rdata1_i[31]}} & (~(32'hffffffff >> reg_rdata2_i[4:0])));
+						end else begin//SRLI
+							reg_wdata_o = reg_rdata1_i >> reg_rdata2_i[4:0];
 						end
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					`INST_OR: begin
-						jump_flag = `JumpDisable;
-						hold_flag = `HoldDisable;
-						jump_addr = `ZeroWord;
-						mem_wdata_o = `ZeroWord;
-						mem_raddr_o = `ZeroWord;
-						mem_waddr_o = `ZeroWord;
-						mem_we = `WriteDisable;
-						reg_wdata = op1_i | op2_i;
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						reg_wdata_o = reg_rdata1_i | reg_rdata2_i;
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					`INST_AND: begin
-						jump_flag = `JumpDisable;
-						hold_flag = `HoldDisable;
-						jump_addr = `ZeroWord;
-						mem_wdata_o = `ZeroWord;
-						mem_raddr_o = `ZeroWord;
-						mem_waddr_o = `ZeroWord;
-						mem_we = `WriteDisable;
-						reg_wdata = op1_i & op2_i;
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						reg_wdata_o = reg_rdata1_i & reg_rdata2_i;
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					default: begin
-						jump_flag = `JumpDisable;
-						hold_flag = `HoldDisable;
-						jump_addr = `ZeroWord;
-						mem_wdata_o = `ZeroWord;
-						mem_raddr_o = `ZeroWord;
-						mem_waddr_o = `ZeroWord;
-						mem_we = `WriteDisable;
-						reg_wdata = `ZeroWord;
+						inst_err_o = 1;     //指令出错
 					end
 				endcase
 			end else if (funct7 == 7'b0000001) begin
 				case (funct3)
 					`INST_MUL: begin
-						jump_flag = `JumpDisable;
-						hold_flag = `HoldDisable;
-						jump_addr = `ZeroWord;
-						mem_wdata_o = `ZeroWord;
-						mem_raddr_o = `ZeroWord;
-						mem_waddr_o = `ZeroWord;
-						mem_we = `WriteDisable;
-						reg_wdata = mul_temp[31:0];
+						mul_in1 = {reg_rdata1_i[31] , reg_rdata1_i};
+						mul_in2 = {reg_rdata2_i[31] , reg_rdata2_i};
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						reg_wdata_o = mul_resl;
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					`INST_MULHU: begin
-						jump_flag = `JumpDisable;
-						hold_flag = `HoldDisable;
-						jump_addr = `ZeroWord;
-						mem_wdata_o = `ZeroWord;
-						mem_raddr_o = `ZeroWord;
-						mem_waddr_o = `ZeroWord;
-						mem_we = `WriteDisable;
-						reg_wdata = mul_temp[63:32];
+						mul_in1 = {1'b0 , reg_rdata1_i};
+						mul_in2 = {1'b0 , reg_rdata2_i};
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						reg_wdata_o = mul_resh;
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					`INST_MULH: begin
-						jump_flag = `JumpDisable;
-						hold_flag = `HoldDisable;
-						jump_addr = `ZeroWord;
-						mem_wdata_o = `ZeroWord;
-						mem_raddr_o = `ZeroWord;
-						mem_waddr_o = `ZeroWord;
-						mem_we = `WriteDisable;
-						case ({reg1_rdata_i[31], reg2_rdata_i[31]})
-							2'b00: begin
-								reg_wdata = mul_temp[63:32];
-							end
-							2'b11: begin
-								reg_wdata = mul_temp[63:32];
-							end
-							2'b10: begin
-								reg_wdata = mul_temp_invert[63:32];
-							end
-							default: begin
-								reg_wdata = mul_temp_invert[63:32];
-							end
-						endcase
+						mul_in1 = {reg_rdata1_i[31] , reg_rdata1_i};
+						mul_in2 = {reg_rdata2_i[31] , reg_rdata2_i};
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						reg_wdata_o = mul_resh;
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					`INST_MULHSU: begin
-						jump_flag = `JumpDisable;
-						hold_flag = `HoldDisable;
-						jump_addr = `ZeroWord;
-						mem_wdata_o = `ZeroWord;
-						mem_raddr_o = `ZeroWord;
-						mem_waddr_o = `ZeroWord;
-						mem_we = `WriteDisable;
-						if (reg1_rdata_i[31] == 1'b1) begin
-							reg_wdata = mul_temp_invert[63:32];
-						end else begin
-							reg_wdata = mul_temp[63:32];
-						end
+						mul_in1 = {reg_rdata1_i[31] , reg_rdata1_i};
+						mul_in2 = {1'b0 , reg_rdata2_i};
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						reg_wdata_o = mul_resh;
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					`INST_DIV: begin
+						div_start_o = 1;
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						reg_wdata_o = div_result_i;
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					`INST_DIVU: begin
+						div_start_o = 1;
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						reg_wdata_o = div_result_i;
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					`INST_REM: begin
+						div_start_o = 1;
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						reg_wdata_o = div_result_i;
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					`INST_REMU: begin
+						div_start_o = 1;
+						reg_we_o = 1;
+						reg_waddr_o = rd;
+						reg_wdata_o = div_result_i;
+						add2_in1 = pc_i;
+						add2_in2 = 4;
+						pc_n_o = add2_res;//PC+4
 					end
 					default: begin
-						jump_flag = `JumpDisable;
-						hold_flag = `HoldDisable;
-						jump_addr = `ZeroWord;
-						mem_wdata_o = `ZeroWord;
-						mem_raddr_o = `ZeroWord;
-						mem_waddr_o = `ZeroWord;
-						mem_we = `WriteDisable;
-						reg_wdata = `ZeroWord;
+						inst_err_o = 1;     //指令出错
 					end
 				endcase
 			end else begin
-				jump_flag = `JumpDisable;
-				hold_flag = `HoldDisable;
-				jump_addr = `ZeroWord;
-				mem_wdata_o = `ZeroWord;
-				mem_raddr_o = `ZeroWord;
-				mem_waddr_o = `ZeroWord;
-				mem_we = `WriteDisable;
-				reg_wdata = `ZeroWord;
+				inst_err_o = 1;     //指令出错
 			end
 		end
 		`INST_TYPE_L: begin
 			case (funct3)
 				`INST_LB: begin
-					jump_flag = `JumpDisable;
-					hold_flag = `HoldDisable;
-					jump_addr = `ZeroWord;
-					mem_wdata_o = `ZeroWord;
-					mem_waddr_o = `ZeroWord;
-					mem_we = `WriteDisable;
-					mem_req = `RIB_REQ;
-					mem_raddr_o = op1_add_op2_res;
-					case (mem_raddr_index)
+					mem_addr_o = reg_rdata1_i + imm12i;//访问内存地址，复用读
+					mem_we_o = 0;//写内存使能
+					mem_en_o = 1;//访问内存使能，复用读
+					reg_we_o = 1;
+					reg_waddr_o = rd;
+					case (mem_addr_o[1:0])
 						2'b00: begin
-							reg_wdata = {{24{mem_rdata_i[7]}}, mem_rdata_i[7:0]};
+							reg_wdata_o = {{24{mem_rdata_i[7]}}, mem_rdata_i[7:0]};
 						end
 						2'b01: begin
-							reg_wdata = {{24{mem_rdata_i[15]}}, mem_rdata_i[15:8]};
+							reg_wdata_o = {{24{mem_rdata_i[15]}}, mem_rdata_i[15:8]};
 						end
 						2'b10: begin
-							reg_wdata = {{24{mem_rdata_i[23]}}, mem_rdata_i[23:16]};
+							reg_wdata_o = {{24{mem_rdata_i[23]}}, mem_rdata_i[23:16]};
 						end
 						default: begin
-							reg_wdata = {{24{mem_rdata_i[31]}}, mem_rdata_i[31:24]};
+							reg_wdata_o = {{24{mem_rdata_i[31]}}, mem_rdata_i[31:24]};
 						end
 					endcase
+					add2_in1 = pc_i;
+					add2_in2 = 4;
+					pc_n_o = add2_res;//PC+4
 				end
 				`INST_LH: begin
-					jump_flag = `JumpDisable;
-					hold_flag = `HoldDisable;
-					jump_addr = `ZeroWord;
-					mem_wdata_o = `ZeroWord;
-					mem_waddr_o = `ZeroWord;
-					mem_we = `WriteDisable;
-					mem_req = `RIB_REQ;
-					mem_raddr_o = op1_add_op2_res;
-					if (mem_raddr_index == 2'b0) begin
-						reg_wdata = {{16{mem_rdata_i[15]}}, mem_rdata_i[15:0]};
+					mem_addr_o = reg_rdata1_i + imm12i;//访问内存地址，复用读
+					mem_we_o = 0;//写内存使能
+					mem_en_o = 1;//访问内存使能，复用读
+					reg_we_o = 1;
+					reg_waddr_o = rd;
+					if (mem_addr_o[1:0] == 2'b0) begin
+						reg_wdata_o = {{16{mem_rdata_i[15]}}, mem_rdata_i[15:0]};
 					end else begin
-						reg_wdata = {{16{mem_rdata_i[31]}}, mem_rdata_i[31:16]};
+						reg_wdata_o = {{16{mem_rdata_i[31]}}, mem_rdata_i[31:16]};
 					end
+					add2_in1 = pc_i;
+					add2_in2 = 4;
+					pc_n_o = add2_res;//PC+4
 				end
 				`INST_LW: begin
-					jump_flag = `JumpDisable;
-					hold_flag = `HoldDisable;
-					jump_addr = `ZeroWord;
-					mem_wdata_o = `ZeroWord;
-					mem_waddr_o = `ZeroWord;
-					mem_we = `WriteDisable;
-					mem_req = `RIB_REQ;
-					mem_raddr_o = op1_add_op2_res;
-					reg_wdata = mem_rdata_i;
+					mem_addr_o = reg_rdata1_i + imm12i;//访问内存地址，复用读
+					mem_we_o = 0;//写内存使能
+					mem_en_o = 1;//访问内存使能，复用读
+					reg_we_o = 1;
+					reg_waddr_o = rd;
+					reg_wdata_o = mem_rdata_i;
+					add2_in1 = pc_i;
+					add2_in2 = 4;
+					pc_n_o = add2_res;//PC+4
 				end
 				`INST_LBU: begin
-					jump_flag = `JumpDisable;
-					hold_flag = `HoldDisable;
-					jump_addr = `ZeroWord;
-					mem_wdata_o = `ZeroWord;
-					mem_waddr_o = `ZeroWord;
-					mem_we = `WriteDisable;
-					mem_req = `RIB_REQ;
-					mem_raddr_o = op1_add_op2_res;
-					case (mem_raddr_index)
+					mem_addr_o = reg_rdata1_i + imm12i;//访问内存地址，复用读
+					mem_we_o = 0;//写内存使能
+					mem_en_o = 1;//访问内存使能，复用读
+					reg_we_o = 1;
+					reg_waddr_o = rd;
+					case (mem_addr_o[1:0])
 						2'b00: begin
-							reg_wdata = {24'h0, mem_rdata_i[7:0]};
+							reg_wdata_o = {24'h0, mem_rdata_i[7:0]};
 						end
 						2'b01: begin
-							reg_wdata = {24'h0, mem_rdata_i[15:8]};
+							reg_wdata_o = {24'h0, mem_rdata_i[15:8]};
 						end
 						2'b10: begin
-							reg_wdata = {24'h0, mem_rdata_i[23:16]};
+							reg_wdata_o = {24'h0, mem_rdata_i[23:16]};
 						end
 						default: begin
-							reg_wdata = {24'h0, mem_rdata_i[31:24]};
+							reg_wdata_o = {24'h0, mem_rdata_i[31:24]};
 						end
 					endcase
+					add2_in1 = pc_i;
+					add2_in2 = 4;
+					pc_n_o = add2_res;//PC+4
 				end
 				`INST_LHU: begin
-					jump_flag = `JumpDisable;
-					hold_flag = `HoldDisable;
-					jump_addr = `ZeroWord;
-					mem_wdata_o = `ZeroWord;
-					mem_waddr_o = `ZeroWord;
-					mem_we = `WriteDisable;
-					mem_req = `RIB_REQ;
-					mem_raddr_o = op1_add_op2_res;
-					if (mem_raddr_index == 2'b0) begin
-						reg_wdata = {16'h0, mem_rdata_i[15:0]};
+					mem_addr_o = reg_rdata1_i + imm12i;//访问内存地址，复用读
+					mem_we_o = 0;//写内存使能
+					mem_en_o = 1;//访问内存使能，复用读
+					reg_we_o = 1;
+					reg_waddr_o = rd;
+					if (mem_addr_o[1:0] == 2'b0) begin
+						reg_wdata_o = {16'h0, mem_rdata_i[15:0]};
 					end else begin
-						reg_wdata = {16'h0, mem_rdata_i[31:16]};
+						reg_wdata_o = {16'h0, mem_rdata_i[31:16]};
 					end
+					add2_in1 = pc_i;
+					add2_in2 = 4;
+					pc_n_o = add2_res;//PC+4
 				end
 				default: begin
-					jump_flag = `JumpDisable;
-					hold_flag = `HoldDisable;
-					jump_addr = `ZeroWord;
-					mem_wdata_o = `ZeroWord;
-					mem_raddr_o = `ZeroWord;
-					mem_waddr_o = `ZeroWord;
-					mem_we = `WriteDisable;
-					reg_wdata = `ZeroWord;
+					inst_err_o = 1;     //指令出错
 				end
 			endcase
 		end
 		`INST_TYPE_S: begin
 			case (funct3)
 				`INST_SB: begin
-					jump_flag = `JumpDisable;
-					hold_flag = `HoldDisable;
-					jump_addr = `ZeroWord;
-					reg_wdata = `ZeroWord;
-					mem_we = `WriteEnable;
-					mem_req = `RIB_REQ;
-					mem_waddr_o = op1_add_op2_res;
-					mem_raddr_o = op1_add_op2_res;
-					case (mem_waddr_index)
+					mem_addr_o = reg_rdata1_i + imm12s;//访问内存地址，复用读
+					mem_we_o = 1;//写内存使能
+					mem_en_o = 1;//访问内存使能，复用读
+					case (mem_addr_o[1:0])
 						2'b00: begin
-							mem_wdata_o = {mem_rdata_i[31:8], reg2_rdata_i[7:0]};
+							mem_wdata_o = {24'h0, reg_rdata2_i[7:0]};
+							mem_wem_o = 4'b0001;   //写内存掩码
 						end
 						2'b01: begin
-							mem_wdata_o = {mem_rdata_i[31:16], reg2_rdata_i[7:0], mem_rdata_i[7:0]};
+							mem_wdata_o = {16'h0, reg_rdata2_i[7:0] , 8'h0};
+							mem_wem_o = 4'b0010;   //写内存掩码
 						end
 						2'b10: begin
-							mem_wdata_o = {mem_rdata_i[31:24], reg2_rdata_i[7:0], mem_rdata_i[15:0]};
+							mem_wdata_o = {8'h0, reg_rdata2_i[7:0] , 16'h0};
+							mem_wem_o = 4'b0100;   //写内存掩码
 						end
-						default: begin
-							mem_wdata_o = {reg2_rdata_i[7:0], mem_rdata_i[23:0]};
+						2'b11: begin
+							mem_wdata_o = {reg_rdata2_i[7:0] , 24'h0};
+							mem_wem_o = 4'b1000;   //写内存掩码
 						end
 					endcase
+					add2_in1 = pc_i;
+					add2_in2 = 4;
+					pc_n_o = add2_res;//PC+4
 				end
 				`INST_SH: begin
-					jump_flag = `JumpDisable;
-					hold_flag = `HoldDisable;
-					jump_addr = `ZeroWord;
-					reg_wdata = `ZeroWord;
-					mem_we = `WriteEnable;
-					mem_req = `RIB_REQ;
-					mem_waddr_o = op1_add_op2_res;
-					mem_raddr_o = op1_add_op2_res;
-					if (mem_waddr_index == 2'b00) begin
-						mem_wdata_o = {mem_rdata_i[31:16], reg2_rdata_i[15:0]};
+					mem_addr_o = reg_rdata1_i + imm12s;//访问内存地址，复用读
+					mem_we_o = 1;//写内存使能
+					mem_en_o = 1;//访问内存使能，复用读
+					if (mem_addr_o[1:0]==2'b00) begin
+							mem_wdata_o = {16'h0, reg_rdata2_i[15:0]};
+							mem_wem_o = 4'b0011;   //写内存掩码
 					end else begin
-						mem_wdata_o = {reg2_rdata_i[15:0], mem_rdata_i[15:0]};
+							mem_wdata_o = {reg_rdata2_i[31:16],16'h0};
+							mem_wem_o = 4'b1100;   //写内存掩码
 					end
+					add2_in1 = pc_i;
+					add2_in2 = 4;
+					pc_n_o = add2_res;//PC+4
 				end
 				`INST_SW: begin
-					jump_flag = `JumpDisable;
-					hold_flag = `HoldDisable;
-					jump_addr = `ZeroWord;
-					reg_wdata = `ZeroWord;
-					mem_we = `WriteEnable;
-					mem_req = `RIB_REQ;
-					mem_waddr_o = op1_add_op2_res;
-					mem_raddr_o = op1_add_op2_res;
-					mem_wdata_o = reg2_rdata_i;
+					mem_addr_o = reg_rdata1_i + imm12s;//访问内存地址，复用读
+					mem_we_o = 1;//写内存使能
+					mem_en_o = 1;//访问内存使能，复用读
+					mem_wdata_o = reg_rdata2_i;
+					mem_wem_o = 4'b1111;   //写内存掩码
+					add2_in1 = pc_i;
+					add2_in2 = 4;
+					pc_n_o = add2_res;//PC+4
 				end
 				default: begin
-					jump_flag = `JumpDisable;
-					hold_flag = `HoldDisable;
-					jump_addr = `ZeroWord;
-					mem_wdata_o = `ZeroWord;
-					mem_raddr_o = `ZeroWord;
-					mem_waddr_o = `ZeroWord;
-					mem_we = `WriteDisable;
-					reg_wdata = `ZeroWord;
+					inst_err_o = 1;     //指令出错
 				end
 			endcase
 		end
 		`INST_TYPE_B: begin
 			case (funct3)
 				`INST_BEQ: begin
-					hold_flag = `HoldDisable;
-					mem_wdata_o = `ZeroWord;
-					mem_raddr_o = `ZeroWord;
-					mem_waddr_o = `ZeroWord;
-					mem_we = `WriteDisable;
-					reg_wdata = `ZeroWord;
-					jump_flag = op1_eq_op2 & `JumpEnable;
-					jump_addr = {32{op1_eq_op2}} & op1_jump_add_op2_jump_res;
+					op_in1 = reg_rdata1_i;
+					op_in2 = reg_rdata2_i;
+					add2_in1 = pc_i;
+					add2_in2 = op_eres? imm12b : 4;//条件跳转
+					pc_n_o = add2_res;
 				end
 				`INST_BNE: begin
 					hold_flag = `HoldDisable;
