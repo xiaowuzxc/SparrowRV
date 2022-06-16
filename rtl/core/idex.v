@@ -59,7 +59,7 @@ wire [`RegBus] zimm = {27'h0 , inst_i[19:15]};//用于CSR的立即数扩展
 wire signed[`RegBus] imm12i= {{20{inst_i[31]}} , inst_i[31:20]};//有符号12位立即数扩展，I type，addi,lb,lh,jalr
 wire signed[`RegBus] imm12s= {{20{inst_i[31]}} , inst_i[31:25] , inst_i[11:7]};//有符号12位立即数扩展，S type，sb,sh
 wire signed[`RegBus] imm12b= {{20{inst_i[31]}} , inst_i[7], inst_i[30:25], inst_i[11:8], 1'b0};//有符号12位立即数扩展，B type，beq
-wire [`RegBus] imm20u= {inst_i[31:20] , 12'h0};//20位立即数左移12位，U type，lui,auipc
+wire [`RegBus] imm20u= {inst_i[31:12] , 12'h0};//20位立即数左移12位，U type，lui,auipc
 wire signed[`RegBus] imm20j= {{12{inst_i[31]}}, inst_i[19:12], inst_i[20], inst_i[30:21], 1'b0};;//有符号20位立即数扩展，J type，jal
 wire shamt = inst_i[24:20];//rs2位置的立即数
 
@@ -600,7 +600,7 @@ always @ (*) begin
 		`INST_LUI: begin//rd=imm<<12
 			reg_we_o = 1;
 			reg_waddr_o = rd;
-			reg_wdata_o = imm20u<<12;
+			reg_wdata_o = imm20u;
 			add2_in1 = pc_i;
 			add2_in2 = 4;
 			pc_n_o = add2_res;//PC+4

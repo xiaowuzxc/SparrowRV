@@ -46,7 +46,7 @@ wire [31:0] t5  = inst_core.inst_regs.regs[30];
 wire [31:0] t6  = inst_core.inst_regs.regs[31];
 // read mem data
 initial begin
-	$readmemh ("inst.data", inst_core.inst_iram.inst_dpram.BRAM);
+	$readmemh ("inst.txt", inst_core.inst_iram.inst_dpram.BRAM);
 end
 // clk
 initial begin

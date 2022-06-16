@@ -23,7 +23,7 @@ module dpram #(
 );
 localparam RAM_PERFORMANCE = "LOW_LATENCY";
 
-reg [RAM_WIDTH-1:0] BRAM [RAM_DEPTH-1:0];
+reg [RAM_WIDTH-1:0] BRAM [0:RAM_DEPTH-1];
 reg [RAM_WIDTH-1:0] ram_data_a = {RAM_WIDTH{1'b0}};
 reg [RAM_WIDTH-1:0] ram_data_b = {RAM_WIDTH{1'b0}};
 
