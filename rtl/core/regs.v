@@ -9,18 +9,18 @@ module regs(
 
 	// core 
 	//r
-	input wire[`RegAddrBus] raddr1_i,     // 读寄存器1地址
-	input wire[`RegAddrBus] raddr2_i,     // 读寄存器2地址
-	output reg[`RegBus] rdata1_o,         // 读寄存器1数据
-	output reg[`RegBus] rdata2_o,         // 读寄存器2数据
+	input wire [`RegAddrBus] raddr1_i,     // 读寄存器1地址
+	input wire [`RegAddrBus] raddr2_i,     // 读寄存器2地址
+	output reg [`RegBus] rdata1_o,         // 读寄存器1数据
+	output reg [`RegBus] rdata2_o,         // 读寄存器2数据
 	//w
 	input wire we_i,                      // 写寄存器使能
-	input wire[`RegAddrBus] waddr_i,      // 写寄存器地址
-	input wire[`RegBus] wdata_i,          // 写寄存器数据
+	input wire [`RegAddrBus] waddr_i,      // 写寄存器地址
+	input wire [`RegBus] wdata_i,          // 写寄存器数据
 
 	// bus 
-	input wire[`RegAddrBus] bus_raddr_i,  // 读寄存器地址
-	output reg[`RegBus] bus_data_o       // 读寄存器数据
+	input wire [`RegAddrBus] bus_raddr_i,  // 读寄存器地址
+	output reg [`RegBus] bus_data_o       // 读寄存器数据
 
 	);
 

@@ -15,7 +15,6 @@ module sctr (
 	input wire mem_en_i,                    //访问内存使能，复用读
 	output reg [`MemBus] mem_rdata_o,       //读内存数据
 
-	input wire [`InstAddrBus] pc_n_i,        //下一条指令地址
 	//信号输出
 	output reg reg_we_o,                    //是否要写通用寄存器
 	output reg csr_we_o,                    //写CSR寄存器请求
@@ -25,6 +24,7 @@ module sctr (
 	//阻塞指示
 	input wire div_start_i,//除法启动
 	input wire div_ready_i,//除法结束
+	input wire iram_rstn_i,//iram模块阻塞
 
 	//总线接口
 	//M -> S
@@ -60,7 +60,7 @@ always @(posedge clk or negedge rst_n) begin//状态切换
 end
 
 always @(*) begin//状态转移条件
-	if (sta_p) begin
+	if (sta_p == 1'b0) begin
 		if( div_start_i | ((~mem_we_i) & sctr_cmd_valid & sctr_cmd_ready))//开始除法，或读总线
 			sta_n = 1'b1;
 		else
@@ -75,11 +75,11 @@ always @(*) begin//状态转移条件
 end
 
 always @(*) begin//阻塞条件hx_valid控制
-	if (sta_p) begin//初始状态
-		if( (~div_start_i) & (mem_we_i & sctr_cmd_valid & sctr_cmd_ready))//没有除法，且写总线成功
-			hx_valid = 1'b1;
-		else
+	if (sta_p == 1'b0) begin//初始状态
+		if( div_start_i | iram_rstn_i | (mem_en_i & (~mem_we_i)) | (mem_en_i & mem_we_i & (~sctr_cmd_ready)))//开始除法，或iram复位未结束，或总线cmd等待
 			hx_valid = 1'b0;
+		else
+			hx_valid = 1'b1;
 	end
 	else begin//结束状态
 		if( div_ready_i | (sctr_rsp_valid & sctr_rsp_ready))//除法结束，或读返回成功

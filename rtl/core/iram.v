@@ -7,6 +7,8 @@ module iram (
 	output reg [`InstAddrBus] pc_o,//指令地址
 	output wire[`InstBus] inst_o,//指令
 
+	output wire iram_rstn_o,//iram模块阻塞
+
 	input  wire [`MemBus]		iram_cmd_wdata,//写数据
 	input  wire [`MemAddrBus] 	iram_cmd_addr ,//地址
 	input  wire 				iram_cmd_we   ,//写使能
@@ -33,7 +35,7 @@ always @(posedge clk) begin
 		pc_o <= 32'h0;
 end
 wire [clogb2(`IRamSize-1)-1:0]addra = rstn_rr ? pc_n_i[31:2] : 0;
-
+assign iram_rstn_o = ~rstn_rr;
 
 //总线交互
 reg [clogb2(`IRamSize-1)-1:0]addrb;
@@ -67,13 +69,13 @@ dpram #(
 	.clka   (clk),
 	.addra  (addra),
 	.addrb  (addrb),
-	.dina   (dina),
+	.dina   (),
 	.dinb   (iram_cmd_wdata),
 	.wea    (1'b0),
 	.web    (web),
 	.wema   (),
 	.wemb   (iram_cmd_wem),
-	.ena    (iram_rd_o),
+	.ena    (iram_rd_o | ~rstn_rr),
 	.enb    (enb),
 	.rsta   (),
 	.rstb   (),

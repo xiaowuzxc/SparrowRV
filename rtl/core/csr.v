@@ -66,7 +66,7 @@ wire[`RegBus] mhartid=32'h0;//线程编号
 assign tcmp_tarp = (mtime >= mtimecmp) ? 1'b1 : 1'b0;//生成定时器中断标志
 assign soft_trap = (msip != 32'h0) ? 1'b1 : 1'b0;//生成软件中断标志
 
-assign ex_trap_o   = (mie_MEIE11) ? ex_trap : 1'b0 ;//经过屏蔽处理
+assign ex_trap_o   = (mie_MEIE11) ? ex_trap_i : 1'b0 ;//经过屏蔽处理
 assign tcmp_tarp_o = (mie_MTIE7) ? tcmp_tarp : 1'b0 ;//经过屏蔽处理
 assign soft_trap_o = (mie_MSIE3) ? soft_trap : 1'b0 ;//经过屏蔽处理
 // mcycle
