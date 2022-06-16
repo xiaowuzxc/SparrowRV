@@ -2,7 +2,7 @@
 
 
 //译码执行，组合逻辑
-module ex(
+module idex(
 	//读操作通道
 		//inst
 	input wire[`InstBus] inst_i,            //指令内容
@@ -10,9 +10,9 @@ module ex(
 		//reg
 	input wire[`RegBus] reg_rdata1_i,       //读rs1数据
 	input wire[`RegBus] reg_rdata2_i,       //读rs2数据
-		//csr
+		//csr空间
 	input wire[`RegBus] csr_rdata_i,        //读CSR寄存器数据
-		//mem
+		//32位地址空间
 	input wire[`MemBus] mem_rdata_i,        //读内存数据
 		//div
 	output reg[`RegBus] dividend_o,         //被除数
@@ -28,11 +28,11 @@ module ex(
 	output reg[`RegBus] reg_wdata_o,        //写寄存器数据
 	output reg reg_we_o,                    //是否要写通用寄存器
 	output reg[`RegAddrBus] reg_waddr_o,    //写通用寄存器地址
-		//csr
+		//csr空间
 	output reg[`RegBus] csr_wdata_o,        //写CSR寄存器数据
 	output reg csr_we_o,                    //写CSR寄存器请求
 	output reg[`CsrAddrBus] csr_addr_o,     //访问CSR寄存器地址
-		//mem
+		//32位地址空间
 	output reg[`MemBus] mem_wdata_o,        //写内存数据
 	output reg[`MemAddrBus] mem_addr_o,     //访问内存地址，复用读
 	output reg mem_we_o,                    //写内存使能
@@ -84,56 +84,6 @@ reg [`RegBus] op_in2;//比较器输入2
 wire op_sres = $signed(op_in1) >= $signed(op_in2);//有符号数比较，in1 >= in2
 wire op_ures = op_in1 >= op_in2;// 无符号数比较，in1 >= in2
 wire op_eres = (op_in1 == op_in2);//相等
-//-------------------------------------------
-
-
-
-/*
-assign sr_shift = reg1_rdata_i >> reg2_rdata_i[4:0];
-assign sri_shift = reg1_rdata_i >> inst_i[24:20];
-assign sr_shift_mask = 32'hffffffff >> reg2_rdata_i[4:0];
-assign sri_shift_mask = 32'hffffffff >> inst_i[24:20];
-
-assign op1_add_op2_res = op1_i + op2_i;
-assign op1_jump_add_op2_jump_res = op1_jump_i + op2_jump_i;
-
-assign reg1_data_invert = ~reg1_rdata_i + 1;
-assign reg2_data_invert = ~reg2_rdata_i + 1;
-
-// 有符号数比较
-assign op1_ge_op2_signed = $signed(op1_i) >= $signed(op2_i);
-// 无符号数比较
-assign op1_ge_op2_unsigned = op1_i >= op2_i;
-assign op1_eq_op2 = (op1_i == op2_i);
-
-assign mul_temp = mul_op1 * mul_op2;
-assign mul_temp_invert = ~mul_temp + 1;
-
-assign mem_raddr_index = (reg1_rdata_i + {{20{inst_i[31]}}, inst_i[31:20]}) & 2'b11;
-assign mem_waddr_index = (reg1_rdata_i + {{20{inst_i[31]}}, inst_i[31:25], inst_i[11:7]}) & 2'b11;
-
-assign div_start_o = (int_assert_i == `INT_ASSERT)? `DivStop: div_start;
-
-assign reg_wdata_o = reg_wdata | div_wdata;
-// 响应中断时不写通用寄存器
-assign reg_we_o = (int_assert_i == `INT_ASSERT)? `WriteDisable: (reg_we || div_we);
-assign reg_waddr_o = reg_waddr | div_waddr;
-
-// 响应中断时不写内存
-assign mem_we_o = (int_assert_i == `INT_ASSERT)? `WriteDisable: mem_we;
-
-// 响应中断时不向总线请求访问内存
-assign mem_req_o = (int_assert_i == `INT_ASSERT)? `RIB_NREQ: mem_req;
-
-assign hold_flag_o = hold_flag || div_hold_flag;
-assign jump_flag_o = jump_flag || div_jump_flag || ((int_assert_i == `INT_ASSERT)? `JumpEnable: `JumpDisable);
-assign jump_addr_o = (int_assert_i == `INT_ASSERT)? int_addr_i: (jump_addr | div_jump_addr);
-
-// 响应中断时不写CSR寄存器
-assign csr_we_o = (int_assert_i == `INT_ASSERT)? `WriteDisable: csr_we_i;
-assign csr_waddr_o = csr_waddr_i;
-*/
-//-------------------------------------------
 
 
 // 执行

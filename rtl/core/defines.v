@@ -13,8 +13,9 @@
  See the License for the specific language governing permissions and     
  limitations under the License.                                          
  */
+`define RstPC 32'h0
 
-`define CpuResetAddr 32'h0
+`define IRamSize 16384 //65536kB
 
 `define RstEnable 1'b0
 `define RstDisable 1'b1
@@ -143,19 +144,35 @@
 `define INST_MRET   17'b0011000_00010_00000
 `define INST_WFI    17'b0001000_00101_00000
 
-// CSR reg addr
-`define CSR_CYCLE   12'hc00
-`define CSR_CYCLEH  12'hc80
-`define CSR_MTVEC   12'h305
-`define CSR_MCAUSE  12'h342
-`define CSR_MEPC    12'h341
-`define CSR_MIE     12'h304
-`define CSR_MSTATUS 12'h300
-`define CSR_MSCRATCH 12'h340
+// CSR addr
+`define CSR_MSTATUS    12'h300
+`define CSR_MISA       12'h301
+`define CSR_MIE        12'h304
+`define CSR_MTVEC      12'h305
+`define CSR_MSCRATCH   12'h340
+`define CSR_MEPC       12'h341
+`define CSR_MCAUSE     12'h342
+`define CSR_MTVAL      12'h343
+`define CSR_MIP        12'h344
+`define CSR_MSIP       12'h345
 
-`define RomNum 4096  // rom depth(how many words)
+`define CSR_MCYCLE     12'hB00
+`define CSR_MCYCLEH    12'hB80
+`define CSR_MINSTRET   12'hB02
+`define CSR_MINSTRETH  12'hB82
+`define CSR_MTIME      12'hB03
+`define CSR_MTIMEH     12'hB83
+`define CSR_MTIMECMP   12'hB04
+`define CSR_MTIMECMPH  12'hB84
+`define CSR_MCCTR      12'hB88//计数器控制
 
-`define MemNum 4096  // memory depth(how many words)
+`define CSR_MVENDORID  12'hF11
+`define CSR_MARCHID    12'hF12
+`define CSR_MIMPID     12'hF13
+`define CSR_MHARTID    12'hF14
+
+
+
 `define MemBus 31:0
 `define MemAddrBus 31:0
 `define CsrAddrBus 11:0
@@ -166,7 +183,5 @@
 // common regs
 `define RegAddrBus 4:0
 `define RegBus 31:0
-`define DoubleRegBus 63:0
 `define RegWidth 32
-`define RegNum 32        // reg num
-`define RegNumLog2 5
+

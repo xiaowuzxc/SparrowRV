@@ -1,18 +1,3 @@
- /*                                                                      
- Copyright 2019 Blue Liang, liangkangnan@163.com
-																		 
- Licensed under the Apache License, Version 2.0 (the "License");         
- you may not use this file except in compliance with the License.        
- You may obtain a copy of the License at                                 
-																		 
-	 http://www.apache.org/licenses/LICENSE-2.0                          
-																		 
- Unless required by applicable law or agreed to in writing, software    
- distributed under the License is distributed on an "AS IS" BASIS,       
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and     
- limitations under the License.                                          
- */
 
 `include "defines.v"
 
@@ -29,7 +14,7 @@ module regs(
 	output reg[`RegBus] rdata1_o,         // 读寄存器1数据
 	output reg[`RegBus] rdata2_o,         // 读寄存器2数据
 	//w
-	input wire we_i,                      // 写寄存器标志
+	input wire we_i,                      // 写寄存器使能
 	input wire[`RegAddrBus] waddr_i,      // 写寄存器地址
 	input wire[`RegBus] wdata_i,          // 写寄存器数据
 
@@ -39,7 +24,7 @@ module regs(
 
 	);
 
-	reg[`RegBus] regs[0:`RegNum - 1];
+	reg[`RegBus] regs[31:0];
 
 	// 写寄存器
 	always @ (posedge clk or negedge rst_n) begin
@@ -87,7 +72,6 @@ module regs(
 	always @ (*) begin
 		if (raddr1_i == 0) begin
 			rdata1_o = 0;
-		// 如果读地址等于写地址，并且正在写操作，则直接返回写数据
 		end else begin
 			rdata1_o = regs[raddr1_i];
 		end
@@ -97,7 +81,6 @@ module regs(
 	always @ (*) begin
 		if (raddr2_i == 0) begin
 			rdata2_o = 0;
-		// 如果读地址等于写地址，并且正在写操作，则直接返回写数据
 		end else begin
 			rdata2_o = regs[raddr2_i];
 		end
