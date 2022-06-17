@@ -1,3 +1,4 @@
 # drawio
 *.drawio.bkp
-
+/tb/tb
+/tb/*.lxt

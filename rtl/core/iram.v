@@ -3,7 +3,7 @@ module iram (
 	input wire clk,
 	input wire rst_n,
 	input wire [`InstAddrBus] pc_n_i,//读地址
-	input wire iram_rd_o,//读使能
+	input wire iram_rd_i,//读使能
 	output reg [`InstAddrBus] pc_o,//指令地址
 	output wire[`InstBus] inst_o,//指令
 
@@ -30,7 +30,10 @@ always @(posedge clk) begin
 	rstn_r <= rst_n;
 	rstn_rr <= rstn_r;
 	if(rstn_rr)
-		pc_o <= pc_n_i;
+		if(iram_rd_i)
+			pc_o <= pc_n_i;
+		else
+			pc_o <= pc_o ;
 	else
 		pc_o <= 32'h0;
 end
@@ -75,7 +78,7 @@ dpram #(
 	.web    (web),
 	.wema   (),
 	.wemb   (iram_cmd_wem),
-	.ena    (iram_rd_o | ~rstn_rr),
+	.ena    (iram_rd_i | ~rstn_rr),
 	.enb    (enb),
 	.rsta   (),
 	.rstb   (),

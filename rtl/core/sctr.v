@@ -104,7 +104,7 @@ always @(*) begin//reg,csr,iram写控制
 end
 
 always @(*) begin//总线控制
-	if(hx_valid) begin
+	if(sta_p == 1'b0) begin
 		mem_rdata_o    = 0;
 		sctr_cmd_wdata = mem_wdata_i;
 		sctr_cmd_addr  = mem_addr_i;

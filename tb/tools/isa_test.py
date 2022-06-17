@@ -90,7 +90,7 @@ def main():
 			break
 
 	if (错误标志 == False):
-		print('RV32IM all pass')
+		print('--  RV32IM 指令全部通过！  --')
 
 if __name__ == '__main__':
 	sys.exit(main())

@@ -89,7 +89,7 @@ iram inst_iram
 	.clk            (clk),
 	.rst_n          (rst_n),
 	.pc_n_i         (pc_n),
-	.iram_rd_o      (iram_rd),
+	.iram_rd_i      (iram_rd),
 	.pc_o           (pc),
 	.inst_o         (inst),
 	.iram_rstn_o    (iram_rstn),

@@ -61,7 +61,7 @@ wire signed[`RegBus] imm12s= {{20{inst_i[31]}} , inst_i[31:25] , inst_i[11:7]};/
 wire signed[`RegBus] imm12b= {{20{inst_i[31]}} , inst_i[7], inst_i[30:25], inst_i[11:8], 1'b0};//有符号12位立即数扩展，B type，beq
 wire [`RegBus] imm20u= {inst_i[31:12] , 12'h0};//20位立即数左移12位，U type，lui,auipc
 wire signed[`RegBus] imm20j= {{12{inst_i[31]}}, inst_i[19:12], inst_i[20], inst_i[30:21], 1'b0};;//有符号20位立即数扩展，J type，jal
-wire shamt = inst_i[24:20];//rs2位置的立即数
+wire [4:0]shamt = inst_i[24:20];//rs2位置的立即数
 
 //复用运算单元
 //加法器
@@ -76,8 +76,8 @@ reg signed[32:0] mul_in1;//乘法器有符号33位输入1
 reg signed[32:0] mul_in2;//乘法器有符号33位输入2
 wire signed[65:0]mul_res;//乘法器有符号66位结果
 assign mul_res=mul_in1*mul_in2;
-wire mul_resl=mul_res[31: 0];//乘法器低32位结果
-wire mul_resh=mul_res[63:32];//乘法器高32位结果
+wire [`RegBus]mul_resl=mul_res[31: 0];//乘法器低32位结果
+wire [`RegBus]mul_resh=mul_res[63:32];//乘法器高32位结果
 //比较器，(in1 >= in2) ? 1 : 0
 reg [`RegBus] op_in1;//比较器输入1
 reg [`RegBus] op_in2;//比较器输入2
@@ -506,7 +506,7 @@ always @ (*) begin
 							mem_wdata_o = {16'h0, reg_rdata2_i[15:0]};
 							mem_wem_o = 4'b0011;   //写内存掩码
 					end else begin
-							mem_wdata_o = {reg_rdata2_i[31:16],16'h0};
+							mem_wdata_o = {reg_rdata2_i[15:0],16'h0};
 							mem_wem_o = 4'b1100;   //写内存掩码
 					end
 					add2_in1 = pc_i;
@@ -609,7 +609,7 @@ always @ (*) begin
 			reg_we_o = 1;
 			reg_waddr_o = rd;
 			add1_in1 = pc_i;
-			add1_in2 = imm20u<<12;
+			add1_in2 = imm20u;
 			reg_wdata_o = add1_res;
 			add2_in1 = pc_i;
 			add2_in2 = 4;
