@@ -16,13 +16,13 @@
 ```
 SoC RTL
  ├─内核
- │   ├─译码执行 (Debug)
+ │   ├─译码执行 (Debug 90%)
  │   ├─iram (OK)
- │   ├─CSR  (Debuf)
+ │   ├─CSR  (Debug 0%)
  │   ├─寄存器组 (OK)
- │   ├─总线接口 (Debug)
+ │   ├─总线接口 (Debug 60%)
  │   ├─中断控制 (未进行)
- │   └─多周期指令控制 (Debug)
+ │   └─多周期指令控制 (Debug 80%)
  ├─外设 (未进行)
  └─调试 (未进行)
 
@@ -39,7 +39,7 @@ SoC RTL
 - 所有文本采用UTF-8编码，具备良好的多语言和跨平台支持。  
 
 ### 仿真
-目前仅支持内核仿真，且只配置了Windows下的批处理脚本，makefile脚本暂缓开发。需要安装iverilog、python，环境配置可参考[大黄鸭处理器](https://gitee.com/xiaowuzxc/Yduck-processor/)  
+目前仅支持内核仿真，且只配置了Windows下的批处理脚本，makefile脚本待开发。需要安装iverilog、python，环境配置可参考[大黄鸭处理器](https://gitee.com/xiaowuzxc/Yduck-processor/)  
 双击`tb/run.bat`即可启动脚本，输入单个数字或符号即可执行对应项目。目前仅支持命令`1`和`c`  
 执行ISA测试，可以对内核进行仿真，依次测试机器模式下RV32IM的指令，并收集测试结果。
 
