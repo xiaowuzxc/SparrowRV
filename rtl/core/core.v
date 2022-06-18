@@ -22,7 +22,8 @@ wire [`RegBus] reg_rdata1;//rs1数据
 wire [`RegBus] reg_rdata2;//rs2数据
 wire [`RegAddrBus] reg_waddr;//rd写地址
 wire [`RegBus] reg_wdata;//rd写数据
-wire [`InstAddrBus] pc_n;//下一条指令的PC
+wire [`InstAddrBus] idex_pc_n;//idex下一条指令PC
+wire [`InstAddrBus] trap_pc_n;//中断仲裁后的下一条指令PC
 wire [`InstAddrBus] pc;//当前指令的PC
 wire [`InstBus] inst;//当前指令
 wire [`MemBus] iram_cmd_wdata;
@@ -60,6 +61,9 @@ sctr inst_sctr
 	.div_ready_i    (div_ready),
 	.iram_rstn_i    (iram_rstn),
 	.trap_in_i      (trap_in),
+	.trap_jump_i    (trap_jump),
+	.idex_mret_i    (idex_mret),
+	.trap_stat_o    (),//中断状态指示
 	.sctr_cmd_wdata (sctr_cmd_wdata),
 	.sctr_cmd_addr  (sctr_cmd_addr ),
 	.sctr_cmd_we    (sctr_cmd_we   ),
@@ -92,7 +96,7 @@ iram inst_iram
 (
 	.clk            (clk),
 	.rst_n          (rst_n),
-	.pc_n_i         (pc_n),
+	.pc_n_i         (trap_pc_n),
 	.iram_rd_i      (iram_rd),
 	.pc_o           (pc),
 	.inst_o         (inst),
@@ -136,11 +140,12 @@ idex inst_idex
 	.mem_we_o     (mem_we),
 	.mem_wem_o    (mem_wem),
 	.mem_en_o     (mem_en),
-	.pc_n_o       (pc_n),
+	.pc_n_o       (idex_pc_n),
 	.ecall_o      (ecall_trap),
 	.ebreak_o     (ebreak_trap),
 	.wfi_o        (wfi_trap),
 	.inst_err_o   (inst_err_trap),
+	.idex_mret_o  (idex_mret),
 	.mepc         (mepc)
 );
 
@@ -177,6 +182,7 @@ csr inst_csr
 	.ex_trap_o        (pex_trap),
 	.tcmp_tarp_o      (ptcmp_tarp),
 	.soft_trap_o      (psoft_tarp),
+	.mstatus_MIE3     (mstatus_MIE3),
 	.hx_valid         (hx_valid)
 );
 
@@ -195,6 +201,10 @@ trap inst_trap
 	.pex_trap_i   (pex_trap),
 	.ptcmp_tarp_i (ptcmp_tarp),
 	.psoft_tarp_i (psoft_tarp),
+	.mstatus_MIE3 (mstatus_MIE3),
+	.pc_n_i       (idex_pc_n),
+	.pc_n_o       (trap_pc_n),
+	.trap_jump_o  (trap_jump),
 	.trap_in_o    (trap_in)
 );
 

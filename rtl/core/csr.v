@@ -28,7 +28,8 @@ module csr(
 	output wire ex_trap_o,//外部中断信号
 	output wire tcmp_tarp_o,//定时器中断信号
 	output wire soft_trap_o,//软件中断信号
-	
+	//全局中断使能标志
+	output mstatus_MIE3,//全局中断使能，1表示可以中断
 
 	input wire hx_valid//回写使能信号
 
@@ -39,7 +40,7 @@ wire soft_trap;//软件中断标志
 
 reg mstatus_MIE3, mstatus_MPIE7;
 wire[`RegBus] misa=32'b01_0000_0000000000000_1_000_1_00000000;//RV32IM
-reg mie_MEIE11, mie_MTIE7, mie_MSIE3;//中断屏蔽
+reg mie_MEIE11, mie_MTIE7, mie_MSIE3;//中断屏蔽，1使能，0屏蔽
 reg [`RegBus] mtvec;//[32:2]中断入口,[1:0]=0
 reg [`RegBus] mscratch;//寄存器
 reg [`RegBus] mepc;//中断返回

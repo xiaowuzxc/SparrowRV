@@ -1,7 +1,6 @@
 import os
 import sys
-import subprocess
-import time
+from tkinter import filedialog
 def 找到所有bin文件(path):
 	找到的文件列表 = []
 	list_dir = os.walk(path)
@@ -15,8 +14,7 @@ def 找到所有bin文件(path):
 
 def bin文件转换(输入文件, 输出文件):
 	bin文件 = open(输入文件, 'rb')
-	文本文件 = open(输出文件, 'w')#自动覆盖
-	#一行4字节
+	文本文件 = open(输出文件, 'w')
 	字节索引 = 0
 	b0 = 0
 	b1 = 0
@@ -63,15 +61,16 @@ def 编译并仿真():
 def ISA测试(测试程序):
 	bin文件转换(测试程序, 'inst.txt')
 	return 编译并仿真()
-	
-# 主函数
+
+def bin文件转文本():
+	待转换的文件路径=filedialog.askopenfilename()
+	if 待转换的文件路径:
+		print(待转换的文件路径)
+		bin文件转换(待转换的文件路径, 'inst.txt')
+
 def main():
 	bin文件列表 = 找到所有bin文件(r'tools/isa/generated')
-	#print(bin文件列表)
 	错误标志 = False
-
-	# 对每一个bin文件进行测试
-
 	for file in bin文件列表:
 		输出字符串 = ISA测试(file)
 		if (输出字符串.find('TEST_PASS') != -1):
@@ -93,4 +92,10 @@ def main():
 		print('--  RV32IM 指令全部通过！  --')
 
 if __name__ == '__main__':
-	sys.exit(main())
+	if sys.argv[1] == 'all_isa':
+		sys.exit(main())
+	elif sys.argv[1] == 'tsr_bin':
+		sys.exit(bin文件转文本())
+	else:
+		print(r'isa_test.py找不到指令')
+		sys.exit()

@@ -45,6 +45,7 @@ module idex(
 	output reg ebreak_o,                    //指令中断使能
 	output reg wfi_o,                       //中断等待使能
 	output reg inst_err_o,                  //指令出错
+	output reg idex_mret_o,                 //mret中断返回标志
 	//直连输入通道
 	input wire[`RegBus] mepc                //mepc寄存器
 
@@ -109,6 +110,7 @@ always @ (*) begin
 	ebreak_o = 0;       //指令中断使能
 	wfi_o = 0;          //中断等待使能
 	inst_err_o = 0;     //指令出错
+	idex_mret_o = 0;
 	//复用运算单元
 	add1_in1 = 0;       //加法器1输入1
 	add1_in2 = 0;       //加法器1输入2
@@ -708,6 +710,7 @@ always @ (*) begin
 							csr_we_o = 1;       //写CSR寄存器请求
 							csr_addr_o = 12'h300;    //访问CSR mstatus
 							pc_n_o = mepc;
+							idex_mret_o = 1;
 						end
 						`INST_WFI: begin//等待中断
 							wfi_o = 1;

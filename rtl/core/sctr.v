@@ -18,14 +18,18 @@ module sctr (
 	//信号输出
 	output reg reg_we_o,                    //是否要写通用寄存器
 	output reg csr_we_o,                    //写CSR寄存器请求
-	output reg iram_rd_o,//iram指令存储器读使能
-
+	output reg iram_rd_o,      //iram指令存储器读使能
 
 	//阻塞指示
 	input wire div_start_i,//除法启动
 	input wire div_ready_i,//除法结束
 	input wire iram_rstn_i,//iram模块阻塞
 	input wire trap_in_i,//进中断指示
+
+	//中断相关
+	input wire trap_jump_i,//中断跳转指示，进中断最后一步
+	input wire idex_mret_i,//中断返回
+	output reg trap_stat_o,//中断状态指示
 
 	//总线接口
 	//M -> S
@@ -100,7 +104,10 @@ always @(*) begin//reg,csr,iram写控制
 	else begin
 		reg_we_o = 1'b0;
 		csr_we_o = 1'b0;
-		iram_rd_o = 1'b0;
+		if(trap_jump_i)
+			iram_rd_o = 1'b1;//发生中断，可以寻址
+		else
+			iram_rd_o = 1'b0;//未中断，不许寻址
 	end
 end
 
@@ -124,4 +131,23 @@ always @(*) begin//总线控制
 		sctr_rsp_ready = 1'b1;
 	end
 end
+/*
+	input wire trap_jump_i,//中断跳转指示，进中断最后一步
+	input wire idex_mret_i,//中断返回
+	output reg trap_stat_o,//中断状态指示
+*/
+always @(posedge clk or negedge rst_n) begin
+	if(~rst_n) begin
+		trap_stat_o <= 0;
+	end 
+	else begin
+		if(~trap_stat_o)//未处于中断
+			if(trap_jump_i)//若跳转到中断入口
+				trap_stat_o <= 1;//切换到中断状态
+		else//处于中断
+			if(idex_mret_i & hx_valid)//遇到mret指令且写回使能
+				trap_stat_o <= 0;//退出中断状态
+	end
+end
+
 endmodule
