@@ -21,7 +21,7 @@ SoC RTL
  │   ├─CSR  (Debug 0%)
  │   ├─寄存器组 (OK)
  │   ├─总线接口 (Debug 60%)
- │   ├─中断控制 (未进行)
+ │   ├─中断控制 (10%)
  │   └─多周期指令控制 (Debug 80%)
  ├─外设 (未进行)
  └─调试 (未进行)
@@ -29,17 +29,20 @@ SoC RTL
 软件部分
  ├─指令仿真 (OK)
  └─BSP (未进行)
+
+当前任务
+- 设计中断控制器
 ```
 
 ### 开发工具
 - 处理器RTL设计采用Verilog-2001。此版本代码密度更高，可读性更强，并且受到综合器的广泛支持。  
 - 处理器RTL验证采用System Verilog-2005。此版本可以满足仿真需求，语法受到仿真器的广泛支持。   
 - 数字逻辑仿真采用iverilog。开源免费的跨平台HDL仿真器。  
-- 辅助脚本采用 Batchfile批处理(Win)/Makefile(Linux) + Python。发挥各种脚本语言的优势，最大程度地简化操作。  
+- 辅助脚本采用 Batchfile批处理(Win)/Makefile(Linux) + Python3。发挥各种脚本语言的优势，最大程度地简化操作。  
 - 所有文本采用UTF-8编码，具备良好的多语言和跨平台支持。  
 
 ### 仿真
-目前仅支持内核仿真，且只配置了Windows下的批处理脚本，makefile脚本待开发。需要安装iverilog、python，环境配置可参考[大黄鸭处理器](https://gitee.com/xiaowuzxc/Yduck-processor/)  
+目前仅支持内核仿真，且只配置了Windows下的批处理脚本，makefile脚本待开发。需要安装iverilog、python3，环境配置可参考[大黄鸭处理器](https://gitee.com/xiaowuzxc/Yduck-processor/)  
 双击`tb/run.bat`即可启动脚本，输入单个数字或符号即可执行对应项目。目前仅支持命令`1`和`c`  
 执行ISA测试，可以对内核进行仿真，依次测试机器模式下RV32IM的指令，并收集测试结果。
 
@@ -52,6 +55,6 @@ SoC RTL
 
 ### 致谢
 本项目参考了tinyriscv的RTL设计和Python脚本：https://gitee.com/liangkangnan/tinyriscv  
-感谢开源软件为我提供了很多好用的工具  
-感谢导师对我选择的道路的支持和理解  
+感谢众多开源软件为我提供了很多好用的工具  
+感谢导师对我的支持和理解  
 大家的支持是我前进的动力  

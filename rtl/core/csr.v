@@ -242,7 +242,7 @@ end
 always @ (*) begin
 	case (idex_csr_addr_i)
 		`CSR_MSTATUS: begin
-			idex_csr_rdata_o = {24'h0, mstatus_MPIE7, 3'h0, mstatus_MIE3, 3'h0};
+			idex_csr_rdata_o = {19'h0, 2'b11 , 3'h0 , mstatus_MPIE7, 3'h0, mstatus_MIE3, 3'h0};
 		end
 		`CSR_MISA: begin
 			idex_csr_rdata_o = misa;

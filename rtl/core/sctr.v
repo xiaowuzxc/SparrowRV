@@ -8,10 +8,10 @@ module sctr (
 	input wire  reg_we_i,                    //是否要写通用寄存器
 	input wire  csr_we_i,                    //写CSR寄存器请求
 
-	input wire [`MemBus] mem_wdata_i,        //写内存数据
-	input wire [`MemAddrBus] mem_addr_i,     //访问内存地址，复用读
+	input wire [`MemBus] mem_wdata_i,       //写内存数据
+	input wire [`MemAddrBus] mem_addr_i,    //访问内存地址，复用读
 	input wire mem_we_i,                    //写内存使能
-	input wire [3:0] mem_wem_i,              //写内存掩码
+	input wire [3:0] mem_wem_i,             //写内存掩码
 	input wire mem_en_i,                    //访问内存使能，复用读
 	output reg [`MemBus] mem_rdata_o,       //读内存数据
 
@@ -25,6 +25,7 @@ module sctr (
 	input wire div_start_i,//除法启动
 	input wire div_ready_i,//除法结束
 	input wire iram_rstn_i,//iram模块阻塞
+	input wire trap_in_i,//进中断指示
 
 	//总线接口
 	//M -> S
@@ -61,13 +62,13 @@ end
 
 always @(*) begin//状态转移条件
 	if (sta_p == 1'b0) begin
-		if( div_start_i | ((~mem_we_i) & sctr_cmd_valid & sctr_cmd_ready))//开始除法，或读总线
+		if( ~trap_in_i & (div_start_i | ((~mem_we_i) & sctr_cmd_valid & sctr_cmd_ready)))//没有中断且(开始除法，或读总线)
 			sta_n = 1'b1;
 		else
 			sta_n = 1'b0;
 	end 
 	else begin
-		if( div_ready_i | (sctr_rsp_valid & sctr_rsp_ready))//除法结束，或读返回成功
+		if( div_ready_i | trap_in_i | (sctr_rsp_valid & sctr_rsp_ready))//除法结束，或中断，或读返回成功
 			sta_n = 1'b0;
 		else
 			sta_n = 1'b1;
@@ -76,13 +77,13 @@ end
 
 always @(*) begin//阻塞条件hx_valid控制
 	if (sta_p == 1'b0) begin//初始状态
-		if( div_start_i | iram_rstn_i | (mem_en_i & (~mem_we_i)) | (mem_en_i & mem_we_i & (~sctr_cmd_ready)))//开始除法，或iram复位未结束，或总线cmd等待
+		if( div_start_i | iram_rstn_i | trap_in_i | (mem_en_i & (~mem_we_i)) | (mem_en_i & mem_we_i & (~sctr_cmd_ready)))//开始除法，或iram复位未结束，或中断，或总线cmd等待
 			hx_valid = 1'b0;
 		else
 			hx_valid = 1'b1;
 	end
 	else begin//结束状态
-		if( div_ready_i | (sctr_rsp_valid & sctr_rsp_ready))//除法结束，或读返回成功
+		if( ~trap_in_i & (div_ready_i | (sctr_rsp_valid & sctr_rsp_ready)))//没有中断且(除法结束，或读返回成功)
 			hx_valid = 1'b1;
 		else
 			hx_valid = 1'b0;
@@ -110,8 +111,8 @@ always @(*) begin//总线控制
 		sctr_cmd_addr  = mem_addr_i;
 		sctr_cmd_we    = mem_we_i;
 		sctr_cmd_wem   = mem_wem_i;
-		sctr_cmd_valid = mem_en_i;
-		sctr_rsp_ready = 1'b0;
+		sctr_cmd_valid = mem_en_i & ~trap_in_i;//进中断过程中不允许访存
+		sctr_rsp_ready = 1'b1;
 	end
 	else begin
 		mem_rdata_o    = sctr_rsp_rdata;

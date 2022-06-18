@@ -2,3 +2,4 @@
 *.drawio.bkp
 /tb/tb
 /tb/*.lxt
+/py_gen
