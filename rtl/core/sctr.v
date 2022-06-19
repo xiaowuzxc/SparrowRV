@@ -144,9 +144,11 @@ always @(posedge clk or negedge rst_n) begin
 		if(~trap_stat_o)//未处于中断
 			if(trap_jump_i)//若跳转到中断入口
 				trap_stat_o <= 1;//切换到中断状态
+			else begin end
 		else//处于中断
 			if(idex_mret_i & hx_valid)//遇到mret指令且写回使能
 				trap_stat_o <= 0;//退出中断状态
+			else begin end
 	end
 end
 

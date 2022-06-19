@@ -60,7 +60,7 @@ initial begin
 	adcrst();//复位系统
 	#30;
 	ex_trap_i=1;
-	#2;
+	#7;
 	ex_trap_i=0;
 
 	wait(x26 == 32'b1)   // wait sim end, when x26 == 1

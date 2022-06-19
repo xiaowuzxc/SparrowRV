@@ -708,7 +708,7 @@ always @ (*) begin
 						`INST_MRET: begin//中断返回
 							csr_wdata_o = {csr_rdata_i[31:8],1'b0,csr_rdata_i[6:4],csr_rdata_i[7],csr_rdata_i[2:0]};//MIE=MPIE,MPIE=0
 							csr_we_o = 1;       //写CSR寄存器请求
-							csr_addr_o = 12'h300;    //访问CSR mstatus
+							csr_addr_o = `CSR_MSTATUS;    //访问CSR mstatus
 							pc_n_o = mepc;
 							idex_mret_o = 1;
 						end

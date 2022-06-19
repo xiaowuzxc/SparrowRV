@@ -12,14 +12,19 @@ module trap (
 	//中断输入接口
 	input wire ecall_i,//ecall指令中断
 	input wire ebreak_i,//ebreak指令中断
-
 	input wire inst_err_i,//指令解码错误中断
+	input wire mem_err_i,//访存错误-------未使用
+
 	input wire pex_trap_i,//外部中断
 	input wire ptcmp_tarp_i,//定时器中断
 	input wire psoft_tarp_i,//软件中断
 
 	input wire mstatus_MIE3,//全局中断使能标志
 	input wire wfi_i,//wfi指令休眠
+
+	input wire[`InstAddrBus] pc_i,            //当前条指令地址
+	input wire[`InstBus] inst_i,              //指令内容
+	input wire [`MemAddrBus] mem_addr_i,      //访存地址
 
 	//下一个PC控制
 	input wire[`InstAddrBus] pc_n_i,          //idex提供的下一条指令地址
@@ -31,17 +36,42 @@ module trap (
 
 );
 
+
+wire trap_exception_en = ecall_i | ebreak_i | inst_err_i | mem_err_i;//有异常到达，不可屏蔽
+wire trap_interrupt_en = pex_trap_i | ptcmp_tarp_i | psoft_tarp_i;//有中断到达，可屏蔽
+
+reg [`RegBus] mcause_gen;//生成mcause信息
+reg [`RegBus] mtval_gen;//生成mtval信息
+
 always @(*) begin
-	csr_wdata_o=0;
-	csr_we_o=0;
-	csr_addr_o=0;
-	trap_in_o=0;
-	trap_jump_o=0;
-	pc_n_o=pc_n_i;
+	if(trap_interrupt_en) begin
+		mcause_gen[31] = 1'b1;
+		if(pex_trap_i)//优先外部中断
+			mcause_gen[30:0] = 31'd11;
+		else
+			if(ptcmp_tarp_i)//其次定时器中断
+				mcause_gen[30:0] = 7;
+			else
+				if(psoft_tarp_i)//其次软件中断
+					mcause_gen[30:0] = 31'd3;
+	end
+	else begin
+		mcause_gen[31] = 1'b0;
+		mcause_gen[30:0] = 31'hffff;//异常暂不处理
+	end
 end
 
-wire trap_exception_en = ecall_i | ebreak_i | inst_err_i;//有异常到达，不可屏蔽
-wire trap_interrupt_en = pex_trap_i | ptcmp_tarp_i | psoft_tarp_i;//有中断到达，可屏蔽
+always @(*) begin
+	if(trap_exception_en)
+		if(inst_err_i)
+			mtval_gen = inst_i;
+		else
+			mtval_gen = mem_addr_i;
+	else
+		mtval_gen = 0;
+	
+end
+
 
 //--------------FSM------------------
 reg [2:0]sta_n,sta_p;//下一状态sta_n,当前状态sta_p
@@ -124,18 +154,50 @@ always @(*) begin //输出
 	pc_n_o=pc_n_i;
 	case (sta_p)
 		IDLE: begin//空闲状态
+			if(trap_exception_en)//异常
+				trap_in_o=1;
+			else
+				if(mstatus_MIE3)//全局中断开
+					if(trap_interrupt_en)//中断
+						trap_in_o=1;
+					else//没中断
+						trap_in_o=0;
+				else//全局中断关
+					trap_in_o=0;
 		end
 		SWFI: begin//等待中断状态
+			trap_in_o=1;
 		end
 		CMIE: begin//关闭全局中断mstatus->MPIE=MIE,MIE=0
+			trap_in_o=1;
+			csr_wdata_o={csr_rdata_i[31:8],csr_rdata_i[3],csr_rdata_i[6:4],1'b0,csr_rdata_i[2:0]};;
+			csr_we_o=1;
+			csr_addr_o=`CSR_MSTATUS;
 		end
-		WRPC: begin//写返回地址mepc=PCn
+		WRPC: begin//写返回地址mepc=PC
+			trap_in_o=1;
+			csr_wdata_o=pc_i;
+			csr_we_o=1;
+			csr_addr_o=`CSR_MEPC;
 		end
 		WMCA: begin//写异常原因mcause
+			trap_in_o=1;
+			csr_wdata_o=mcause_gen;
+			csr_we_o=1;
+			csr_addr_o=`CSR_MCAUSE;
 		end
 		RTVA: begin//写异常值寄存器mtval
+			trap_in_o=1;
+			csr_wdata_o=mtval_gen;
+			csr_we_o=1;
+			csr_addr_o=`CSR_MTVAL;
 		end
 		JVPC: begin//跳转到中断入口PC=mtvec[31:2]，使能
+			trap_in_o=1;
+			trap_jump_o=1;//PC跳转
+			csr_we_o=0;
+			csr_addr_o=`CSR_MTVEC;
+			pc_n_o={csr_rdata_i[31:2],2'b00};
 		end
 		default: ;
 	endcase
