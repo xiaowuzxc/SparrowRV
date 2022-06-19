@@ -1,52 +1,53 @@
 `timescale 1ns/100ps
 module tb_core(); /* this is automatically generated */
 
-
+`define CorePath inst_sparrow_soc.inst_core
 //测试用信号
 logic clk;
 logic rst_n;
 logic ex_trap_i;
 
 integer r;//计数
-//寄存器监测
-wire [31:0] x3  = inst_core.inst_regs.regs[3];
-wire [31:0] x26 = inst_core.inst_regs.regs[26];
-wire [31:0] x27 = inst_core.inst_regs.regs[27];
 
-wire [31:0] ra  = inst_core.inst_regs.regs[1];
-wire [31:0] sp  = inst_core.inst_regs.regs[2];
-wire [31:0] gp  = inst_core.inst_regs.regs[3];
-wire [31:0] tp  = inst_core.inst_regs.regs[4];
-wire [31:0] t0  = inst_core.inst_regs.regs[5];
-wire [31:0] t1  = inst_core.inst_regs.regs[6];
-wire [31:0] t2  = inst_core.inst_regs.regs[7];
-wire [31:0] s0  = inst_core.inst_regs.regs[8];
-wire [31:0] s1  = inst_core.inst_regs.regs[9];
-wire [31:0] a0  = inst_core.inst_regs.regs[10];
-wire [31:0] a1  = inst_core.inst_regs.regs[11];
-wire [31:0] a2  = inst_core.inst_regs.regs[12];
-wire [31:0] a3  = inst_core.inst_regs.regs[13];
-wire [31:0] a4  = inst_core.inst_regs.regs[14];
-wire [31:0] a5  = inst_core.inst_regs.regs[15];
-wire [31:0] a6  = inst_core.inst_regs.regs[16];
-wire [31:0] a7  = inst_core.inst_regs.regs[17];
-wire [31:0] s2  = inst_core.inst_regs.regs[18];
-wire [31:0] s3  = inst_core.inst_regs.regs[19];
-wire [31:0] s4  = inst_core.inst_regs.regs[20];
-wire [31:0] s5  = inst_core.inst_regs.regs[21];
-wire [31:0] s6  = inst_core.inst_regs.regs[22];
-wire [31:0] s7  = inst_core.inst_regs.regs[23];
-wire [31:0] s8  = inst_core.inst_regs.regs[24];
-wire [31:0] s9  = inst_core.inst_regs.regs[25];
-wire [31:0] s10 = inst_core.inst_regs.regs[26];
-wire [31:0] s11 = inst_core.inst_regs.regs[27];
-wire [31:0] t3  = inst_core.inst_regs.regs[28];
-wire [31:0] t4  = inst_core.inst_regs.regs[29];
-wire [31:0] t5  = inst_core.inst_regs.regs[30];
-wire [31:0] t6  = inst_core.inst_regs.regs[31];
+//寄存器监测
+wire [31:0] x3  = `CorePath.inst_regs.regs[3];
+wire [31:0] x26 = `CorePath.inst_regs.regs[26];
+wire [31:0] x27 = `CorePath.inst_regs.regs[27];
+
+wire [31:0] ra  = `CorePath.inst_regs.regs[1];
+wire [31:0] sp  = `CorePath.inst_regs.regs[2];
+wire [31:0] gp  = `CorePath.inst_regs.regs[3];
+wire [31:0] tp  = `CorePath.inst_regs.regs[4];
+wire [31:0] t0  = `CorePath.inst_regs.regs[5];
+wire [31:0] t1  = `CorePath.inst_regs.regs[6];
+wire [31:0] t2  = `CorePath.inst_regs.regs[7];
+wire [31:0] s0  = `CorePath.inst_regs.regs[8];
+wire [31:0] s1  = `CorePath.inst_regs.regs[9];
+wire [31:0] a0  = `CorePath.inst_regs.regs[10];
+wire [31:0] a1  = `CorePath.inst_regs.regs[11];
+wire [31:0] a2  = `CorePath.inst_regs.regs[12];
+wire [31:0] a3  = `CorePath.inst_regs.regs[13];
+wire [31:0] a4  = `CorePath.inst_regs.regs[14];
+wire [31:0] a5  = `CorePath.inst_regs.regs[15];
+wire [31:0] a6  = `CorePath.inst_regs.regs[16];
+wire [31:0] a7  = `CorePath.inst_regs.regs[17];
+wire [31:0] s2  = `CorePath.inst_regs.regs[18];
+wire [31:0] s3  = `CorePath.inst_regs.regs[19];
+wire [31:0] s4  = `CorePath.inst_regs.regs[20];
+wire [31:0] s5  = `CorePath.inst_regs.regs[21];
+wire [31:0] s6  = `CorePath.inst_regs.regs[22];
+wire [31:0] s7  = `CorePath.inst_regs.regs[23];
+wire [31:0] s8  = `CorePath.inst_regs.regs[24];
+wire [31:0] s9  = `CorePath.inst_regs.regs[25];
+wire [31:0] s10 = `CorePath.inst_regs.regs[26];
+wire [31:0] s11 = `CorePath.inst_regs.regs[27];
+wire [31:0] t3  = `CorePath.inst_regs.regs[28];
+wire [31:0] t4  = `CorePath.inst_regs.regs[29];
+wire [31:0] t5  = `CorePath.inst_regs.regs[30];
+wire [31:0] t6  = `CorePath.inst_regs.regs[31];
 // read mem data
 initial begin
-	$readmemh ("inst.txt", inst_core.inst_iram.inst_dpram.BRAM);
+	$readmemh ("inst.txt", `CorePath.inst_iram.inst_dpram.BRAM);
 end
 // clk
 initial begin
@@ -87,7 +88,7 @@ initial begin
 	$display("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 	$display("fail testnum = %2d", x3);
 	for (r = 1; r < 32; r = r + 1)
-		$display("x%2d = 0x%x", r, inst_core.inst_regs.regs[r]);
+		$display("x%2d = 0x%x", r, `CorePath.inst_regs.regs[r]);
 	end
 
 	$finish;
@@ -108,7 +109,7 @@ endtask : adcrst
 
 
 
-core inst_core (
+sparrow_soc inst_sparrow_soc (
 	.clk(clk), 
 	.rst_n(rst_n), 
 	.ex_trap_i(ex_trap_i)

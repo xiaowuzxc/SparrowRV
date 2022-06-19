@@ -134,12 +134,12 @@ end
 //写CSR
 always @ (posedge clk or negedge rst_n) begin
 	if (~rst_n) begin
-		mstatus_MIE3 <= 1'b1;
+		mstatus_MIE3 <= 1'b0;
 		mstatus_MPIE7 <= 1'b0;
-		mie_MEIE11 <= 1'b1;
+		mie_MEIE11 <= 1'b0;
 		mie_MTIE7 <= 1'b0;
 		mie_MSIE3 <= 1'b0;
-		mtvec <= 32'hd8;
+		mtvec <= 32'hd0;
 		mscratch <= 0;
 		mepc <= 0;
 		mcause <= 0;

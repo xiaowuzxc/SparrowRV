@@ -12,6 +12,8 @@
 - JTAG调试支持  
 - 片外Flash启动支持  
 
+**功能框图**
+![soc架构](/pic/img/soc架构.svg)  
 ### 设计进度
 ```
 SoC RTL

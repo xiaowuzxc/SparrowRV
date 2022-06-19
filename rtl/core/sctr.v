@@ -31,19 +31,32 @@ module sctr (
 	input wire idex_mret_i,//中断返回
 	output reg trap_stat_o,//中断状态指示
 
-	//总线接口
-	//M -> S
-	output reg [`MemBus]		sctr_cmd_wdata,//写数据
-	output reg [`MemAddrBus] 	sctr_cmd_addr ,//地址
-	output reg 					sctr_cmd_we   ,//写使能
-	output reg [3:0]			sctr_cmd_wem  ,//写掩码
-	output reg 					sctr_cmd_valid,//主机请求
-	input  wire					sctr_cmd_ready,//从机准备好
-	//S ->M
-	input  wire [`MemBus]		sctr_rsp_rdata,//读数据
-	input  wire					sctr_rsp_valid,//从机请求
-	output reg					sctr_rsp_ready,//主机准备好
-	input  wire					sctr_rsp_error,//总线错误，备用
+	//AXI4-Lite总线接口
+	//AW写地址
+	output reg [`MemAddrBus] 	sctr_axi_awaddr ,//写地址
+	output reg [2:0]			sctr_axi_awprot ,//写保护类型，恒为0
+	output reg 					sctr_axi_awvalid,//写地址有效
+	input  wire					sctr_axi_awready,//写地址准备好
+	//W写数据
+	output reg [`MemBus]	 	sctr_axi_wdata  ,//写数据
+	output reg [3:0]		 	sctr_axi_wstrb  ,//写数据选通
+	output reg 				 	sctr_axi_wvalid ,//写数据有效
+	input wire					sctr_axi_wready ,//写数据准备好
+	//B写响应
+	input wire [1:0]			sctr_axi_bresp  ,//写响应
+	input wire					sctr_axi_bvalid ,//写响应有效
+	output reg 				 	sctr_axi_bready ,//写响应准备好
+	//AR读地址
+	output reg [`MemAddrBus] 	sctr_axi_araddr ,//读地址
+	output reg [2:0]			sctr_axi_arprot ,//读保护类型，恒为0
+	output reg 					sctr_axi_arvalid,//读地址有效
+	input  wire					sctr_axi_arready,//读地址准备好
+	//R读数据
+	input wire [`MemBus]		sctr_axi_rdata  ,//读数据
+	input wire [1:0]			sctr_axi_rresp  ,//读响应
+	input wire					sctr_axi_rvalid ,//读数据有效
+	output reg 				 	sctr_axi_rready ,//读数据准备好
+
 
 
 	//回写使能
@@ -66,13 +79,13 @@ end
 
 always @(*) begin//状态转移条件
 	if (sta_p == 1'b0) begin
-		if( ~trap_in_i & (div_start_i | ((~mem_we_i) & sctr_cmd_valid & sctr_cmd_ready)))//没有中断且(开始除法，或读总线)
+		if( ~trap_in_i & (div_start_i | ((~mem_we_i) & sctr_axi_arvalid & sctr_axi_arready)))//没有中断且(开始除法，或读总线)
 			sta_n = 1'b1;
 		else
 			sta_n = 1'b0;
 	end 
 	else begin
-		if( div_ready_i | trap_in_i | (sctr_rsp_valid & sctr_rsp_ready))//除法结束，或中断，或读返回成功
+		if( div_ready_i | trap_in_i | (sctr_axi_rvalid & sctr_axi_rready & sctr_axi_rresp==2'b00))//除法结束，或中断，或读返回成功
 			sta_n = 1'b0;
 		else
 			sta_n = 1'b1;
@@ -81,13 +94,13 @@ end
 
 always @(*) begin//阻塞条件hx_valid控制
 	if (sta_p == 1'b0) begin//初始状态
-		if( div_start_i | iram_rstn_i | trap_in_i | (mem_en_i & (~mem_we_i)) | (mem_en_i & mem_we_i & (~sctr_cmd_ready)))//开始除法，或iram复位未结束，或中断，或总线cmd等待
+		if( div_start_i | iram_rstn_i | trap_in_i | (mem_en_i & (~mem_we_i)) | (mem_en_i & mem_we_i & ~(sctr_axi_wready | sctr_axi_awready)))//开始除法，或iram复位未结束，或中断，或总线等待
 			hx_valid = 1'b0;
 		else
 			hx_valid = 1'b1;
 	end
 	else begin//结束状态
-		if( ~trap_in_i & (div_ready_i | (sctr_rsp_valid & sctr_rsp_ready)))//没有中断且(除法结束，或读返回成功)
+		if( ~trap_in_i & (div_ready_i | (sctr_axi_rvalid & sctr_axi_rready & sctr_axi_rresp==2'b00 )))//没有中断且(除法结束，或读返回成功)
 			hx_valid = 1'b1;
 		else
 			hx_valid = 1'b0;
@@ -112,30 +125,32 @@ always @(*) begin//reg,csr,iram写控制
 end
 
 always @(*) begin//总线控制
+	sctr_axi_awprot  = 0;//写保护类型，恒为0
+	sctr_axi_arprot  = 0;//读保护类型，恒为0
+	sctr_axi_bready  = 1;//写响应准备好，恒为1
+	sctr_axi_rready  = 1'b1;//读数据准备好
 	if(sta_p == 1'b0) begin
-		mem_rdata_o    = 0;
-		sctr_cmd_wdata = mem_wdata_i;
-		sctr_cmd_addr  = mem_addr_i;
-		sctr_cmd_we    = mem_we_i;
-		sctr_cmd_wem   = mem_wem_i;
-		sctr_cmd_valid = mem_en_i & ~trap_in_i;//进中断过程中不允许访存
-		sctr_rsp_ready = 1'b1;
+		mem_rdata_o      = 0;
+		sctr_axi_awaddr  = mem_addr_i;//写地址
+		sctr_axi_awvalid = mem_en_i & ~trap_in_i;//写地址有效
+		sctr_axi_wdata   = mem_wdata_i;//写数据
+		sctr_axi_wstrb   = mem_wem_i;//写数据选通
+		sctr_axi_wvalid  = mem_en_i & mem_we_i & ~trap_in_i;//写数据有效
+		sctr_axi_araddr  = mem_addr_i;//读地址
+		sctr_axi_arvalid = mem_en_i & ~mem_we_i & ~trap_in_i;//读地址有效
 	end
 	else begin
-		mem_rdata_o    = sctr_rsp_rdata;
-		sctr_cmd_wdata = 0;
-		sctr_cmd_addr  = 0;
-		sctr_cmd_we    = 1'b0;
-		sctr_cmd_wem   = 0;
-		sctr_cmd_valid = 1'b0;
-		sctr_rsp_ready = 1'b1;
+		mem_rdata_o      = sctr_axi_rdata;//读数据
+		sctr_axi_awaddr  = 0;//写地址
+		sctr_axi_awvalid = 0;//写地址有效
+		sctr_axi_wdata   = 0;//写数据
+		sctr_axi_wstrb   = 0;//写数据选通
+		sctr_axi_wvalid  = 0;//写数据有效
+		sctr_axi_araddr  = 0;//读地址
+		sctr_axi_arvalid = 0;//读地址有效
 	end
 end
-/*
-	input wire trap_jump_i,//中断跳转指示，进中断最后一步
-	input wire idex_mret_i,//中断返回
-	output reg trap_stat_o,//中断状态指示
-*/
+
 always @(posedge clk or negedge rst_n) begin
 	if(~rst_n) begin
 		trap_stat_o <= 0;

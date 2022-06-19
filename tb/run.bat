@@ -10,7 +10,7 @@
 @echo ============================
 @set /p cmchc=输入命令编号：
 
-@if %cmchc% == 0 (iverilog -g2005-sv -o tb -y ../rtl/core/ -I ../rtl/core/ tb_core.sv & echo 开始执行单个ISA测试 & goto vlogsim)^
+@if %cmchc% == 0 (python tools/isa_test.py sim_rtl & goto cmsl)^
 else if %cmchc% == 1 (python tools/isa_test.py all_isa & goto cmsl)^
 else if %cmchc% == 2 (python tools/isa_test.py tsr_bin & goto cmsl)^
 else if %cmchc% == c (del tb *.lxt inst.txt & @echo 缓存文件已清理 & goto cmsl)^

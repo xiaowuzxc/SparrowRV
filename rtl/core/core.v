@@ -3,8 +3,54 @@ module core (
 	input wire clk,
 	input wire rst_n,
 
-	input wire ex_trap_i//外部中断
-	
+	input wire ex_trap_i,//外部中断
+
+	//AXI4-Lite总线接口 Master core
+	//AW写地址
+	output reg [`MemAddrBus] 	core_axi_awaddr ,//写地址
+	output reg [2:0]			core_axi_awprot ,//写保护类型，恒为0
+	output reg 					core_axi_awvalid,//写地址有效
+	input  wire					core_axi_awready,//写地址准备好
+	//W写数据
+	output reg [`MemBus]	 	core_axi_wdata  ,//写数据
+	output reg [3:0]		 	core_axi_wstrb  ,//写数据选通
+	output reg 				 	core_axi_wvalid ,//写数据有效
+	input wire					core_axi_wready ,//写数据准备好
+	//B写响应
+	input wire [1:0]			core_axi_bresp  ,//写响应
+	input wire					core_axi_bvalid ,//写响应有效
+	output reg 				 	core_axi_bready ,//写响应准备好
+	//AR读地址
+	output reg [`MemAddrBus] 	core_axi_araddr ,//读地址
+	output reg [2:0]			core_axi_arprot ,//读保护类型，恒为0
+	output reg 					core_axi_arvalid,//读地址有效
+	input  wire					core_axi_arready,//读地址准备好
+	//R读数据
+	input wire [`MemBus]		core_axi_rdata  ,//读数据
+	input wire [1:0]			core_axi_rresp  ,//读响应
+	input wire					core_axi_rvalid ,//读数据有效
+	output reg 				 	core_axi_rready ,//读数据准备好
+
+	//AXI4-Lite Slave iram
+	input wire [`MemAddrBus] 	iram_axi_awaddr ,//写地址
+	input wire [2:0]			iram_axi_awprot ,//写保护类型，恒为0
+	input wire 					iram_axi_awvalid,//写地址有效
+	output reg					iram_axi_awready,//写地址准备好
+	input wire [`MemBus]	 	iram_axi_wdata  ,//写数据
+	input wire [3:0]		 	iram_axi_wstrb  ,//写数据选通
+	input wire 				 	iram_axi_wvalid ,//写数据有效
+	output reg					iram_axi_wready ,//写数据准备好
+	output reg [1:0]			iram_axi_bresp  ,//写响应
+	output reg					iram_axi_bvalid ,//写响应有效
+	input wire				 	iram_axi_bready ,//写响应准备好
+	input wire [`MemAddrBus] 	iram_axi_araddr ,//读地址
+	input wire [2:0]			iram_axi_arprot ,//读保护类型，恒为0
+	input wire 					iram_axi_arvalid,//读地址有效
+	output reg					iram_axi_arready,//读地址准备好
+	output reg [`MemBus]		iram_axi_rdata  ,//读数据
+	output reg [1:0]			iram_axi_rresp  ,//读响应
+	output reg					iram_axi_rvalid ,//读数据有效
+	input wire				 	iram_axi_rready //读数据准备好
 );
 
 //-------------定义内部线网--------------
@@ -12,10 +58,7 @@ wire [`MemBus] mem_wdata;//存储空间写数据
 wire [`MemBus] mem_rdata;//存储空间读数据
 wire [`MemAddrBus] mem_addr;//存储空间访问地址
 wire [3:0] mem_wem;//存储空间写掩码
-wire [`MemBus] sctr_cmd_wdata;//存储空间总线写数据
-wire [`MemBus] sctr_rsp_rdata;//存储空间总线读数据
-wire [`MemAddrBus] sctr_cmd_addr;  //存储空间总线访问地址
-wire [3:0] sctr_cmd_wem;//存储空间总线写掩码
+
 wire [`RegAddrBus] reg_raddr1;//rs1地址
 wire [`RegAddrBus] reg_raddr2;//rs2地址
 wire [`RegBus] reg_rdata1;//rs1数据
@@ -64,16 +107,25 @@ sctr inst_sctr
 	.trap_jump_i    (trap_jump),
 	.idex_mret_i    (idex_mret),
 	.trap_stat_o    (),//中断状态指示
-	.sctr_cmd_wdata (sctr_cmd_wdata),
-	.sctr_cmd_addr  (sctr_cmd_addr ),
-	.sctr_cmd_we    (sctr_cmd_we   ),
-	.sctr_cmd_wem   (sctr_cmd_wem  ),
-	.sctr_cmd_valid (sctr_cmd_valid),
-	.sctr_cmd_ready (sctr_cmd_ready),
-	.sctr_rsp_rdata (sctr_rsp_rdata),
-	.sctr_rsp_valid (sctr_rsp_valid),
-	.sctr_rsp_ready (sctr_rsp_ready),
-	.sctr_rsp_error (sctr_rsp_error),
+	.sctr_axi_awaddr  (core_axi_awaddr ),
+	.sctr_axi_awprot  (core_axi_awprot ),
+	.sctr_axi_awvalid (core_axi_awvalid),
+	.sctr_axi_awready (core_axi_awready),
+	.sctr_axi_wdata   (core_axi_wdata  ),
+	.sctr_axi_wstrb   (core_axi_wstrb  ),
+	.sctr_axi_wvalid  (core_axi_wvalid ),
+	.sctr_axi_wready  (core_axi_wready ),
+	.sctr_axi_bresp   (core_axi_bresp  ),
+	.sctr_axi_bvalid  (core_axi_bvalid ),
+	.sctr_axi_bready  (core_axi_bready ),
+	.sctr_axi_araddr  (core_axi_araddr ),
+	.sctr_axi_arprot  (core_axi_arprot ),
+	.sctr_axi_arvalid (core_axi_arvalid),
+	.sctr_axi_arready (core_axi_arready),
+	.sctr_axi_rdata   (core_axi_rdata  ),
+	.sctr_axi_rresp   (core_axi_rresp  ),
+	.sctr_axi_rvalid  (core_axi_rvalid ),
+	.sctr_axi_rready  (core_axi_rready ),
 	.hx_valid       (hx_valid)
 );
 
@@ -101,16 +153,25 @@ iram inst_iram
 	.pc_o           (pc),
 	.inst_o         (inst),
 	.iram_rstn_o    (iram_rstn),
-	.iram_cmd_wdata (sctr_cmd_wdata),
-	.iram_cmd_addr  (sctr_cmd_addr ),
-	.iram_cmd_we    (sctr_cmd_we   ),
-	.iram_cmd_wem   (sctr_cmd_wem  ),
-	.iram_cmd_valid (sctr_cmd_valid),
-	.iram_cmd_ready (sctr_cmd_ready),
-	.iram_rsp_rdata (sctr_rsp_rdata),
-	.iram_rsp_valid (sctr_rsp_valid),
-	.iram_rsp_ready (sctr_rsp_ready),
-	.iram_rsp_error (sctr_rsp_error)
+	.iram_axi_awaddr  (iram_axi_awaddr ),
+	.iram_axi_awprot  (iram_axi_awprot ),
+	.iram_axi_awvalid (iram_axi_awvalid),
+	.iram_axi_awready (iram_axi_awready),
+	.iram_axi_wdata   (iram_axi_wdata  ),
+	.iram_axi_wstrb   (iram_axi_wstrb  ),
+	.iram_axi_wvalid  (iram_axi_wvalid ),
+	.iram_axi_wready  (iram_axi_wready ),
+	.iram_axi_bresp   (iram_axi_bresp  ),
+	.iram_axi_bvalid  (iram_axi_bvalid ),
+	.iram_axi_bready  (iram_axi_bready ),
+	.iram_axi_araddr  (iram_axi_araddr ),
+	.iram_axi_arprot  (iram_axi_arprot ),
+	.iram_axi_arvalid (iram_axi_arvalid),
+	.iram_axi_arready (iram_axi_arready),
+	.iram_axi_rdata   (iram_axi_rdata  ),
+	.iram_axi_rresp   (iram_axi_rresp  ),
+	.iram_axi_rvalid  (iram_axi_rvalid ),
+	.iram_axi_rready  (iram_axi_rready )
 );
 
 
