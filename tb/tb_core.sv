@@ -59,10 +59,12 @@ initial begin
 	ex_trap_i=0;
 	adcrst();//复位系统
 	#30;
+	ex_trap_i=1;
+	#2;
+	ex_trap_i=0;
 
-	#300;
 	wait(x26 == 32'b1)   // wait sim end, when x26 == 1
-	#100
+	#10
 	if (x27 == 32'b1) begin
 	$display("~~~~~~~~~~~~~~~~~~~ TEST_PASS ~~~~~~~~~~~~~~~~~~~");
 	$display("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");

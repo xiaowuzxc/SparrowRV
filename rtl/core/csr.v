@@ -145,7 +145,7 @@ always @ (posedge clk or negedge rst_n) begin
 		mcause <= 0;
 		mtval <= 0;
 		msip <= 0;
-		mtimecmp <= 64'h0;
+		mtimecmp <= 64'hffff_ffff_ffff_ffff;//比较器复位为最大值
 		mcctr <= 3'b0;
 	end else begin
 		if (idex_csr_we_i) begin //优先idex写
