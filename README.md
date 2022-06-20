@@ -64,7 +64,7 @@ SoC RTL
 如果只是为了拿来用，tinyriscv、蜂鸟E203、PicoRV都是非常成熟且优秀的设计，做一个使用者，方便快捷。但是，我是一个不甘于一直做“使用者”的人，如果有可能，我想做开发者，能力不够也可以尝试去修改。我以前搞单片机，开发C语言程序，是“使用者”；我修改tinyriscv和蜂鸟E203的功能和外设，做出自己想要的东西，是“开发者”。同样，我在tinyriscv或蜂鸟E203的基础上进行开发，却是“使用者”；我尝试自己写一个RISC-V处理器，做出自己想要的东西，是“开发者”。  
 
 ### 致谢
-本项目参考了tinyriscv的RTL设计和Python脚本：https://gitee.com/liangkangnan/tinyriscv  
+本项目借鉴了[tinyriscv](https://gitee.com/liangkangnan/tinyriscv)的RTL设计和Python脚本，使用其除法器模块。tinyriscv使用[Apache-2.0](http://www.apache.org/licenses/LICENSE-2.0)协议    
 感谢先驱者为我们提供的灵感  
 感谢众多开源软件提供的好用的工具  
 感谢导师对我学习方向的支持和理解  
