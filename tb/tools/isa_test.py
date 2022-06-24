@@ -51,15 +51,17 @@ def 编译并仿真():
 	编译命令+=r'-y ../rtl/core/ '#文件夹路径
 	编译命令+=r'-y ../rtl/soc/ '#文件夹路径
 	编译命令+=r'-I ../rtl/ '#头文件路径
+	if sys.argv[1] == 'all_isa':
+		编译命令+=r'-D ISA_TEST '
 	编译命令+=r'tb_core.sv '#仿真文件
 	编译进程 = os.popen(str(编译命令))
-	if sys.argv[1] == 'sim_rtl':
+	if sys.argv[1] != 'all_isa':
 		print(编译进程.read())
 	编译进程.close()
 	仿真进程 = os.popen(r'vvp -n tb -lxt2')
 	仿真输出 = 仿真进程.read()
 	仿真进程.close()
-	if sys.argv[1] == 'sim_rtl':
+	if sys.argv[1] != 'all_isa':
 		print(仿真输出)
 		波形进程 = os.popen(r'gtkwave tb.lxt')
 		波形进程.close()
@@ -105,6 +107,9 @@ if __name__ == '__main__':
 	elif sys.argv[1] == 'tsr_bin':
 		sys.exit(bin文件转文本())
 	elif sys.argv[1] == 'sim_rtl':
+		sys.exit(编译并仿真())
+	elif sys.argv[1] == 'sim_bin':
+		bin文件转文本()
 		sys.exit(编译并仿真())
 	else:
 		print(r'isa_test.py找不到指令')

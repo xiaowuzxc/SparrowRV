@@ -125,7 +125,7 @@ dpram #(
     .dinb   (dinb),
     .wea    (1'b0),
     .web    (web),
-    .wema   (0),
+    .wema   (4'h0),
     .wemb   (wemb),
     .ena    (iram_rd_i | ~rstn_rr),
     .enb    (enb),

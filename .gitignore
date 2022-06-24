@@ -5,3 +5,5 @@
 /py_gen
 /tb/inst.txt
 /syn
+/tools/*
+/bsp/obj/*

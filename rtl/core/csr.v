@@ -63,6 +63,11 @@ wire[`RegBus] marchid=32'd1;//微架构编号
 wire[`RegBus] mimpid=32'd1;//硬件实现编号
 wire[`RegBus] mhartid=32'h0;//线程编号
 
+//仿真模式专用
+reg [7:0] mprints;//仿真标准输出
+reg mends;//仿真结束
+//仿真模式专用
+
 assign tcmp_tarp = (mtime >= mtimecmp) ? 1'b1 : 1'b0;//生成定时器中断标志
 assign soft_trap = (msip != 32'h0) ? 1'b1 : 1'b0;//生成软件中断标志
 
@@ -144,6 +149,8 @@ always @ (posedge clk or negedge rst_n) begin
         mcause <= 0;
         mtval <= 0;
         msip <= 0;
+        mprints <= 0;
+        mends <= 0;
         mtimecmp <= 64'hffff_ffff_ffff_ffff;//比较器复位为最大值
         mcctr <= 3'b0;
     end else begin
@@ -175,6 +182,12 @@ always @ (posedge clk or negedge rst_n) begin
                 end
                 `CSR_MSIP: begin
                     msip <= idex_csr_wdata_i;
+                end
+                `CSR_MPRINTS: begin
+                    mprints <= idex_csr_wdata_i[7:0];
+                end
+                `CSR_MENDS: begin
+                    mends <= idex_csr_wdata_i[0];
                 end
                 `CSR_MTIMECMP: begin
                     mtimecmp[31:0] <= idex_csr_wdata_i;
@@ -219,6 +232,9 @@ always @ (posedge clk or negedge rst_n) begin
                 end
                 `CSR_MSIP: begin
                     msip <= trap_csr_wdata_i;
+                end
+                `CSR_MPRINTS: begin
+                    mprints <= trap_csr_wdata_i[7:0];
                 end
                 `CSR_MTIMECMP: begin
                     mtimecmp[31:0] <= trap_csr_wdata_i;
@@ -270,6 +286,9 @@ always @ (*) begin
         end
         `CSR_MSIP: begin
             idex_csr_rdata_o = msip;
+        end
+        `CSR_MPRINTS: begin
+            idex_csr_rdata_o = {24'h0 , mprints};
         end
         `CSR_MCYCLE: begin
             idex_csr_rdata_o = mcycle[31:0];
@@ -349,6 +368,9 @@ always @ (*) begin
         `CSR_MSIP: begin
             trap_csr_rdata_o = msip;
         end
+        `CSR_MPRINTS: begin
+            trap_csr_rdata_o = {24'h0 , mprints};
+        end
         `CSR_MCYCLE: begin
             trap_csr_rdata_o = mcycle[31:0];
         end
@@ -394,4 +416,8 @@ always @ (*) begin
     endcase
 end
 
+always @(posedge clk) begin
+    if(idex_csr_we_i & (idex_csr_addr_i == `CSR_MPRINTS))
+        $write("%c", idex_csr_wdata_i);
+end
 endmodule

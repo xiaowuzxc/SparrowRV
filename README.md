@@ -67,5 +67,6 @@ SoC RTL
 本项目借鉴了[tinyriscv](https://gitee.com/liangkangnan/tinyriscv)的RTL设计和Python脚本，使用其除法器模块。tinyriscv使用[Apache-2.0](http://www.apache.org/licenses/LICENSE-2.0)协议    
 感谢先驱者为我们提供的灵感  
 感谢众多开源软件提供的好用的工具  
+感谢沁恒提供的开发工具  
 感谢导师对我学习方向的支持和理解  
 大家的支持是我前进的动力！  

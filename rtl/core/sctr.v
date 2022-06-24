@@ -24,9 +24,9 @@ module sctr (
     input wire div_start_i,//除法启动
     input wire div_ready_i,//除法结束
     input wire iram_rstn_i,//iram模块阻塞
-    input wire trap_in_i,//进中断指示
 
     //中断相关
+    input wire trap_in_i,//进中断指示
     input wire trap_jump_i,//中断跳转指示，进中断最后一步
     input wire idex_mret_i,//中断返回
     output reg trap_stat_o,//中断状态指示
@@ -110,8 +110,8 @@ end
 
 always @(*) begin//reg,csr,iram写控制
     if(hx_valid) begin
-        reg_we_o = 1'b1;
-        csr_we_o = 1'b1;
+        reg_we_o = reg_we_i;
+        csr_we_o = csr_we_i;
         iram_rd_o = 1'b1;
     end
     else begin

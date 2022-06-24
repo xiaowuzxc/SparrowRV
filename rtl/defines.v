@@ -1,6 +1,8 @@
 `define RstPC 32'h0 //复位后PC
 
-`define IRamSize 16384 //65536kB
+
+`define IRam_KB 64 //iram指令存储器大小，单位为KB
+`define IRamSize (`IRam_KB*1024/4) //kB->B->4B
 
 `define RstEnable 1'b0
 `define RstDisable 1'b1
@@ -137,6 +139,8 @@
 `define CSR_MTVAL      12'h343
 `define CSR_MIP        12'h344
 `define CSR_MSIP       12'h345
+`define CSR_MPRINTS    12'h346//sim标准输出
+`define CSR_MENDS      12'h347//仿真结束
 
 `define CSR_MCYCLE     12'hB00
 `define CSR_MCYCLEH    12'hB80

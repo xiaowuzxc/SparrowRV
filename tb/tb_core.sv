@@ -45,6 +45,7 @@ wire [31:0] t3  = `CorePath.inst_regs.regs[28];
 wire [31:0] t4  = `CorePath.inst_regs.regs[29];
 wire [31:0] t5  = `CorePath.inst_regs.regs[30];
 wire [31:0] t6  = `CorePath.inst_regs.regs[31];
+wire mends = `CorePath.inst_csr.mends;
 // read mem data
 initial begin
 	$readmemh ("inst.txt", `CorePath.inst_iram.inst_dpram.BRAM);
@@ -64,6 +65,7 @@ initial begin
 	#7;
 	ex_trap_i=0;
 
+`ifdef ISA_TEST
 	wait(x26 == 32'b1)   // wait sim end, when x26 == 1
 	#10
 	if (x27 == 32'b1) begin
@@ -90,13 +92,25 @@ initial begin
 	for (r = 1; r < 32; r = r + 1)
 		$display("x%2d = 0x%x", r, `CorePath.inst_regs.regs[r]);
 	end
-
 	$finish;
+`endif
+
 end
 
 initial begin
 	#30000;
 	$display("Timeout");
+`ifdef ISA_TEST
+	$display("ISA_TEST Err");
+`endif
+	$finish;
+end
+
+initial begin
+	#30;
+	wait(mends === 1'b1)
+	$display("CSR MENDS END");
+	#10;
 	$finish;
 end
 
