@@ -51,20 +51,23 @@ SoC RTL
 **功能框图**  
 ![soc架构](/pic/img/仿真环境.svg)  
 目前已配置：  
-- 导入程序，单次仿真并显示波形  
+- 导入inst.txt，单次仿真并显示波形  
 - 收集指令测试集程序，测试所有指令  
 - 转换bin文件为可被testbench读取的格式  
+- 读取bin文件并导入仅需仿真  
 - 清理缓存文件  
 
 ### 板级支持包BSP
 位于`/bsp/`文件夹下
 
 #### 环境配置说明
-支持3种开发方式
-1. Linux+Makefile开发
-2. Windows+Makefile开发
-3. MRS图形化界面开发
-其中，`1` `2`方式的使用流程相同，说明见`Makefile开发`，适合老司机使用。`3`有图形化界面，适合习惯用keil的开发者，说明见`图形化界面开发`。  
+支持3种开发方式  
+1. Linux+Makefile  
+2. Windows+Makefile  
+3. MRS图形化界面开发   
+
+`1` `2`方式的使用流程相同，适合老司机使用，说明见**Makefile开发**。  
+`3`有图形化界面，适合习惯用keil的开发者，说明见**图形化界面开发**。  
 
 ##### Makefile开发
 通过makefile，仅需终端输入make，即可执行自动化编译。虽然写脚本有点麻烦，但是后期用得爽。    
@@ -115,6 +118,6 @@ SparrowRV
 本项目借鉴了[tinyriscv](https://gitee.com/liangkangnan/tinyriscv)的RTL设计和Python脚本，使用其除法器模块。tinyriscv使用[Apache-2.0](http://www.apache.org/licenses/LICENSE-2.0)协议    
 感谢先驱者为我们提供的灵感  
 感谢众多开源软件提供的好用的工具  
-感谢沁恒提供的开发工具  
+感谢MRS开发工具提供的便利   
 感谢导师对我学习方向的支持和理解  
 大家的支持是我前进的动力！  
