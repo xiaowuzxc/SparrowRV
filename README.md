@@ -1,7 +1,7 @@
 # 小麻雀处理器
 
 ### 简介
-小麻雀处理器(SparrowRV)是一款单周期32位，支持RV32IM指令集的嵌入式处理器。它执行一条指令只要一个周期，控制逻辑简单，没有复杂的流水线控制结构，没有冗余的线网连接，并且代码注释完备，整体的可读性强。 
+小麻雀处理器(SparrowRV)是一款单周期32位，支持RV32IM指令集的嵌入式处理器。它的控制逻辑简单，没有复杂的流水线控制结构，没有冗余的线网连接，代码注释完备，整体可读性强。 
 
 **设计指标：**  
 - 兼容RV32IM指令集  
@@ -21,7 +21,7 @@ SoC RTL
  ├─内核
  │   ├─译码执行 (完成)
  │   ├─iram (完成)
- │   ├─CSR  (Debug 85%)
+ │   ├─CSR  (Debug 90%)
  │   ├─寄存器组 (完成)
  │   ├─总线接口 (Debug 75%)
  │   ├─中断控制 (Debug 90%)
@@ -31,7 +31,7 @@ SoC RTL
 
 软件部分
  ├─指令仿真 (完成)
- └─BSP (未进行)
+ └─BSP (90%)
 
 当前任务
 - 扩展AXI总线
@@ -55,6 +55,53 @@ SoC RTL
 - 收集指令测试集程序，测试所有指令  
 - 转换bin文件为可被testbench读取的格式  
 - 清理缓存文件  
+
+### 板级支持包BSP
+位于`/bsp/`文件夹下
+
+#### 环境配置说明
+支持3种开发方式
+1. Linux+Makefile开发
+2. Windows+Makefile开发
+3. MRS图形化界面开发
+其中，`1` `2`方式的使用流程相同，说明见`Makefile开发`，适合老司机使用。`3`有图形化界面，适合习惯用keil的开发者，说明见`图形化界面开发`。  
+
+##### Makefile开发
+通过makefile，仅需终端输入make，即可执行自动化编译。虽然写脚本有点麻烦，但是后期用得爽。    
+使用流程：  
+1. 下载并解压GCC工具链至`/tools/`目录，GCC根据操作系统(Win/Linux)进行二选一：  
+百度网盘`https://pan.baidu.com/s/1m1luz1W5OHPBfxs3ueZPUQ?pwd=h8ya`   
+Github`111`   
+请确保解压后文件目录为以下形式，否则无法正常make   
+```
+SparrowRV
+  ├─bsp
+  ├─doc
+  ├─pic
+  ├─rtl
+  ├─tb
+  └─tools
+      └─RISC-V_Embedded_GCC
+         ├─bin
+         ├─distro-info
+         ├─doc
+         ├─include
+         ├─lib
+         ├─libexec
+         ├─riscv-none-embed
+         └─share
+```
+2. 进入`/bsp/app/`，终端输入`make`，执行编译，此目录下会输出文件  
+3. 进入`/bsp/app/`，终端输入`make clean`，清理编译文件  
+
+##### 图形化界面开发
+本工程使用MRS(MounRiver Studio)作为图形化开发环境。MRS基于Eclipse GNU版本开发，支持中文界面，配置了完善的GCC工具链，可以做到开箱即用。  
+官网链接`http://www.mounriver.com/`  
+使用流程：  
+1. 下载并安装MRS  
+2. 切换中文界面。打开MRS主界面，`Help`->`Language`->`Simplified Chinese`  
+3. 打开工程。`文件`->`加载`->`选定'工程'`->`浏览..`->`选择bsp目录下的SparrowRV.wvproj`
+4. 点击`构建项目`，编译并生成bin文件
 
 ### 杂谈:个人心路历程
 本项目开坑，是我学习数字逻辑设计从量变到质变的又一个转折点。  
