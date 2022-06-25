@@ -100,7 +100,7 @@ SparrowRV
 
 ##### 图形化界面开发
 本工程使用MRS(MounRiver Studio)作为图形化开发环境。MRS基于Eclipse GNU版本开发，支持中文界面，配置了完善的GCC工具链，可以做到开箱即用。  
-官网链接`http://www.mounriver.com/`  
+官网链接http://www.mounriver.com/  
 使用流程：  
 1. 下载并安装MRS  
 2. 切换中文界面。打开MRS主界面，`Help`->`Language`->`Simplified Chinese`  
