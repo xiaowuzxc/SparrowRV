@@ -69,9 +69,9 @@ SoC RTL
 ##### Makefile开发
 通过makefile，仅需终端输入make，即可执行自动化编译。虽然写脚本有点麻烦，但是后期用得爽。    
 使用流程：  
-1. 下载并解压GCC工具链至`/tools/`目录，GCC根据操作系统(Win/Linux)进行二选一：  
-百度网盘`https://pan.baidu.com/s/1m1luz1W5OHPBfxs3ueZPUQ?pwd=h8ya`   
-Github`111`   
+1. 下载并解压GCC工具链至`/tools/`目录，GCC根据操作系统(Win/Linux)进行选择：  
+百度网盘：https://pan.baidu.com/s/1thofSUOS5Mg0Fu-38qPeag?pwd=dj8b  
+Github：https://github.com/xiaowuzxc/SparrowRV/releases/tag/v0.8   
 请确保解压后文件目录为以下形式，否则无法正常make   
 ```
 SparrowRV
@@ -91,8 +91,9 @@ SparrowRV
          ├─riscv-none-embed
          └─share
 ```
-2. 进入`/bsp/app/`，终端输入`make`，执行编译，此目录下会输出文件  
-3. 进入`/bsp/app/`，终端输入`make clean`，清理编译文件  
+2. Linux或已安装make的windows用户可跳过。下载make.exe，将make.exe所在的路径添加至环境变量`Path`  
+3. 进入`/bsp/app/`，终端输入`make`，执行编译，此目录下会输出文件  
+4. 进入`/bsp/app/`，终端输入`make clean`，清理编译文件  
 
 ##### 图形化界面开发
 本工程使用MRS(MounRiver Studio)作为图形化开发环境。MRS基于Eclipse GNU版本开发，支持中文界面，配置了完善的GCC工具链，可以做到开箱即用。  
