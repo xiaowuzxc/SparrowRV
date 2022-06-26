@@ -73,24 +73,26 @@ sudo apt install python3-tk
 iverilog安装及windows下仿真可参考[视频教程](https://www.bilibili.com/video/bv1dS4y1H7zn)  
 
 ### 开始仿真
-`/tb/run.bat`是Windows环境下的启动器，进入`/tb/`目录，仅需双击`run.bat`即可启动人机交互界面。根据提示，输入单个数字或符号，按下回车即可执行对应项目。  
-`/tb/makefile`是Windows/Linux环境下的启动器，进入`/tb/`目录，终端输入`make`即可启动人机交互界面。根据提示，输入`make`+`空格`+`单个数字或符号`，按下回车即可执行对应项目。
-`/tb/tools/isa_test.py`是仿真脚本的核心，负责控制仿真流程，转换文件类型，数据收集，通过启动器与此脚本交互。  
+- `/tb/run.bat`是Windows环境下的启动器，进入`/tb/`目录，仅需双击`run.bat`即可启动人机交互界面。根据提示，输入单个数字或符号，按下回车即可执行对应项目。  
+- `/tb/makefile`是Windows/Linux环境下的启动器，进入`/tb/`目录，终端输入`make`即可启动人机交互界面。根据提示，输入`make`+`空格`+`单个数字或符号`，按下回车即可执行对应项目。 
+
+`/tb/tools/isa_test.py`是仿真脚本的核心，负责控制仿真流程，转换文件类型，数据收集，通过启动器与此脚本交互。一般情况下不建议修改。  
 iverilog是仿真工具，gtkwave用于查看波形。  
 **仿真流程**  
 ![soc架构](/pic/img/仿真环境.svg)  
 目前支持的命令：  
-- [0]导入inst.txt，单次RTL仿真并显示波形  
+- [0]导入inst.txt，RTL仿真并显示波形  
 - [1]收集指令测试集程序，测试所有指令  
-- [2]转换bin文件为可被testbench读取的格式  
-- [3]转换并导入bin文件，进行RTL仿真  
+- [2]转换bin文件为inst.txt，可被testbench读取  
+- [3]转换并导入bin文件，进行RTL仿真并显示波形  
 - [c]清理缓存文件  
 
-**说明**
-- inst.txt是被testbench读入指令存储器的文件  
+### 问题说明
+- inst.txt是被testbench读入指令存储器的文件，处理器将执行此文件中的命令  
 - bin文件不能直接被读取，需要先转换为inst.txt  
 - iverilog版本建议大于v11，低于此版本可能会无法运行  
 - 命令[2]或[3]需要Python3-tkinter支持，Linux用户请注意  
+- Makefile环境下可能会出现gtkwave开着的情况下不显示打印信息  
 
 
 ## 板级支持包BSP
