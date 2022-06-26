@@ -59,7 +59,7 @@ sudo make install
 cd ..
 rm -rf iverilog/
 ```
-如果使用`命令3`，需要安装`python3-tk`：  
+如果使用命令[2]或[3]，需要安装`python3-tk`：  
 ```
 sudo apt install python3-tk
 ```
@@ -70,24 +70,27 @@ sudo apt install python3-tk
 - 进入[iverilog Win官网](http://bleyer.org/icarus/)，下载并安装iverilog-v12-20220611-x64_setup[18.2MB]  
 - (可跳过)如果想在Win系统使用make，请参阅**Makefile开发**。  
 
+iverilog安装及windows下仿真可参考[视频教程](https://www.bilibili.com/video/bv1dS4y1H7zn)  
+
 ### 开始仿真
-`/tb/run.bat`是Windows环境下的启动器，仅需双击`run.bat`即可启动人机交互界面。根据提示，输入单个数字或符号，按下回车即可执行对应项目。  
-`/tb/makefile`是Windows/Linux环境下的启动器，终端输入`make`即可启动人机交互界面。根据提示，输入`make`+`空格`+`单个数字或符号`，按下回车即可执行对应项目。
+`/tb/run.bat`是Windows环境下的启动器，进入`/tb/`目录，仅需双击`run.bat`即可启动人机交互界面。根据提示，输入单个数字或符号，按下回车即可执行对应项目。  
+`/tb/makefile`是Windows/Linux环境下的启动器，进入`/tb/`目录，终端输入`make`即可启动人机交互界面。根据提示，输入`make`+`空格`+`单个数字或符号`，按下回车即可执行对应项目。
 `/tb/tools/isa_test.py`是仿真脚本的核心，负责控制仿真流程，转换文件类型，数据收集，通过启动器与此脚本交互。  
 iverilog是仿真工具，gtkwave用于查看波形。  
 **仿真流程**  
 ![soc架构](/pic/img/仿真环境.svg)  
 目前支持的命令：  
-- [0]导入inst.txt，单次仿真并显示波形  
+- [0]导入inst.txt，单次RTL仿真并显示波形  
 - [1]收集指令测试集程序，测试所有指令  
 - [2]转换bin文件为可被testbench读取的格式  
-- [3]读取bin文件并导入仅需仿真  
+- [3]转换并导入bin文件，进行RTL仿真  
 - [c]清理缓存文件  
 
 **说明**
 - inst.txt是被testbench读入指令存储器的文件  
 - bin文件不能直接被读取，需要先转换为inst.txt  
 - iverilog版本建议大于v11，低于此版本可能会无法运行  
+- 命令[2]或[3]需要Python3-tkinter支持，Linux用户请注意  
 
 
 ## 板级支持包BSP
@@ -103,8 +106,8 @@ iverilog是仿真工具，gtkwave用于查看波形。
 `3`有图形化界面，适合习惯用keil的开发者，环境配置与使用说明见**图形化界面开发**。  
 
 #### Makefile开发
+**支持Linux和Windows**  
 通过makefile脚本，仅需终端输入make，即可执行自动化编译。虽然写脚本有点麻烦，但是后期用得爽。    
-支持Linux和Windows  
 使用流程：  
 1. 下载并解压GCC工具链至`/tools/`目录，GCC根据操作系统(Win/Linux)进行选择：  
 百度网盘：https://pan.baidu.com/s/1thofSUOS5Mg0Fu-38qPeag?pwd=dj8b  
@@ -133,9 +136,9 @@ SparrowRV
 4. 进入`/bsp/app/`，终端输入`make clean`，清理编译文件  
 
 #### 图形化界面开发
+**仅支持Windows**  
 本工程使用MRS(MounRiver Studio)作为图形化开发环境。MRS基于Eclipse GNU版本开发，支持中文界面，配置了完善的GCC工具链，可以做到开箱即用。  
 官网链接http://www.mounriver.com/  
-仅支持Windows  
 使用流程：  
 1. 下载并安装MRS  
 2. 切换中文界面。打开MRS主界面，`Help`->`Language`->`Simplified Chinese`  
