@@ -136,6 +136,7 @@
 `define CSR_MISA       12'h301
 `define CSR_MIE        12'h304
 `define CSR_MTVEC      12'h305
+`define CSR_MTRIG      12'h306//触发系统
 `define CSR_MSCRATCH   12'h340
 `define CSR_MEPC       12'h341
 `define CSR_MCAUSE     12'h342

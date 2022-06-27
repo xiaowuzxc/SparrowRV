@@ -241,36 +241,42 @@ csr inst_csr
     .mepc             (mepc),
     .ex_trap_i        (ex_trap_i),
     .ex_trap_o        (pex_trap),
-    .tcmp_tarp_o      (ptcmp_tarp),
-    .soft_trap_o      (psoft_tarp),
+    .tcmp_trap_o      (ptcmp_trap),
+    .soft_trap_o      (psoft_trap),
     .mstatus_MIE3     (mstatus_MIE3),
+    .pex_trap_rsp     (pex_trap_rsp  ),
+    .ptcmp_trap_rsp   (ptcmp_trap_rsp),
+    .psoft_trap_rsp   (psoft_trap_rsp),
     .hx_valid         (hx_valid)
 );
 
 trap inst_trap
 (
-    .clk          (clk),
-    .rst_n        (rst_n),
-    .csr_rdata_i  (trap_csr_rdata),
-    .csr_wdata_o  (trap_csr_wdata),
-    .csr_we_o     (trap_csr_we),
-    .csr_addr_o   (trap_csr_addr),
-    .ecall_i      (ecall_trap),
-    .ebreak_i     (ebreak_trap),
-    .wfi_i        (wfi_trap),
-    .inst_err_i   (inst_err_trap),
-    .mem_err_i    (1'b0),//访存错误
-    .pex_trap_i   (pex_trap),
-    .ptcmp_tarp_i (ptcmp_tarp),
-    .psoft_tarp_i (psoft_tarp),
-    .mstatus_MIE3 (mstatus_MIE3),
-    .pc_i         (pc),
-    .inst_i       (inst),
-    .mem_addr_i   (mem_addr),
-    .pc_n_i       (idex_pc_n),
-    .pc_n_o       (trap_pc_n),
-    .trap_jump_o  (trap_jump),
-    .trap_in_o    (trap_in)
+    .clk           (clk),
+    .rst_n         (rst_n),
+    .csr_rdata_i   (trap_csr_rdata),
+    .csr_wdata_o   (trap_csr_wdata),
+    .csr_we_o      (trap_csr_we),
+    .csr_addr_o    (trap_csr_addr),
+    .pex_trap_rsp  (pex_trap_rsp  ),
+    .ptcmp_trap_rsp(ptcmp_trap_rsp),
+    .psoft_trap_rsp(psoft_trap_rsp),
+    .ecall_i       (ecall_trap),
+    .ebreak_i      (ebreak_trap),
+    .wfi_i         (wfi_trap),
+    .inst_err_i    (inst_err_trap),
+    .mem_err_i     (1'b0),//访存错误
+    .pex_trap_i    (pex_trap),
+    .ptcmp_trap_i  (ptcmp_trap),
+    .psoft_trap_i  (psoft_trap),
+    .mstatus_MIE3  (mstatus_MIE3),
+    .pc_i          (pc),
+    .inst_i        (inst),
+    .mem_addr_i    (mem_addr),
+    .pc_n_i        (idex_pc_n),
+    .pc_n_o        (trap_pc_n),
+    .trap_jump_o   (trap_jump),
+    .trap_in_o     (trap_in)
 );
 
 endmodule
