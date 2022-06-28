@@ -39,7 +39,7 @@ reg [3:0] wem;
 reg [`MemBus]dout;
 reg [`MemBus]din;
 wire axi_whsk = sram_axi_awvalid & sram_axi_wvalid;//写通道握手
-wire axi_rhsk = sram_axi_arvalid & ~sram_axi_rvalid;//读通道握手,没有读响应
+wire axi_rhsk = sram_axi_arvalid & (~sram_axi_rvalid | (sram_axi_rvalid & sram_axi_rready));//读通道握手,没有读响应或读响应握手成功
 
 always @(posedge clk or negedge rst_n)//写响应控制
 if (~rst_n)
@@ -87,7 +87,7 @@ always @(*) begin
         end
     end
     din = sram_axi_wdata;
-    en = axi_whsk | axi_rhsk;
+    en = axi_whsk | axi_rhsk;//握手成功，使能存储器
     wem = sram_axi_wstrb;
 end
 

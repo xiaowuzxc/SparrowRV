@@ -61,7 +61,7 @@ reg [3:0] wemb;
 wire [`MemBus]doutb;
 reg [`MemBus]dinb;
 wire axi_whsk = iram_axi_awvalid & iram_axi_wvalid;//写通道握手
-wire axi_rhsk = iram_axi_arvalid & ~iram_axi_rvalid;//读通道握手,没有读响应
+wire axi_rhsk = iram_axi_arvalid & (~iram_axi_rvalid | (iram_axi_rvalid & iram_axi_rready));//读通道握手,没有读响应
 
 always @(posedge clk or negedge rst_n)//写响应控制
 if (~rst_n)
