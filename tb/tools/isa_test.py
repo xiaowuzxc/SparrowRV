@@ -50,6 +50,7 @@ def 编译并仿真():
 	编译命令+=r'-Y .sv '#检索sv文件
 	编译命令+=r'-y ../rtl/core/ '#文件夹路径
 	编译命令+=r'-y ../rtl/soc/ '#文件夹路径
+	编译命令+=r'-y ../rtl/perips/ '#文件夹路径
 	编译命令+=r'-I ../rtl/ '#头文件路径
 	if sys.argv[1] == 'all_isa':
 		编译命令+=r'-D ISA_TEST '

@@ -1,8 +1,8 @@
 `define RstPC 32'h0 //复位后PC
 
 
-`define IRam_KB 64 //iram指令存储器大小，单位为KB
-`define SRam_KB 64 //sram数据存储器大小，单位为KB
+`define IRam_KB 32 //iram指令存储器大小，单位为KB
+`define SRam_KB 32 //sram数据存储器大小，单位为KB
 
 `define IRamSize (`IRam_KB*1024/4) //kB->B->4B
 `define SRamSize (`SRam_KB*1024/4) //kB->B->4B

@@ -4,19 +4,19 @@ ENTRY(_start)
 
 MEMORY
 {
-  flash (wxa!ri) : ORIGIN = 0x0, LENGTH = 32K
-  ram (wxa!ri) :   ORIGIN = 0x8000, LENGTH = 32K
+  iram (wxa!ri) : ORIGIN = 0x00000000, LENGTH = 32K /*iram指令存储器基地址，大小*/
+  sram (wxa!ri) : ORIGIN = 0x10000000, LENGTH = 32K /*sram存储器基地址，大小*/
 }
 
 
 SECTIONS
 {
-   __stack_size = DEFINED(__stack_size) ? __stack_size : 8K;
+   __stack_size = DEFINED(__stack_size) ? __stack_size : 8K; /*堆栈区大小*/
 
   .init           :
   {
     KEEP (*(SORT_NONE(.init)))
-  } >flash AT>flash 
+  } >iram AT>iram 
 
   .text           :
   {
@@ -24,7 +24,7 @@ SECTIONS
     *(.text.startup .text.startup.*)
     *(.text .text.*)
     *(.gnu.linkonce.t.*)
-  } >flash AT>flash 
+  } >iram AT>iram 
 
   . = ALIGN(4);
 
@@ -37,7 +37,7 @@ SECTIONS
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array))
     PROVIDE_HIDDEN (__preinit_array_end = .);
-  } >flash AT>flash 
+  } >iram AT>iram 
 
   .init_array     :
   {
@@ -45,7 +45,7 @@ SECTIONS
     KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
     KEEP (*(.init_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors))
     PROVIDE_HIDDEN (__init_array_end = .);
-  } >flash AT>flash 
+  } >iram AT>iram 
 
   .fini_array     :
   {
@@ -53,7 +53,7 @@ SECTIONS
     KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
     KEEP (*(.fini_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .dtors))
     PROVIDE_HIDDEN (__fini_array_end = .);
-  } >flash AT>flash 
+  } >iram AT>iram 
 
   .ctors          :
   {
@@ -75,7 +75,7 @@ SECTIONS
     KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .ctors))
     KEEP (*(SORT(.ctors.*)))
     KEEP (*(.ctors))
-  } >flash AT>flash 
+  } >iram AT>iram 
 
   .dtors          :
   {
@@ -84,19 +84,19 @@ SECTIONS
     KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .dtors))
     KEEP (*(SORT(.dtors.*)))
     KEEP (*(.dtors))
-  } >flash AT>flash 
+  } >iram AT>iram 
 
   .lalign         :
   {
     . = ALIGN(4);
     PROVIDE( _data_lma = . );
-  } >flash AT>flash 
+  } >iram AT>iram 
 
   .dalign         :
   {
     . = ALIGN(4);
     PROVIDE( _data = . );
-  } >ram AT>flash 
+  } >sram AT>iram 
 
   .data          :
   {
@@ -115,7 +115,7 @@ SECTIONS
     *(.srodata.cst4)
     *(.srodata.cst2)
     *(.srodata .srodata.*)
-  } >ram AT>flash 
+  } >sram AT>iram 
 
   . = ALIGN(4);
   PROVIDE( _edata = . );
@@ -131,17 +131,17 @@ SECTIONS
     *(.gnu.linkonce.b.*)
     *(COMMON)
     . = ALIGN(4);
-  } >ram AT>ram 
+  } >sram AT>sram 
 
   . = ALIGN(8);
   PROVIDE( _end = . );
   PROVIDE( end = . );
 
-  .stack ORIGIN(ram) + LENGTH(ram) - __stack_size :
+  .stack ORIGIN(sram) + LENGTH(sram) - __stack_size :
   {
     PROVIDE( _heap_end = . );
     . = __stack_size;
     PROVIDE( _sp = . );
-  } >ram AT>ram
+  } >sram AT>sram
 
 }

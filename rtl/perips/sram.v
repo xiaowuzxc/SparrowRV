@@ -6,7 +6,6 @@ module sram (
     //AXI4-Lite总线接口 Slave
     //AW写地址
     input wire [`MemAddrBus]    sram_axi_awaddr ,//写地址
-    input wire [2:0]            sram_axi_awprot ,//写保护类型，恒为0
     input wire                  sram_axi_awvalid,//写地址有效
     output reg                  sram_axi_awready,//写地址准备好
     //W写数据
@@ -14,18 +13,12 @@ module sram (
     input wire [3:0]            sram_axi_wstrb  ,//写数据选通
     input wire                  sram_axi_wvalid ,//写数据有效
     output reg                  sram_axi_wready ,//写数据准备好
-    //B写响应
-    output reg [1:0]            sram_axi_bresp  ,//写响应
-    output reg                  sram_axi_bvalid ,//写响应有效
-    input wire                  sram_axi_bready ,//写响应准备好
     //AR读地址
     input wire [`MemAddrBus]    sram_axi_araddr ,//读地址
-    input wire [2:0]            sram_axi_arprot ,//读保护类型，恒为0
     input wire                  sram_axi_arvalid,//读地址有效
     output reg                  sram_axi_arready,//读地址准备好
     //R读数据
     output reg [`MemBus]        sram_axi_rdata  ,//读数据
-    output reg [1:0]            sram_axi_rresp  ,//读响应
     output reg                  sram_axi_rvalid ,//读数据有效
     input wire                  sram_axi_rready //读数据准备好
 	
@@ -41,17 +34,7 @@ reg [`MemBus]din;
 wire axi_whsk = sram_axi_awvalid & sram_axi_wvalid;//写通道握手
 wire axi_rhsk = sram_axi_arvalid & (~sram_axi_rvalid | (sram_axi_rvalid & sram_axi_rready));//读通道握手,没有读响应或读响应握手成功
 
-always @(posedge clk or negedge rst_n)//写响应控制
-if (~rst_n)
-    sram_axi_bvalid <=1'b0;
-else begin
-    if (axi_whsk)//写握手
-        sram_axi_bvalid <=1'b1;
-    else if (sram_axi_bvalid & sram_axi_bready)//写响应握手
-        sram_axi_bvalid <=1'b0;
-    else//等待响应
-        sram_axi_bvalid <= sram_axi_bvalid;
-end
+
 
 always @(posedge clk or negedge rst_n)//读响应控制
 if (~rst_n)
@@ -70,8 +53,6 @@ always @(*) begin
     sram_axi_wready = axi_whsk;//写地址数据同时准备好
     sram_axi_rdata = dout;//读数据
     sram_axi_arready = axi_rhsk;//读地址握手
-    sram_axi_bresp = 2'b00;//响应
-    sram_axi_rresp = 2'b00;//响应
     if(axi_whsk) begin//写握手
         addr = sram_axi_awaddr[clogb2(`SRamSize-1)+1:2];
         we = 1;

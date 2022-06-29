@@ -4,16 +4,20 @@
 #include "system.h"
 #include "uart.h"
 
-uint32_t adc_v;
-uint8_t a[13];
-uint8_t abc=0;
-
-
+uint8_t a[60];
+//测试
 int main()
 {
+    a[0]='R';
+    a[1]='V';
+    a[2]='3';
+    a[3]='2';
+    a[4]='I';
+    a[5]='M';
+    a[6]='\n';
+    a[7]=0x00;
     uart_init(9600);
-    a[4]=0xcc;
-    a[5]=0x00;
-    xprintf("%s", "Hello world!!!\n");
-    xprintf("%s", "SparrowRV!!!\n");
+    xprintf("%s", "Hello world\n");
+    xprintf("%s", "SparrowRV ");
+    xprintf("%s", a);
 }
