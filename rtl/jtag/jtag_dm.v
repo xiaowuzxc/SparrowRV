@@ -32,9 +32,6 @@ module jtag_dm #(
     dm_mem_sel_o,
 
     req_valid_o,
-    req_ready_i,
-    rsp_valid_i,
-    rsp_ready_o,
 
     dm_halt_req_o,
     dm_reset_req_o
@@ -64,9 +61,6 @@ module jtag_dm #(
     input wire[31:0] dm_mem_rdata_i;
     output wire[3:0] dm_mem_sel_o;
     output wire req_valid_o;
-    input wire req_ready_i;
-    input wire rsp_valid_i;
-    output wire rsp_ready_o;
     output wire dm_halt_req_o;
     output wire dm_reset_req_o;
 
@@ -316,10 +310,6 @@ module jtag_dm #(
         end
     end
 
-    wire jtag_req_hsked = (req_valid_o & req_ready_i);
-    wire jtag_rsp_hsked = (rsp_valid_i & rsp_ready_o);
-
-    assign rsp_ready_o = (~rst_n)? 1'b0: 1'b1;
     assign dm_mem_sel_o = dm_mem_sel;
 
 

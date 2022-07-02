@@ -15,8 +15,8 @@ module idex(
         //32位地址空间
     input wire[`MemBus] mem_rdata_i,        //读内存数据
         //div
-    output reg[`RegBus] dividend_o,         //被除数
-    output reg[`RegBus] divisor_o,          //除数
+    output reg[`RegBus] dividend_o,         //被除数rs1
+    output reg[`RegBus] divisor_o,          //除数rs2
     output reg[2:0] div_op_o,               //除法指令标志
     output reg div_start_o,                 //除法运算开始标志
     input wire[`RegBus] div_result_i,       //除法运算结果

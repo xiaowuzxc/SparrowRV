@@ -4,6 +4,7 @@ module core (
     input wire rst_n,
 
     input wire ex_trap_i,//外部中断
+    input wire halt_req_i,//jtag停住cpu
 
     //AXI4-Lite总线接口 Master core
     //AW写地址
@@ -103,6 +104,7 @@ sctr inst_sctr
     .div_start_i      (div_start),
     .div_ready_i      (div_ready),
     .iram_rstn_i      (iram_rstn),
+    .halt_req_i       (halt_req_i),
     .trap_in_i        (trap_in),
     .trap_jump_i      (trap_jump),
     .idex_mret_i      (idex_mret),
@@ -126,7 +128,7 @@ sctr inst_sctr
     .sctr_axi_rresp   (core_axi_rresp  ),
     .sctr_axi_rvalid  (core_axi_rvalid ),
     .sctr_axi_rready  (core_axi_rready ),
-    .hx_valid       (hx_valid)
+    .hx_valid         (hx_valid)
 );
 
 regs inst_regs

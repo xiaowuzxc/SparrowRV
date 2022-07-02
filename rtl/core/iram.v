@@ -63,18 +63,6 @@ reg [`MemBus]dinb;
 wire axi_whsk = iram_axi_awvalid & iram_axi_wvalid;//写通道握手
 wire axi_rhsk = iram_axi_arvalid & (~iram_axi_rvalid | (iram_axi_rvalid & iram_axi_rready));//读通道握手,没有读响应
 
-always @(posedge clk or negedge rst_n)//写响应控制
-if (~rst_n)
-    iram_axi_bvalid <=1'b0;
-else begin
-    if (axi_whsk)//写握手
-        iram_axi_bvalid <=1'b1;
-    else if (iram_axi_bvalid & iram_axi_bready)//写响应握手
-        iram_axi_bvalid <=1'b0;
-    else//等待响应
-        iram_axi_bvalid <= iram_axi_bvalid;
-end
-
 always @(posedge clk or negedge rst_n)//读响应控制
 if (~rst_n)
     iram_axi_rvalid <=1'b0;
@@ -92,6 +80,7 @@ always @(*) begin
     iram_axi_wready = axi_whsk;//写地址数据同时准备好
     iram_axi_rdata = doutb;//读数据
     iram_axi_arready = axi_rhsk;//读地址握手
+    iram_axi_bvalid = 1'b1;
     iram_axi_bresp = 2'b00;//响应
     iram_axi_rresp = 2'b00;//响应
     if(axi_whsk) begin//写握手

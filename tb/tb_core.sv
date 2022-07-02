@@ -6,8 +6,9 @@ module tb_core(); /* this is automatically generated */
 logic clk;
 logic rst_n;
 logic ex_trap_i;
+logic JTAG_TCK,JTAG_TMS,JTAG_TDI,JTAG_TDO;//jtag
 
-integer r;//计数
+integer r;//计数工具人
 
 //寄存器监测
 wire [31:0] x3  = `CorePath.inst_regs.regs[3];
@@ -45,12 +46,14 @@ wire [31:0] t3  = `CorePath.inst_regs.regs[28];
 wire [31:0] t4  = `CorePath.inst_regs.regs[29];
 wire [31:0] t5  = `CorePath.inst_regs.regs[30];
 wire [31:0] t6  = `CorePath.inst_regs.regs[31];
-wire mends = `CorePath.inst_csr.mends;
-// read mem data
+wire mends = `CorePath.inst_csr.mends;//仿真结束标志
+
+// 读入程序
 initial begin
 	$readmemh ("inst.txt", `CorePath.inst_iram.inst_dpram.BRAM);
 end
-// clk
+
+// 生成clk
 initial begin
 	clk = '0;
 	forever #(0.5) clk = ~clk;
@@ -59,14 +62,17 @@ end
 //启动测试
 initial begin
 	ex_trap_i=0;
-	adcrst();//复位系统
+	JTAG_TCK=0;
+	JTAG_TMS=0;
+	JTAG_TDI=0;
+	sysrst();//复位系统
 	#30;
 	ex_trap_i=1;
 	#7;
 	ex_trap_i=0;
 
-`ifdef ISA_TEST
-	wait(x26 == 32'b1)   // wait sim end, when x26 == 1
+`ifdef ISA_TEST  //通过宏定义，控制是否是指令集测试程序
+	wait(x26 == 32'b1)   // x26 == 1，结束仿真
 	#10
 	if (x27 == 32'b1) begin
 	$display("~~~~~~~~~~~~~~~~~~~ TEST_PASS ~~~~~~~~~~~~~~~~~~~");
@@ -92,14 +98,14 @@ initial begin
 	for (r = 1; r < 32; r = r + 1)
 		$display("x%2d = 0x%x", r, `CorePath.inst_regs.regs[r]);
 	end
-	$finish;
+	$finish;//结束
 `endif
 
 end
 
 initial begin
 	#30000;
-	$display("Timeout");
+	$display("Timeout");//超时
 `ifdef ISA_TEST
 	$display("ISA_TEST Err");
 `endif
@@ -108,24 +114,28 @@ end
 
 initial begin
 	#30;
-	wait(mends === 1'b1)
+	wait(mends === 1'b1)//软件控制仿真结束
 	$display("CSR MENDS END");
 	#10;
 	$finish;
 end
 
-task adcrst;//复位任务
+task sysrst;//复位任务
 	rst_n <= '0;
 	#10
 	rst_n <= '1;
 	#5;
-endtask : adcrst
+endtask : sysrst
 
 
 
 sparrow_soc inst_sparrow_soc (
 	.clk(clk), 
 	.rst_n(rst_n), 
+	.JTAG_TCK(JTAG_TCK),
+	.JTAG_TMS(JTAG_TMS),
+	.JTAG_TDI(JTAG_TDI),
+	.JTAG_TDO(JTAG_TDO),
 	.ex_trap_i(ex_trap_i)
 );
 
