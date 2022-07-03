@@ -1,4 +1,4 @@
-`define RstPC 32'h0 //复位后PC
+`define RstPC 32'h0000_0000 //复位后PC
 
 
 `define IRam_KB 32 //iram指令存储器大小，单位为KB

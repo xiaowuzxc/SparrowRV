@@ -131,7 +131,7 @@ endtask : sysrst
 
 sparrow_soc inst_sparrow_soc (
 	.clk(clk), 
-	.rst_n(rst_n), 
+	.hard_rst_n(rst_n), 
 	.JTAG_TCK(JTAG_TCK),
 	.JTAG_TMS(JTAG_TMS),
 	.JTAG_TDI(JTAG_TDI),

@@ -1,7 +1,7 @@
 `include "defines.v"
 module sparrow_soc (
     input wire clk,    // Clock
-    input wire rst_n,  // Asynchronous reset active low
+    input wire hard_rst_n,  //来自外部引脚的复位信号
 
     input  wire JTAG_TCK,
     input  wire JTAG_TMS,
@@ -10,6 +10,7 @@ module sparrow_soc (
 
     input wire ex_trap_i//外部中断
 );
+
 //*********************************
 //           定义线网
 //
@@ -97,6 +98,7 @@ core inst_core
     .rst_n            (rst_n),
     .ex_trap_i        (ex_trap_i),
     .halt_req_i       (halt_req),
+    .soft_rst         (soft_rst_en),
 //m1
     .core_axi_awaddr  (core_axi_awaddr ),
     .core_axi_awprot  (core_axi_awprot ),
@@ -143,7 +145,7 @@ core inst_core
 jtag_top inst_jtag_top
 (
     .clk              (clk),
-    .jtag_rst_n       (rst_n),
+    .jtag_rst_n       (jtag_rst_n),
     .jtag_pin_TCK     (JTAG_TCK),
     .jtag_pin_TMS     (JTAG_TMS),
     .jtag_pin_TDI     (JTAG_TDI),
@@ -173,7 +175,7 @@ jtag_top inst_jtag_top
     .jtag_axi_rvalid  (jtag_axi_rvalid ),
     .jtag_axi_rready  (jtag_axi_rready ),
     .halt_req_o       (halt_req),
-    .reset_req_o      (reset_req)
+    .reset_req_o      (jtag_rst_en)
 );
 
 //s1 sram外设
@@ -454,10 +456,15 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s15_axi_rready  ()
 );
 
-
-
-
-
+rstc inst_rstc
+(
+    .clk         (clk),
+    .hard_rst_n  (hard_rst_n),
+    .soft_rst_en (soft_rst_en),
+    .jtag_rst_en (jtag_rst_en),
+    .rst_n       (rst_n),
+    .jtag_rst_n  (jtag_rst_n)
+);
 
 
 endmodule

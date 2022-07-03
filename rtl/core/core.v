@@ -6,6 +6,8 @@ module core (
     input wire ex_trap_i,//外部中断
     input wire halt_req_i,//jtag停住cpu
 
+    output wire soft_rst,//mcctr[3]软件复位
+
     //AXI4-Lite总线接口 Master core
     //AW写地址
     output wire [`MemAddrBus]   core_axi_awaddr ,//写地址
@@ -241,6 +243,7 @@ csr inst_csr
     .trap_csr_wdata_i (trap_csr_wdata),
     .trap_csr_rdata_o (trap_csr_rdata),
     .mepc             (mepc),
+    .soft_rst         (soft_rst),
     .ex_trap_i        (ex_trap_i),
     .ex_trap_o        (pex_trap),
     .tcmp_trap_o      (ptcmp_trap),

@@ -15,6 +15,9 @@
 **功能框图**  
 ![soc架构](/pic/img/soc架构.svg)  
 
+软件开发请参阅[板级支持包BSP](#板级支持包BSP)  
+仿真环境搭建请参阅[仿真流程](#仿真)  
+
 ## 设计进度
 ```
 SoC RTL
@@ -45,9 +48,9 @@ SoC RTL
 - 所有文本采用UTF-8编码，具备良好的多语言和跨平台支持。  
 
 ## 仿真
-本工程需要使用 批处理/Makefile + Python3 + iverilog/gtkwave 进行仿真。如果已配置相关工具，可跳过环境配置步骤。    
+本工程使用 批处理/Makefile + Python3 + iverilog/gtkwave 完成仿真全流程。如果已配置相关工具，可跳过环境搭建步骤。    
 ### Linux环境搭建
-建议使用带有GUI界面的Linux的系统，否则功能受限  
+需要使用带有图形化界面的Linux的系统，否则无法正常仿真。    
 Debian系(Ubuntu、Debian、Deepin)执行以下命令：  
 ```
 sudo apt install make git python3 python3-tk gtkwave gcc g++ bison flex gperf autoconf
@@ -60,16 +63,13 @@ sudo make install
 cd ..
 rm -rf iverilog/
 ```
-如果使用命令[2]或[3]，需要安装`python3-tk`：  
-```
-sudo apt install 
-```
+其中，`python3-tk`只适用于有GUI界面的Linux的系统。若没有安装`python3-tk`，无法正常使用。  
 其他Linux发行版暂不提供支持，请自行探索。  
 
 ### Windows环境搭建
 - 进入[Python官网](https://www.python.org/)，下载并安装Python 3.x版本(建议使用稳定版)  
 - 进入[iverilog Win官网](http://bleyer.org/icarus/)，下载并安装iverilog-v12-20220611-x64_setup[18.2MB]  
-- (可跳过)如果想在Win系统使用make，请参阅**Makefile开发**。  
+- (可跳过)如果想在Win系统使用make，请参阅[Makefile开发](#Makefile开发)第2步。  
 
 Windows下iverilog安装流程及仿真可参考[视频教程](https://www.bilibili.com/video/bv1dS4y1H7zn)  
 
@@ -92,9 +92,8 @@ iverilog是仿真工具，gtkwave用于查看波形。
 
 ### 问题说明
 - inst.txt是被testbench读入指令存储器的文件，处理器将执行此文件中的命令  
-- bin文件不能直接被读取，需要先转换为inst.txt  
+- 程序编译生成的bin文件不能直接被读取，需要先转换为inst.txt  
 - iverilog版本建议大于v11，低于此版本可能会无法运行  
-- 命令[2]或[3]需要Python3-tkinter支持和图形化界面，Linux用户请注意  
 - Makefile环境下可能会出现gtkwave开着的情况下不显示打印信息  
 
 
@@ -134,7 +133,7 @@ SparrowRV
          ├─riscv-none-embed
          └─share
 ```
-2. Linux或已安装make的windows用户可跳过。下载make.exe，将make.exe所在的路径添加至环境变量`Path`  
+2. Linux或已安装make的windows用户可跳过。下载上方GCC工具链中的make.exe，将make.exe所在的路径添加至环境变量`Path`，添加环境变量的步骤自行百度。  
 3. 进入`/bsp/app/`，终端输入`make`，执行编译，此目录下会输出文件  
 4. 进入`/bsp/app/`，终端输入`make clean`，清理编译文件  
 

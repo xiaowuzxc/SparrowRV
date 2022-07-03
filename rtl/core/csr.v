@@ -20,6 +20,7 @@ module csr(
 
     //直接输出通道
     output reg [`RegBus] mepc,//CSR mepc寄存器
+    output wire soft_rst,//mcctr[3]软件复位
 
     //中断处理通道
     //输入
@@ -65,10 +66,12 @@ reg [63:0] mcycle;//运行周期计数
 reg [63:0] minstret;//指令计数
 reg [63:0] mtime;//定时器
 reg [63:0] mtimecmp;//定时器比较
-reg [2 :0] mcctr;//计数器控制
+reg [3 :0] mcctr;//系统控制
 //[0]:mcycle使能
 //[1]:minstret使能
 //[2]:mtime使能
+//[3]:soft_rst写1复位
+assign soft_rst = mcctr[3];
 wire[`RegBus] mvendorid=32'h0;//Vendor ID
 wire[`RegBus] marchid=32'd1;//微架构编号
 wire[`RegBus] mimpid=32'd1;//硬件实现编号
@@ -269,7 +272,7 @@ always @ (posedge clk or negedge rst_n) begin
         mprints <= 0;
         mends <= 0;
         mtimecmp <= 64'hffff_ffff_ffff_ffff;//比较器复位为最大值
-        mcctr <= 3'b0;
+        mcctr <= 4'b0;
     end else begin
         if (idex_csr_we_i) begin //优先idex写
             case (idex_csr_addr_i)
@@ -316,7 +319,7 @@ always @ (posedge clk or negedge rst_n) begin
                     mtimecmp[63:32] <= idex_csr_wdata_i;
                 end
                 `CSR_MCCTR: begin
-                    mcctr <= idex_csr_wdata_i[2:0];
+                    mcctr <= idex_csr_wdata_i[3:0];
                 end
 
                 default: begin
@@ -415,7 +418,7 @@ always @ (*) begin
             idex_csr_rdata_o = mtimecmp[63:32];
         end
         `CSR_MCCTR: begin
-            idex_csr_rdata_o = {29'h0, mcctr};
+            idex_csr_rdata_o = {28'h0, mcctr};
         end
         `CSR_MVENDORID: begin
             idex_csr_rdata_o = mvendorid;

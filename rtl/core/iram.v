@@ -7,7 +7,7 @@ module iram (
     output reg [`InstAddrBus] pc_o,//指令地址
     output wire[`InstBus] inst_o,//指令
 
-    output wire iram_rstn_o,//iram模块阻塞
+    output reg iram_rstn_o,//iram模块阻塞
 
     //AXI4-Lite总线接口 Slave
     //AW写地址
@@ -39,20 +39,21 @@ module iram (
 //port b: axi
 
 //PC复位
-reg rstn_r,rstn_rr;
-always @(posedge clk) begin
-    rstn_r <= rst_n;
-    rstn_rr <= rstn_r;
-    if(rstn_rr)
+always @(posedge clk or negedge rst_n) begin
+    if(~rst_n) begin
+        iram_rstn_o <= 1'b1;
+        pc_o <= `RstPC;
+    end 
+    else begin
+        iram_rstn_o <= 1'b0;
         if(iram_rd_i)
             pc_o <= pc_n_i;
         else
-            pc_o <= pc_o ;
-    else
-        pc_o <= 32'h0;
+            pc_o <= pc_o ;    
+    end
 end
-wire [clogb2(`IRamSize-1)-1:0]addra = rstn_rr ? pc_n_i[31:2] : 0;
-assign iram_rstn_o = ~rstn_rr;
+wire [31:0] rst_addr = `RstPC;
+wire [clogb2(`IRamSize-1)-1:0]addra = iram_rstn_o ? rst_addr[31:2] : pc_n_i[31:2];
 
 //AXI4L总线交互
 reg [clogb2(`IRamSize-1)-1:0]addrb;
@@ -116,7 +117,7 @@ dpram #(
     .web    (web),
     .wema   (4'h0),
     .wemb   (wemb),
-    .ena    (iram_rd_i | ~rstn_rr),
+    .ena    (iram_rd_i | iram_rstn_o),
     .enb    (enb),
     .rsta   (),
     .rstb   (),
