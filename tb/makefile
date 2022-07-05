@@ -15,6 +15,7 @@ list:
 	@echo 1: regress ISA test
 	@echo 2: .bin file turn into inst.txt
 	@echo 3: load .bin file and sim rtl
+	@echo 4: show last wave file
 	@echo c: clean tb file
 	@echo ------------------------------
 #-------------------------------------------------------------------------------------------------------
@@ -33,6 +34,10 @@ list:
 .PHONY : 3
 3 : 
 	python tools/isa_test.py sim_bin
+
+.PHONY : 4
+4 : 
+	python gtkwave tb.lxt
 
 #-------------------------------------------------------------------------------------------------------
 .PHONY : c
