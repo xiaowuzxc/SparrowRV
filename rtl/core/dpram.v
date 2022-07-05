@@ -21,7 +21,6 @@ module dpram #(
     output [RAM_WIDTH-1:0] douta,         // Port A RAM output data
     output [RAM_WIDTH-1:0] doutb          // Port B RAM output data
 );
-localparam RAM_PERFORMANCE = "LOW_LATENCY";
 
 reg [RAM_WIDTH-1:0] BRAM [0:RAM_DEPTH-1];
 reg [RAM_WIDTH-1:0] ram_data_a = {RAM_WIDTH{1'b0}};
@@ -31,7 +30,6 @@ reg [RAM_WIDTH-1:0] ram_data_b = {RAM_WIDTH{1'b0}};
 
 always @(posedge clka)
     if (ena) begin
-        ram_data_a <= BRAM[addra];
         if (wea) begin
             if(wema[0])
                 BRAM[addra][7:0] <= dina[7:0];
@@ -42,11 +40,13 @@ always @(posedge clka)
             if(wema[3])
                 BRAM[addra][31:24] <= dina[31:24];
         end
+        else begin
+            ram_data_a <= BRAM[addra];
+        end
     end
 
 always @(posedge clka)
     if (enb) begin
-        ram_data_b <= BRAM[addrb];
         if (web) begin
             if(wemb[0])
                 BRAM[addrb][7:0] <= dinb[7:0];
@@ -57,40 +57,14 @@ always @(posedge clka)
             if(wemb[3])
                 BRAM[addrb][31:24] <= dinb[31:24];
         end
+        else begin
+            ram_data_b <= BRAM[addrb];
+        end
     end
 
-//  The following code generates HIGH_PERFORMANCE (use output register) or LOW_LATENCY (no output register)
-generate
-    if (RAM_PERFORMANCE == "LOW_LATENCY") begin: no_output_register
+assign douta = ram_data_a;
+assign doutb = ram_data_b;
 
-        // The following is a 1 clock cycle read latency at the cost of a longer clock-to-out timing
-         assign douta = ram_data_a;
-         assign doutb = ram_data_b;
-
-    end else begin: output_register
-
-        // The following is a 2 clock cycle read latency with improve clock-to-out timing
-
-        reg [RAM_WIDTH-1:0] douta_reg = {RAM_WIDTH{1'b0}};
-        reg [RAM_WIDTH-1:0] doutb_reg = {RAM_WIDTH{1'b0}};
-
-        always @(posedge clka)
-            if (rsta)
-                douta_reg <= {RAM_WIDTH{1'b0}};
-            else if (regcea)
-                douta_reg <= ram_data_a;
-
-        always @(posedge clka)
-            if (rstb)
-                doutb_reg <= {RAM_WIDTH{1'b0}};
-            else if (regceb)
-                doutb_reg <= ram_data_b;
-
-        assign douta = douta_reg;
-        assign doutb = doutb_reg;
-
-    end
-endgenerate
 
 //  The following function calculates the address width based on specified RAM depth
 function integer clogb2;

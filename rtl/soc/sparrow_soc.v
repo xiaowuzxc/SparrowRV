@@ -87,6 +87,20 @@ wire                sram_axi_arready;
 wire [`MemBus]      sram_axi_rdata  ;
 wire                sram_axi_rvalid ;
 wire                sram_axi_rready ;
+
+wire [`MemAddrBus]  sysio_axi_awaddr ;
+wire                sysio_axi_awvalid;
+wire                sysio_axi_awready;
+wire [`MemBus]      sysio_axi_wdata  ;
+wire [3:0]          sysio_axi_wstrb  ;
+wire                sysio_axi_wvalid ;
+wire                sysio_axi_wready ;
+wire [`MemAddrBus]  sysio_axi_araddr ;
+wire                sysio_axi_arvalid;
+wire                sysio_axi_arready;
+wire [`MemBus]      sysio_axi_rdata  ;
+wire                sysio_axi_rvalid ;
+wire                sysio_axi_rready ;
 //
 //           定义线网
 //*********************************
@@ -99,7 +113,7 @@ core inst_core
     .ex_trap_i        (ex_trap_i),
     .halt_req_i       (halt_req),
     .soft_rst         (soft_rst_en),
-//m1
+//m1 内核
     .core_axi_awaddr  (core_axi_awaddr ),
     .core_axi_awprot  (core_axi_awprot ),
     .core_axi_awvalid (core_axi_awvalid),
@@ -119,7 +133,7 @@ core inst_core
     .core_axi_rresp   (core_axi_rresp  ),
     .core_axi_rvalid  (core_axi_rvalid ),
     .core_axi_rready  (core_axi_rready ),
-//s0
+//s0 iram指令存储器
     .iram_axi_awaddr  (iram_axi_awaddr ),
     .iram_axi_awprot  (3'h0),
     .iram_axi_awvalid (iram_axi_awvalid),
@@ -150,11 +164,11 @@ jtag_top inst_jtag_top
     .jtag_pin_TMS     (JTAG_TMS),
     .jtag_pin_TDI     (JTAG_TDI),
     .jtag_pin_TDO     (JTAG_TDO),
-    .reg_we_o         (reg_we_o),
-    .reg_addr_o       (reg_addr_o),
-    .reg_wdata_o      (reg_wdata_o),
+    .reg_we_o         (),
+    .reg_addr_o       (),
+    .reg_wdata_o      (),
     .reg_rdata_i      (32'b0),
-    //m0
+    //m0 jtag
     .jtag_axi_awaddr  (jtag_axi_awaddr ),
     .jtag_axi_awprot  (jtag_axi_awprot ),
     .jtag_axi_awvalid (jtag_axi_awvalid),
@@ -196,6 +210,25 @@ sram inst_sram
     .sram_axi_rdata   (sram_axi_rdata  ),
     .sram_axi_rvalid  (sram_axi_rvalid ),
     .sram_axi_rready  (sram_axi_rready )
+);
+//s2 sysio系统输入输出接口
+sysio inst_sysio
+(
+    .clk               (clk),
+    .rst_n             (rst_n),
+    .sysio_axi_awaddr  (sysio_axi_awaddr ),
+    .sysio_axi_awvalid (sysio_axi_awvalid),
+    .sysio_axi_awready (sysio_axi_awready),
+    .sysio_axi_wdata   (sysio_axi_wdata  ),
+    .sysio_axi_wstrb   (sysio_axi_wstrb  ),
+    .sysio_axi_wvalid  (sysio_axi_wvalid ),
+    .sysio_axi_wready  (sysio_axi_wready ),
+    .sysio_axi_araddr  (sysio_axi_araddr ),
+    .sysio_axi_arvalid (sysio_axi_arvalid),
+    .sysio_axi_arready (sysio_axi_arready),
+    .sysio_axi_rdata   (sysio_axi_rdata  ),
+    .sysio_axi_rvalid  (sysio_axi_rvalid ),
+    .sysio_axi_rready  (sysio_axi_rready )
 );
 
 
@@ -272,19 +305,19 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s1_axi_rvalid   (sram_axi_rvalid ),
     .s1_axi_rready   (sram_axi_rready ),
     
-    .s2_axi_awaddr   (),
-    .s2_axi_awvalid  (),
-    .s2_axi_awready  (),
-    .s2_axi_wdata    (),
-    .s2_axi_wstrb    (),
-    .s2_axi_wvalid   (),
-    .s2_axi_wready   (),
-    .s2_axi_araddr   (),
-    .s2_axi_arvalid  (),
-    .s2_axi_arready  (),
-    .s2_axi_rdata    (),
-    .s2_axi_rvalid   (),
-    .s2_axi_rready   (),
+    .s2_axi_awaddr   (sysio_axi_awaddr ),
+    .s2_axi_awvalid  (sysio_axi_awvalid),
+    .s2_axi_awready  (sysio_axi_awready),
+    .s2_axi_wdata    (sysio_axi_wdata  ),
+    .s2_axi_wstrb    (sysio_axi_wstrb  ),
+    .s2_axi_wvalid   (sysio_axi_wvalid ),
+    .s2_axi_wready   (sysio_axi_wready ),
+    .s2_axi_araddr   (sysio_axi_araddr ),
+    .s2_axi_arvalid  (sysio_axi_arvalid),
+    .s2_axi_arready  (sysio_axi_arready),
+    .s2_axi_rdata    (sysio_axi_rdata  ),
+    .s2_axi_rvalid   (sysio_axi_rvalid ),
+    .s2_axi_rready   (sysio_axi_rready ),
     .s3_axi_awaddr   (),
     .s3_axi_awvalid  (),
     .s3_axi_awready  (),
@@ -455,7 +488,7 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s15_axi_rvalid  (),
     .s15_axi_rready  ()
 );
-
+//复位控制器
 rstc inst_rstc
 (
     .clk         (clk),

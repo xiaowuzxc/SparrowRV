@@ -3,7 +3,7 @@
  */
 #ifndef SYSTEM_H_
 #define SYSTEM_H_
-#define SYS_FRE 50000000
+#define SYS_FRE 25000000
 
 
 #endif /* SYSTEM_H_ */

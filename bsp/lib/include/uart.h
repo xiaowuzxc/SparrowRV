@@ -1,7 +1,8 @@
 #include "system.h"
 #ifndef _UART_H_
 #define _UART_H_
-#define UART0_BASE      (0x30000000)
+#define SYSIO_BASE      (0x20000000)
+#define UART0_BASE      (SYSIO_BASE + (0x000))
 #define UART0_CTRL      (UART0_BASE + (0x00))
 #define UART0_STATUS    (UART0_BASE + (0x04))
 #define UART0_BAUD      (UART0_BASE + (0x08))

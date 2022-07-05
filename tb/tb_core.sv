@@ -105,9 +105,10 @@ end
 
 initial begin
 	#30000;
-	$display("Timeout");//超时
 `ifdef ISA_TEST
-	$display("ISA_TEST Err");
+	$display("ISA_TEST Timeout, Err");//ISA测试超时
+`else 
+	$display("Normal Sim Timeout");//普通仿真超时
 `endif
 	$finish;
 end

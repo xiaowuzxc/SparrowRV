@@ -15,7 +15,7 @@
 **功能框图**  
 ![soc架构](/pic/img/soc架构.svg)  
 
-软件开发请参阅[板级支持包BSP](#板级支持包BSP)  
+软件开发请参阅[板级支持包BSP](#板级支持包bsp)  
 仿真环境搭建请参阅[仿真流程](#仿真)  
 
 ## 设计进度
@@ -49,6 +49,7 @@ SoC RTL
 
 ## 仿真
 本工程使用 批处理/Makefile + Python3 + iverilog/gtkwave 完成仿真全流程。如果已配置相关工具，可跳过环境搭建步骤。    
+如果需要编写c语言程序并仿真，请参阅[板级支持包BSP](#板级支持包bsp)  
 ### Linux环境搭建
 需要使用带有图形化界面的Linux的系统，否则无法正常仿真。    
 Debian系(Ubuntu、Debian、Deepin)执行以下命令：  
@@ -85,7 +86,7 @@ iverilog是仿真工具，gtkwave用于查看波形。
 - [0]导入inst.txt，RTL仿真并显示波形  
 - [1]收集指令测试集程序，测试所有指令  
 - [2]转换bin文件为inst.txt，可被testbench读取  
-- [3]转换并导入bin文件，进行RTL仿真并显示波形  
+- [3]转换bin文件并进行RTL仿真、显示波形，主要用于仿真c语言程序  
 - [c]清理缓存文件  
 
 ![soc架构](/pic/img/仿真环境.svg)  

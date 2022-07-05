@@ -32,7 +32,7 @@ reg [3:0] wem;
 reg [`MemBus]dout;
 reg [`MemBus]din;
 wire axi_whsk = sram_axi_awvalid & sram_axi_wvalid;//写通道握手
-wire axi_rhsk = sram_axi_arvalid & (~sram_axi_rvalid | (sram_axi_rvalid & sram_axi_rready));//读通道握手,没有读响应或读响应握手成功
+wire axi_rhsk = sram_axi_arvalid & (~sram_axi_rvalid | (sram_axi_rvalid & sram_axi_rready)) & ~axi_whsk;//读通道握手,没有读响应或读响应握手成功
 
 
 
@@ -79,7 +79,6 @@ reg [RAM_WIDTH-1:0] BRAM [0:RAM_DEPTH-1];
 
 always @(posedge clk)
     if (en) begin//en则可读可写
-        dout <= BRAM[addr];
         if (we) begin//写使能
             if(wem[0])//写选通
                 BRAM[addr][7:0] <= din[7:0];
@@ -89,6 +88,9 @@ always @(posedge clk)
                 BRAM[addr][23:16] <= din[23:16];
             if(wem[3])//写选通
                 BRAM[addr][31:24] <= din[31:24];
+        end
+        else begin
+            dout <= BRAM[addr];
         end
     end
 
