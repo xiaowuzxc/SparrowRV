@@ -10,7 +10,7 @@
 @echo 4: show last wave file
 @echo c: clean tb file
 @echo ============================
-@set /p cmchc = Enter number: 
+@set /p cmchc=Enter number:
 
 @if %cmchc% == 0 (python tools/isa_test.py sim_rtl & goto cmsl)^
 else if %cmchc% == 1 (python tools/isa_test.py all_isa & goto cmsl)^
