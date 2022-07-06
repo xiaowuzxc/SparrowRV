@@ -1,6 +1,7 @@
 import os
 import sys
 from tkinter import filedialog
+
 def 找到所有bin文件(path):
 	找到的文件列表 = []
 	list_dir = os.walk(path)
@@ -57,6 +58,7 @@ def 编译并仿真():
 	if sys.argv[1] == 'all_isa':
 		编译命令+=r'-D ISA_TEST '
 	编译命令+=r'tb_core.sv '#仿真文件
+	编译命令+=r'W25Q128JVxIM.v '#仿真文件
 	编译进程 = os.popen(str(编译命令))
 	if sys.argv[1] != 'all_isa':
 		print(编译进程.read())
@@ -80,6 +82,11 @@ def bin文件转文本():
 	if 待转换的文件路径:
 		print(待转换的文件路径)
 		bin文件转换(待转换的文件路径, 'inst.txt')
+
+def 启动modelsim仿真():
+	仿真进程 = os.popen(r'vsim -do msim.tcl')
+	仿真进程.close()
+
 
 def main():
 	bin文件列表 = 找到所有bin文件(r'tools/isa/generated')
@@ -114,6 +121,11 @@ if __name__ == '__main__':
 	elif sys.argv[1] == 'sim_bin':
 		bin文件转文本()
 		sys.exit(编译并仿真())
+	elif sys.argv[1] == 'vsim_rtl':
+		sys.exit(启动modelsim仿真())
+	elif sys.argv[1] == 'vsim_bin':
+		bin文件转文本()
+		sys.exit(启动modelsim仿真())
 	else:
 		print(r'isa_test.py找不到指令')
 		sys.exit()

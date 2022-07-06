@@ -24,12 +24,12 @@ SoC RTL
  ├─内核
  │   ├─译码执行 (完成)
  │   ├─iram (完成)
- │   ├─CSR  (Debug 95%)
+ │   ├─CSR  (Debug 99%)
  │   ├─寄存器组 (完成)
  │   ├─总线接口 (Debug 95%)
  │   ├─中断控制 (Debug 95%)
  │   └─多周期指令控制 (OK)
- ├─外设 (15%)
+ ├─外设 (25%)
  └─调试 (移植完成)
 
 软件部分
@@ -44,11 +44,13 @@ SoC RTL
 - 处理器RTL设计采用Verilog-2001可综合子集。此版本代码密度更高，可读性更强，并且受到综合器的广泛支持。  
 - 处理器RTL验证采用System Verilog-2005。此版本充分满足仿真需求，并且受到仿真器的广泛支持。   
 - 数字逻辑仿真采用iverilog。开源免费的跨平台HDL仿真器，无法律风险。  
+- 提供Modelsim仿真脚本，便于windows用户使用。  
 - 辅助脚本采用 Batchfile批处理(Win)/Makefile(Linux) + Python3。发挥各种脚本语言的优势，最大程度地简化操作。  
 - 所有文本采用UTF-8编码，具备良好的多语言和跨平台支持。  
 
 ## 仿真
 本工程使用 批处理/Makefile + Python3 + iverilog/gtkwave 完成仿真全流程。如果已配置相关工具，可跳过环境搭建步骤。    
+同时，提供了Windows环境下Modelsim仿真脚本，详情见[Windows环境搭建](#windows环境搭建)[Modeslsim仿真](#modeslsim仿真)
 如果需要编写c语言程序并仿真，请参阅[板级支持包BSP](#板级支持包bsp)  
 ### Linux环境搭建
 需要使用带有图形化界面的Linux的系统，否则无法正常仿真。    
@@ -69,15 +71,14 @@ rm -rf iverilog/
 
 ### Windows环境搭建
 - 进入[Python官网](https://www.python.org/)，下载并安装Python 3.x版本(建议使用稳定版)  
+- (可跳过)如果想在Win系统使用make，请参阅[Makefile开发](#Makefile开发)第2步。 
+### iverilog仿真
 - 进入[iverilog Win官网](http://bleyer.org/icarus/)，下载并安装iverilog-v12-20220611-x64_setup[18.2MB]  
-- (可跳过)如果想在Win系统使用make，请参阅[Makefile开发](#Makefile开发)第2步。  
-
 Windows下iverilog安装流程及仿真可参考[视频教程](https://www.bilibili.com/video/bv1dS4y1H7zn)  
 
-### 开始仿真
 - `/tb/run.bat`是Windows环境下的启动器，进入`/tb/`目录，仅需双击`run.bat`即可启动人机交互界面。根据提示，输入单个数字或符号，按下回车即可执行对应项目。  
 - `/tb/makefile`是Windows/Linux环境下的启动器，进入`/tb/`目录，终端输入`make`即可启动人机交互界面。根据提示，输入`make`+`空格`+`单个数字或符号`，按下回车即可执行对应项目。   
-- 处理器运行C语言程序，见**板级支持包BSP**。需要将生成的`obj.bin`转换为`inst.txt`文件(命令2可以转换，命令3可以直接转换并仿真)，才能导入程序并执行仿真。
+- 处理器运行C语言程序，见[板级支持包BSP](#板级支持包bsp)。需要将生成的`obj.bin`转换为`inst.txt`文件(命令2转换，命令3可以直接转换并仿真)，才能导入程序并执行仿真。
 
 `/tb/tools/isa_test.py`是仿真脚本的核心，负责控制仿真流程，转换文件类型，数据收集，通过启动器与此脚本交互。一般情况下不建议修改。  
 iverilog是仿真工具，gtkwave用于查看波形。  
@@ -92,6 +93,19 @@ iverilog是仿真工具，gtkwave用于查看波形。
 
 **仿真环境框架** 
 ![soc架构](/pic/img/仿真环境.svg)  
+
+### Modeslsim仿真
+本工程提供了Modelsim仿真脚本，软件安装问题请各显神通  
+- `/tb/run.bat`是Windows环境下的启动器，进入`/tb/`目录，仅需双击`run.bat`即可启动人机交互界面。根据提示，输入单个数字或符号，按下回车即可执行对应项目。  
+- `/tb/makefile`是Windows/Linux环境下的启动器，进入`/tb/`目录，终端输入`make`即可启动人机交互界面。根据提示，输入`make`+`空格`+`单个数字或符号`，按下回车即可执行对应项目。   
+- 处理器运行C语言程序，见[板级支持包BSP](#板级支持包bsp)。需要将生成的`obj.bin`转换为`inst.txt`文件(命令2转换，命令3可以直接转换并仿真)，才能导入程序并执行仿真。  
+- `/tb/tools/msim.tcl`主导Modelsim仿真流程，Modelsim启动后自动读入。  
+
+目前支持的命令：  
+- [5]导入inst.txt，RTL仿真并显示波形  
+- [6]转换bin文件并进行RTL仿真、显示波形，主要用于仿真c语言程序  
+- [c]清理缓存文件  
+  
 
 ### 问题说明
 - inst.txt是被testbench读入指令存储器的文件，处理器将执行此文件中的命令  

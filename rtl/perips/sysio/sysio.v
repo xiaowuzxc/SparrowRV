@@ -3,6 +3,22 @@ module sysio (
 	input clk,
 	input rst_n,
 
+    output wire uart0_tx,
+    input  wire uart0_rx,
+
+    output wire uart1_tx,
+    input  wire uart1_rx,
+
+    output wire spi0_mosi,
+    input  wire spi0_miso,
+    output wire spi0_ss  ,
+    output wire spi0_clk ,
+
+    output wire spi1_mosi,
+    input  wire spi1_miso,
+    output wire spi1_ss  ,
+    output wire spi1_clk ,
+
     //AXI4-Lite总线接口 Slave
     //AW写地址
     input wire [`MemAddrBus]    sysio_axi_awaddr ,//写地址
@@ -145,8 +161,8 @@ spi inst_spi0
 
     .spi_mosi (spi0_mosi),
     .spi_miso (spi0_miso),
-    .spi_ss   (spi0_ss),
-    .spi_clk  (spi0_clk)
+    .spi_ss   (spi0_ss  ),
+    .spi_clk  (spi0_clk )
 );
 //3 spi1
 spi inst_spi1
@@ -164,8 +180,8 @@ spi inst_spi1
 
     .spi_mosi (spi1_mosi),
     .spi_miso (spi1_miso),
-    .spi_ss   (spi1_ss),
-    .spi_clk  (spi1_clk)
+    .spi_ss   (spi1_ss  ),
+    .spi_clk  (spi1_clk )
 );
 //4 gpio
 endmodule

@@ -61,7 +61,7 @@ wire signed[`RegBus] imm12i= {{20{inst_i[31]}} , inst_i[31:20]};//有符号12位
 wire signed[`RegBus] imm12s= {{20{inst_i[31]}} , inst_i[31:25] , inst_i[11:7]};//有符号12位立即数扩展，S type，sb,sh
 wire signed[`RegBus] imm12b= {{20{inst_i[31]}} , inst_i[7], inst_i[30:25], inst_i[11:8], 1'b0};//有符号12位立即数扩展，B type，beq
 wire [`RegBus] imm20u= {inst_i[31:12] , 12'h0};//20位立即数左移12位，U type，lui,auipc
-wire signed[`RegBus] imm20j= {{12{inst_i[31]}}, inst_i[19:12], inst_i[20], inst_i[30:21], 1'b0};;//有符号20位立即数扩展，J type，jal
+wire signed[`RegBus] imm20j= {{12{inst_i[31]}}, inst_i[19:12], inst_i[20], inst_i[30:21], 1'b0};//有符号20位立即数扩展，J type，jal
 wire [4:0]shamt = inst_i[24:20];//rs2位置的立即数
 
 //复用运算单元

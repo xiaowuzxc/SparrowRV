@@ -14,9 +14,11 @@
 
 | 编号 | 功能 |
 |---|---|
-|0 | 载入inst.txt并仿真|
-|1 | 执行RISC-V ISA测试集|
+|0 | 使用iverilog载入inst.txt并仿真|
+|1 | 使用iverilog执行RISC-V ISA测试集|
 |2 | bin文件转为inst.txt|
-|3 | 载入bin文件并仿真|
-|4 | 显示上一次的仿真波形|
+|3 | 使用iverilog载入bin文件并仿真|
+|4 | 使用gtkwave显示上一次的仿真波形tb.lxt|
+|5 | 使用modelsim载入inst.txt并仿真|
+|6 | 使用modelsim载入bin文件并仿真|
 |c | 清理缓存文件|

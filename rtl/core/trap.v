@@ -189,7 +189,7 @@ always @(*) begin //输出
         end
         CMIE: begin//关闭全局中断mstatus->MPIE=MIE,MIE=0
             trap_in_o=1;
-            csr_wdata_o={csr_rdata_i[31:8],csr_rdata_i[3],csr_rdata_i[6:4],1'b0,csr_rdata_i[2:0]};;
+            csr_wdata_o={csr_rdata_i[31:8],csr_rdata_i[3],csr_rdata_i[6:4],1'b0,csr_rdata_i[2:0]};
             csr_we_o=1;
             csr_addr_o=`CSR_MSTATUS;
         end

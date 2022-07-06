@@ -26,12 +26,17 @@ module full_handshake_tx #(
 
     );
 
-    localparam STATE_IDLE     = 3'b001;
-    localparam STATE_ASSERT   = 3'b010;
-    localparam STATE_DEASSERT = 3'b100;
+localparam STATE_IDLE     = 3'b001;
+localparam STATE_ASSERT   = 3'b010;
+localparam STATE_DEASSERT = 3'b100;
 
-    reg[2:0] state;
-    reg[2:0] state_next;
+reg[2:0] state;
+reg[2:0] state_next;
+reg ack_d;
+reg ack;
+reg req;
+reg[DW-1:0] req_data;
+reg idle;
 
     always @ (posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -72,8 +77,6 @@ module full_handshake_tx #(
         endcase
     end
 
-    reg ack_d;
-    reg ack;
 
     // 将应答信号打两拍进行同步
     always @ (posedge clk or negedge rst_n) begin
@@ -86,9 +89,6 @@ module full_handshake_tx #(
         end
     end
 
-    reg req;
-    reg[DW-1:0] req_data;
-    reg idle;
 
     always @ (posedge clk or negedge rst_n) begin
         if (!rst_n) begin

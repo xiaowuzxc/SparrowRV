@@ -1,23 +1,25 @@
 #-------------------------------------------------------------------------------------------------------
 list:
-	@echo ------------------------------
+	@echo ==============================
 	@echo It is a UserGuide.
 	@echo Must have iverilog, gtkwave and Python
-	@echo ------------------------------
+	@echo ==============================
 	@echo input : make [cmd] 
 	@echo to choice what you want.
 	@echo ------------------------------
 	@echo Such as:make 1
 	@echo You can sim D bus 
-	@echo ------------------------------
-	@echo [cmd]: information
-	@echo 0: load inst.txt and sim rtl
-	@echo 1: regress ISA test
+	@echo ==============================
+	@echo [cmd]: information---------------Tools
+	@echo 0: load inst.txt and sim rtl-----iverilog   
+	@echo 1: regress ISA test--------------iverilog   
 	@echo 2: .bin file turn into inst.txt
-	@echo 3: load .bin file and sim rtl
-	@echo 4: show last wave file
+	@echo 3: load .bin file and sim rtl----iverilog   
+	@echo 4: show last wave file-----------gtkwave
+	@echo 5: load inst.txt and sim rtl-----modelsim
+	@echo 6: load .bin file and sim rtl----modelsim
 	@echo c: clean tb file
-	@echo ------------------------------
+	@echo ==============================
 #-------------------------------------------------------------------------------------------------------
 .PHONY : 0
 0 : 
@@ -39,8 +41,14 @@ list:
 4 : 
 	python gtkwave tb.lxt
 
+.PHONY : 5
+5 : python tools/isa_test.py vsim_rtl
+
+.PHONY : 6
+6 : python tools/isa_test.py vsim_bin
+
 #-------------------------------------------------------------------------------------------------------
 .PHONY : c
 c  :
-	 rm  -rf  tb *.lxt inst.txt
+	rm  -rf  tb *.lxt inst.txt work transcript vlog.opt 
 #-------------------------------------------------------------------------------------------------------
