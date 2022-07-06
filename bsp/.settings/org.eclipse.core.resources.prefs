@@ -1,5 +1,11 @@
 eclipse.preferences.version=1
 encoding//app/main.c=UTF-8
+encoding//lib/include/trap.h=GBK
+encoding//lib/include/uart.h=GBK
+encoding//lib/include/utils.h=GBK
+encoding//lib/include/xprintf.h=GBK
+encoding//lib/src/trap.c=GBK
+encoding//lib/src/uart.c=GBK
 encoding//lib/src/utils.c=GBK
 encoding//lib/start.S=UTF-8
 encoding//lib/system.h=UTF-8

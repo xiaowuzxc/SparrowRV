@@ -66,7 +66,7 @@ initial begin
 	JTAG_TMS=0;
 	JTAG_TDI=0;
 	sysrst();//复位系统
-	#30;
+	#900;
 	ex_trap_i=1;
 	#7;
 	ex_trap_i=0;

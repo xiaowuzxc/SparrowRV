@@ -1,4 +1,6 @@
 #include "system.h"
+#include "xprintf.h"
+#include "utils.h"
 #ifndef _UART_H_
 #define _UART_H_
 #define SYSIO_BASE      (0x20000000)

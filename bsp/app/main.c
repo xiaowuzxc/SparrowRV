@@ -1,13 +1,16 @@
-#include <stdint.h>
+#include "system.h"
 #include "utils.h"
 #include "xprintf.h"
-#include "system.h"
 #include "uart.h"
-
+#include "trap.h"
 uint8_t a[60];
 //测试
 int main()
 {
+    trap_en_ctrl(TRAP_GLBL,ENABLE);
+    trap_en_ctrl(TRAP_EXTI,ENABLE);
+    trap_trig_ctrl(TRAP_EXTI,TRAP_TRIG_NE);
+    trap_trig_ctrl(TRAP_EXTI,TRAP_TRIG_PE);
     a[0]='R';
     a[1]='V';
     a[2]='3';
@@ -16,7 +19,7 @@ int main()
     a[5]='M';
     a[6]='\n';
     a[7]=0x00;
-    uart_init(9600);
+    uart_init(25000000);
     xprintf("%s", "Hello world\n");
     xprintf("%s", "SparrowRV ");
     xprintf("%s", a);

@@ -81,14 +81,16 @@ Windows下iverilog安装流程及仿真可参考[视频教程](https://www.bilib
 
 `/tb/tools/isa_test.py`是仿真脚本的核心，负责控制仿真流程，转换文件类型，数据收集，通过启动器与此脚本交互。一般情况下不建议修改。  
 iverilog是仿真工具，gtkwave用于查看波形。  
-**仿真流程**  
+
 目前支持的命令：  
 - [0]导入inst.txt，RTL仿真并显示波形  
 - [1]收集指令测试集程序，测试所有指令  
 - [2]转换bin文件为inst.txt，可被testbench读取  
 - [3]转换bin文件并进行RTL仿真、显示波形，主要用于仿真c语言程序  
+- [4]显示上一次的仿真波形  
 - [c]清理缓存文件  
 
+**仿真环境框架** 
 ![soc架构](/pic/img/仿真环境.svg)  
 
 ### 问题说明
@@ -105,10 +107,10 @@ BSP支持3种开发方式
 2. Windows+Makefile  
 3. MRS图形化界面开发   
 
-`1` `2`的操作流程大致相同，Win/Linux双平台支持，适合老司机，环境配置与使用说明见**Makefile开发**。  
-`3`有图形化界面，仅限Win系统，适合习惯用keil的开发者，环境配置与使用说明见**图形化界面开发**。  
+`1` `2`的操作流程大致相同，Win/Linux双平台支持，适合老司机，环境配置与使用说明见[Makefile开发](#makefile开发)。  
+`3`有图形化界面，仅限Win系统，适合习惯用keil的开发者，环境配置与使用说明见[图形化界面开发](#图形化界面开发)。  
 
-#### Makefile开发
+### Makefile开发
 **支持Linux和Windows**  
 通过makefile脚本，仅需终端输入make，即可执行自动化编译。虽然写脚本有点麻烦，但是后期用得爽。    
 使用流程：  
@@ -138,7 +140,7 @@ SparrowRV
 3. 进入`/bsp/app/`，终端输入`make`，执行编译，此目录下会输出文件  
 4. 进入`/bsp/app/`，终端输入`make clean`，清理编译文件  
 
-#### 图形化界面开发
+### 图形化界面开发
 **仅支持Windows**  
 本工程使用MRS(MounRiver Studio)作为图形化开发环境。MRS基于Eclipse GNU版本开发，支持中文界面，配置了完善的GCC工具链，可以做到开箱即用。  
 官网链接http://www.mounriver.com/  

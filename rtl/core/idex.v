@@ -642,7 +642,7 @@ always @ (*) begin
                 end
                 `INST_CSRRS: begin
                     csr_wdata_o = reg_rdata1_i | csr_rdata_i;//CSR[imm]=rs1|CSR[imm]
-                    csr_we_o = (rd==5'h0)?0:1;       //写CSR寄存器请求
+                    csr_we_o = (reg_raddr1_o==5'h0)?0:1;       //写CSR寄存器请求
                     csr_addr_o = imm12i;    //访问CSR寄存器地址
                     reg_we_o = 1;
                     reg_waddr_o = rd;
@@ -653,7 +653,7 @@ always @ (*) begin
                 end
                 `INST_CSRRC: begin
                     csr_wdata_o = (~reg_rdata1_i) & csr_rdata_i;//CSR[imm]=~rs1&CSR[imm]
-                    csr_we_o = (rd==5'h0)?0:1;       //写CSR寄存器请求
+                    csr_we_o = (reg_raddr1_o==5'h0)?0:1;       //写CSR寄存器请求
                     csr_addr_o = imm12i;    //访问CSR寄存器地址
                     reg_we_o = 1;
                     reg_waddr_o = rd;

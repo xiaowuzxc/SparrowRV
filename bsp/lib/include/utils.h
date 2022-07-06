@@ -16,12 +16,17 @@
   else \
     asm volatile ("csrw " #reg ", %0" :: "r"(val)); })
 
+#define set_csr(reg, val) ({ \
+  if (__builtin_constant_p(val) && (unsigned long)(val) < 32) \
+    asm volatile ("csrs " #reg ", %0" :: "i"(val)); \
+  else \
+    asm volatile ("csrs " #reg ", %0" :: "r"(val)); })
 
-#ifdef SIMULATION
-#define set_test_pass() asm("li x27, 0x01")
-#define set_test_fail() asm("li x27, 0x00")
-#endif
-
+#define clear_csr(reg, val) ({ \
+  if (__builtin_constant_p(val) && (unsigned long)(val) < 32) \
+    asm volatile ("csrc " #reg ", %0" :: "i"(val)); \
+  else \
+    asm volatile ("csrc " #reg ", %0" :: "r"(val)); })
 
 uint64_t get_cycle_value();
 void busy_wait(uint32_t us);
