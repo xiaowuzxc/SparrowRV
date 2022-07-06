@@ -52,7 +52,7 @@ SoC RTL
 本工程使用 批处理/Makefile + Python3 + iverilog/gtkwave 完成仿真全流程。如果已配置相关工具，可跳过环境搭建步骤。    
 同时，提供了Windows环境下Modelsim仿真脚本，详情见[Windows环境搭建](#windows环境搭建)[Modeslsim仿真](#modeslsim仿真)
 如果需要编写c语言程序并仿真，请参阅[板级支持包BSP](#板级支持包bsp)  
-### Linux环境搭建
+### Linux环境搭建与仿真
 需要使用带有图形化界面的Linux的系统，否则无法正常仿真。    
 Debian系(Ubuntu、Debian、Deepin)执行以下命令：  
 ```
@@ -72,7 +72,7 @@ rm -rf iverilog/
 ### Windows环境搭建
 - 进入[Python官网](https://www.python.org/)，下载并安装Python 3.x版本(建议使用稳定版)  
 - (可跳过)如果想在Win系统使用make，请参阅[Makefile开发](#Makefile开发)第2步。 
-### iverilog仿真
+#### iverilog仿真
 - 进入[iverilog Win官网](http://bleyer.org/icarus/)，下载并安装iverilog-v12-20220611-x64_setup[18.2MB]  
 Windows下iverilog安装流程及仿真可参考[视频教程](https://www.bilibili.com/video/bv1dS4y1H7zn)  
 
@@ -91,15 +91,15 @@ iverilog是仿真工具，gtkwave用于查看波形。
 - [4]显示上一次的仿真波形  
 - [c]清理缓存文件  
 
-**仿真环境框架** 
+**仿真环境框架**  
 ![soc架构](/pic/img/仿真环境.svg)  
 
-### Modeslsim仿真
-本工程提供了Modelsim仿真脚本，软件安装问题请各显神通  
+#### Modeslsim仿真
+本工程提供了Modelsim仿真脚本，启动方式与iverilog类似，软件安装问题请各显神通  
 - `/tb/run.bat`是Windows环境下的启动器，进入`/tb/`目录，仅需双击`run.bat`即可启动人机交互界面。根据提示，输入单个数字或符号，按下回车即可执行对应项目。  
 - `/tb/makefile`是Windows/Linux环境下的启动器，进入`/tb/`目录，终端输入`make`即可启动人机交互界面。根据提示，输入`make`+`空格`+`单个数字或符号`，按下回车即可执行对应项目。   
 - 处理器运行C语言程序，见[板级支持包BSP](#板级支持包bsp)。需要将生成的`obj.bin`转换为`inst.txt`文件(命令2转换，命令3可以直接转换并仿真)，才能导入程序并执行仿真。  
-- `/tb/tools/msim.tcl`主导Modelsim仿真流程，Modelsim启动后自动读入。  
+- `/tb/tools/msim.tcl`主导Modelsim的启动、配置、编译、仿真流程，Modelsim启动后自动读入。  
 
 目前支持的命令：  
 - [5]导入inst.txt，RTL仿真并显示波形  
