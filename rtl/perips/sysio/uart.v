@@ -162,7 +162,7 @@ module uart(
     reg[31:0] data_r;
 
     // 读寄存器
-    always @ (posedge clk or negedge rst_n) begin
+    always @ (posedge clk) begin
         if (ren) begin
             case (raddr_i[7:0])
                 UART_CTRL:   data_r <= {30'h0, uart_ctrl};

@@ -58,7 +58,6 @@ def 编译并仿真():
 	if sys.argv[1] == 'all_isa':
 		编译命令+=r'-D ISA_TEST '
 	编译命令+=r'tb_core.sv '#仿真文件
-	编译命令+=r'W25Q128JVxIM.v '#仿真文件
 	编译进程 = os.popen(str(编译命令))
 	if sys.argv[1] != 'all_isa':
 		print(编译进程.read())

@@ -7,7 +7,7 @@
 /tb/SFDP.TXT
 /tb/SREG.TXT
 /tb/SECSI.TXT
-/tb/W25Q128JVxIM.v
+
 /tb/vlog.opt
 /tb/transcript
 /tb/work
@@ -17,3 +17,4 @@
 /syn
 /tools/*
 /bsp/obj/*
+/rtl/W25Q128JVxIM.v
