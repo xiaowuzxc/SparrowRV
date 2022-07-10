@@ -42,13 +42,16 @@ list:
 	python gtkwave tb.lxt
 
 .PHONY : 5
-5 : python tools/isa_test.py vsim_rtl
+5 : 
+	vsim -do msim.tcl
 
 .PHONY : 6
-6 : python tools/isa_test.py vsim_bin
+6 : 
+	python tools/isa_test.py tsr_bin
+	vsim -do ./msim.tcl
 
 #-------------------------------------------------------------------------------------------------------
 .PHONY : c
 c  :
-	rm  -rf  tb *.lxt inst.txt work transcript vlog.opt 
+	rm  -rf  tb *.lxt inst.txt work transcript vlog.opt vsim.wlf
 #-------------------------------------------------------------------------------------------------------

@@ -63,19 +63,23 @@ initial begin
 	for (r = 1; r < 32; r = r + 1)
 		$display("x%2d = 0x%x", r, `CorePath.inst_regs.regs[r]);
 	end
-	$finish;//结束
+	$stop;//结束
 `endif
 
 end
 
 initial begin
-	#30000;
+`ifndef MODELSIM
+	#30000;//iverilog
+`else 
+	#300000;//modeslsim
+`endif
 `ifdef ISA_TEST
 	$display("ISA_TEST Timeout, Err");//ISA测试超时
 `else 
 	$display("Normal Sim Timeout");//普通仿真超时
 `endif
-	$finish;
+	$stop;
 end
 
 initial begin
@@ -83,7 +87,7 @@ initial begin
 	wait(mends === 1'b1)//软件控制仿真结束
 	$display("CSR MENDS END");
 	#10;
-	$finish;
+	$stop;
 end
 
 task sysrst;//复位任务

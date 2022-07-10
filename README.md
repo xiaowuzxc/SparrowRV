@@ -34,7 +34,7 @@ SoC RTL
 
 软件部分
  ├─指令仿真 (完成)
- └─BSP (95%)
+ └─BSP (扩展驱动程序)
 
 当前任务
 - UART下载
@@ -44,16 +44,16 @@ SoC RTL
 - 处理器RTL设计采用Verilog-2001可综合子集。此版本代码密度更高，可读性更强，并且受到综合器的广泛支持。  
 - 处理器RTL验证采用System Verilog-2005。此版本充分满足仿真需求，并且受到仿真器的广泛支持。   
 - 数字逻辑仿真采用iverilog。开源免费的跨平台HDL仿真器，无法律风险。  
-- 提供Modelsim仿真脚本，便于windows用户使用。  
+- 提供Modelsim仿真脚本，便于搞FPGA的用户使用。  
 - 辅助脚本采用 Batchfile批处理(Win)/Makefile(Linux) + Python3。发挥各种脚本语言的优势，最大程度地简化操作。  
 - 所有文本采用UTF-8编码，具备良好的多语言和跨平台支持。  
 
 ## 仿真
-本工程使用 批处理/Makefile + Python3 + iverilog/gtkwave 完成仿真全流程。如果已配置相关工具，可跳过环境搭建步骤。    
-同时，提供了Windows环境下Modelsim仿真脚本，详情见[Windows环境搭建](#windows环境搭建)[Modeslsim仿真](#modeslsim仿真)
-如果需要编写c语言程序并仿真，请参阅[板级支持包BSP](#板级支持包bsp)  
+本工程使用`批处理/Makefile + Python3 + Modelsim/iverilog`完成仿真全流程，可根据个人喜好使用合适的工具。如果已配置相关工具，可跳过环境搭建步骤。    
+若需要编写c语言程序并仿真，请参阅[板级支持包BSP](#板级支持包bsp)  
 ### Linux环境搭建与仿真
 需要使用带有图形化界面的Linux的系统，否则无法正常仿真。    
+Linux下仅支持iverilog  
 Debian系(Ubuntu、Debian、Deepin)执行以下命令：  
 ```
 sudo apt install make git python3 python3-tk gtkwave gcc g++ bison flex gperf autoconf
@@ -66,19 +66,19 @@ sudo make install
 cd ..
 rm -rf iverilog/
 ```
-其中，`python3-tk`只适用于有GUI界面的Linux的系统。若没有安装`python3-tk`，无法正常使用。  
 其他Linux发行版暂不提供支持，请自行探索。  
 
 ### Windows环境搭建
 - 进入[Python官网](https://www.python.org/)，下载并安装Python 3.x版本(建议使用稳定版)  
-- (可跳过)如果想在Win系统使用make，请参阅[Makefile开发](#Makefile开发)第2步。 
+- (可跳过)如果想在Win系统使用make，请参阅[Makefile开发](#Makefile开发)第2步。  
 #### iverilog仿真
-- 进入[iverilog Win官网](http://bleyer.org/icarus/)，下载并安装iverilog-v12-20220611-x64_setup[18.2MB]  
+进入[iverilog Win官网](http://bleyer.org/icarus/)，下载并安装iverilog-v12-20220611-x64_setup[18.2MB]  
 Windows下iverilog安装流程及仿真可参考[视频教程](https://www.bilibili.com/video/bv1dS4y1H7zn)  
-
+**可选择以下任意一种方式进行仿真**  
 - `/tb/run.bat`是Windows环境下的启动器，进入`/tb/`目录，仅需双击`run.bat`即可启动人机交互界面。根据提示，输入单个数字或符号，按下回车即可执行对应项目。  
 - `/tb/makefile`是Windows/Linux环境下的启动器，进入`/tb/`目录，终端输入`make`即可启动人机交互界面。根据提示，输入`make`+`空格`+`单个数字或符号`，按下回车即可执行对应项目。   
-- 处理器运行C语言程序，见[板级支持包BSP](#板级支持包bsp)。需要将生成的`obj.bin`转换为`inst.txt`文件(命令2转换，命令3可以直接转换并仿真)，才能导入程序并执行仿真。
+
+处理器运行C语言程序，见[板级支持包BSP](#板级支持包bsp)。需要将生成的`obj.bin`转换为`inst.txt`文件(命令2转换，命令3可以直接转换并仿真)，才能导入程序并执行仿真。
 
 `/tb/tools/isa_test.py`是仿真脚本的核心，负责控制仿真流程，转换文件类型，数据收集，通过启动器与此脚本交互。一般情况下不建议修改。  
 iverilog是仿真工具，gtkwave用于查看波形。  
@@ -112,6 +112,8 @@ iverilog是仿真工具，gtkwave用于查看波形。
 - 程序编译生成的bin文件不能直接被读取，需要先转换为inst.txt  
 - iverilog版本建议大于v11，低于此版本可能会无法运行  
 - Makefile环境下可能会出现gtkwave开着的情况下不显示打印信息  
+- Windows下`make`建议使用Powershell，经测试Bash存在未知bug   
+- run_zh.bat是中文的启动器，但是由于`git CRLF`相关问题无法使用  
 
 
 ## 板级支持包BSP

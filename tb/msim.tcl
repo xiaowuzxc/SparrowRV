@@ -20,7 +20,6 @@ vmap work work
 
 # 编译文件
 vlog +incdir+./../rtl/  +define+MODELSIM ./tb_core.sv
-vlog +incdir+./../rtl/  ./W25Q128JVxIM.v
 vlog +incdir+./../rtl/  ./../rtl/core/*.v
 vlog +incdir+./../rtl/  ./../rtl/soc/*.v
 vlog +incdir+./../rtl/  ./../rtl/perips/*.v

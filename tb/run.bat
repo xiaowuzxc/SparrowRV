@@ -21,7 +21,7 @@ else if %cmchc% == 3 (python tools/isa_test.py sim_bin & goto cmsl)^
 else if %cmchc% == 4 (gtkwave tb.lxt & goto cmsl)^
 else if %cmchc% == 5 (python tools/isa_test.py vsim_rtl & goto cmsl)^
 else if %cmchc% == 6 (python tools/isa_test.py vsim_bin & goto cmsl)^
-else if %cmchc% == c (del tb *.lxt inst.txt transcript vlog.opt & rd /s work & @echo clean & goto cmsl)^
+else if %cmchc% == c (del tb *.lxt inst.txt transcript vlog.opt vsim.wlf & rd /s/q work & @echo clean & goto cmsl)^
 else (echo Error 0 & goto cmsl)
 
 pause
