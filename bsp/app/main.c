@@ -1,8 +1,5 @@
 #include "system.h"
-#include "utils.h"
-#include "xprintf.h"
-#include "uart.h"
-#include "trap.h"
+
 uint8_t a[60];
 //测试
 int main()
