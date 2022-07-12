@@ -13,7 +13,18 @@
  * @return  none
  */
 void uart_enable_ctr(uint32_t UARTx, uint32_t uart_en)
-{}
+{
+    if(uart_en == ENABLE)
+    {
+        UART_REG(UART_CTRL(UARTx)) = 0x3;
+    }
+    else
+    {
+        UART_REG(UART_CTRL(UARTx)) = 0x0;
+    }
+}
+
+
 /*********************************************************************
  * @fn      uart_band_ctr
  *
@@ -25,7 +36,11 @@ void uart_enable_ctr(uint32_t UARTx, uint32_t uart_en)
  * @return  none
  */
 void uart_band_ctr(uint32_t UARTx, uint32_t uart_band)
-{}
+{
+    UART_REG(UART_BAUD(UARTx)) = SYS_FRE / uart_band ;
+}
+
+
 /*********************************************************************
  * @fn      uart_send_date
  *
@@ -37,7 +52,13 @@ void uart_band_ctr(uint32_t UARTx, uint32_t uart_band)
  * @return  none
  */
 void uart_send_date(uint32_t UARTx, uint32_t uart_send)
-{}
+{
+    while (UART_REG(UART_STATUS(UARTx)) & 0x1);
+    UART_REG(UART_TXDATA(UARTx)) = uart_send;
+    write_csr(msprint, uart_send);//msprint
+}
+
+
 /*********************************************************************
  * @fn      uart_recv_date
  *
@@ -48,7 +69,12 @@ void uart_send_date(uint32_t UARTx, uint32_t uart_send)
  * @return  返回接收到的数据
  */
 uint8_t uart_recv_date(uint32_t UARTx)
-{}
+{
+    UART_REG(UART_STATUS(UARTx)) &= ~0x2;//清除接收标志
+    return (UART_REG(UART_RXDATA(UARTx)) & 0xff);//返回串口接收到的数据
+}
+
+
 /*********************************************************************
  * @fn      uart_recv_flg
  *
@@ -59,32 +85,15 @@ uint8_t uart_recv_date(uint32_t UARTx)
  * @return  如果接收缓冲区有数据，返回1；没有为0
  */
 uint8_t uart_recv_flg(uint32_t UARTx)
-{}
-
-
-//发送一个字节
-void uart_putc(uint8_t c)
 {
-    while (UART_REG(UART0_STATUS) & 0x1);
-    UART_REG(UART0_TXDATA) = c;
-    write_csr(0x346, c);//0x346 msprint
-}
-// Block, get one char from uart.
-uint8_t uart_getc()
-{
-    UART_REG(UART0_STATUS) &= ~0x2;
-    while (!(UART_REG(UART0_STATUS) & 0x2));
-    return (UART_REG(UART0_RXDATA) & 0xff);
+    if (UART_REG(UART_STATUS(UARTx)) & 0x2)//有数据
+    {
+        return 1;
+    }
+    else//没有数据
+    {
+        return 0;
+    }
 }
 
-// band = 25M/band
-void uart_init(uint32_t band)
-{
-    //配置波特率
-    UART_REG(UART0_BAUD) = SYS_FRE / band ;
-    // enable tx and rx
-    UART_REG(UART0_CTRL) = 0x3;
-    //xprint
-    xdev_out(uart_putc);
-}
 
