@@ -11,6 +11,8 @@
 @echo 4: 显示上一次的仿真波形-gtkwave
 @echo 5: 载入inst.txt并仿真---modelsim 
 @echo 6: 载入bin文件并仿真----modelsim 
+@echo 7: bin文件转为isp.txt 
+@echo 8: bin文件转isp.txt并仿真 
 @echo c: 清理缓存文件  
 @echo ===============================
 
@@ -23,6 +25,8 @@ else if %cmchc% == 3 (python tools/isa_test.py sim_bin & goto cmsl)^
 else if %cmchc% == 4 (gtkwave tb.lxt & goto cmsl)^
 else if %cmchc% == 5 (python tools/isa_test.py vsim_rtl & goto cmsl)^
 else if %cmchc% == 6 (python tools/isa_test.py vsim_bin & goto cmsl)^
+else if %cmchc% == 7 (python tools/isa_test.py tsr_isp & goto cmsl)^
+else if %cmchc% == 8 (python tools/isa_test.py sim_isp & goto cmsl)^
 else if %cmchc% == c (del tb *.lxt inst.txt transcript vlog.opt vsim.wlf & rd /s/q work & @echo 缓存文件已清理 & goto cmsl)^
 else (echo Err 0: 命令未找到 & goto cmsl)
 

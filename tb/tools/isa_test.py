@@ -82,6 +82,12 @@ def bin文件转文本():
 		print(待转换的文件路径)
 		bin文件转换(待转换的文件路径, 'inst.txt')
 
+def isp文件转文本():
+	待转换的文件路径=filedialog.askopenfilename()
+	if 待转换的文件路径:
+		print(待转换的文件路径)
+		bin文件转换(待转换的文件路径, 'isp.txt')
+
 def 启动modelsim仿真():
 	仿真进程 = os.popen(r'vsim -do msim.tcl')
 	仿真进程.close()
@@ -115,10 +121,15 @@ if __name__ == '__main__':
 		sys.exit(main())
 	elif sys.argv[1] == 'tsr_bin':
 		sys.exit(bin文件转文本())
+	elif sys.argv[1] == 'tsr_isp':
+		sys.exit(isp文件转文本())
 	elif sys.argv[1] == 'sim_rtl':
 		sys.exit(编译并仿真())
 	elif sys.argv[1] == 'sim_bin':
 		bin文件转文本()
+		sys.exit(编译并仿真())
+	elif sys.argv[1] == 'sim_isp':
+		isp文件转文本()
 		sys.exit(编译并仿真())
 	elif sys.argv[1] == 'vsim_rtl':
 		sys.exit(启动modelsim仿真())

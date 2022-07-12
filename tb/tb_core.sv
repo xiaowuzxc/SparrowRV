@@ -1,6 +1,6 @@
 `timescale 1ns/100ps
 module tb_core(); /* this is automatically generated */
-
+//`define W25Q//启用w25q spi flash的仿真模型
 `define CorePath inst_sparrow_soc.inst_core
 //测试用信号
 logic clk;
@@ -20,6 +20,7 @@ wire mends = `CorePath.inst_csr.mends;//仿真结束标志
 // 读入程序
 initial begin
 	$readmemh ("inst.txt", `CorePath.inst_iram.inst_dpram.BRAM);
+	$readmemh ("isp.txt", `CorePath.inst_iram.inst_isp.BRAM);
 end
 
 // 生成clk
@@ -126,7 +127,8 @@ sparrow_soc inst_sparrow_soc (
     .spi1_clk          (spi1_clk),
 	.ex_trap_i         (ex_trap_i)
 );
-/*
+
+`ifdef W25Q
 pullup(WPn);
 pullup(HOLDn);
 W25Q128JVxIM inst_W25Q128JVxIM (
@@ -137,7 +139,8 @@ W25Q128JVxIM inst_W25Q128JVxIM (
 	.WPn   (WPn),
 	.HOLDn (HOLDn)
 );
-*/
+`endif
+
 // 输出波形
 `ifndef MODELSIM
 initial begin

@@ -35,9 +35,19 @@ module iram (
     output reg                  iram_axi_rvalid ,//读数据有效
     input wire                  iram_axi_rready //读数据准备好
 );
-//port a: iram
-//port b: axi
-
+/* iram是指令存储器，位于处理器内核，由2部分构成
+ * 
+ * 1. 用户指令存储区
+ * 起始地址: 0x0000_0000
+ * 长度: 由宏定义文件配置
+ * 用途: 存储需要执行的指令
+ * 
+ * 2. 在系统编程ISP区
+ * 起始地址: 0x0800_0000
+ * 长度: 
+ * 用途: 复位后PC指向此处，完成数据搬移、UART烧录
+ * 
+*/
 //PC复位
 always @(posedge clk or negedge rst_n) begin
     if(~rst_n) begin
@@ -53,13 +63,15 @@ always @(posedge clk or negedge rst_n) begin
     end
 end
 wire [31:0] rst_addr = `RstPC;
-wire [clogb2(`IRamSize-1)-1:0]addra = iram_rstn_o ? rst_addr[31:2] : pc_n_i[31:2];
-
+wire [`InstAddrBus]addra = iram_rstn_o ? rst_addr[31:2] : pc_n_i[31:2];
+wire [`MemBus]douta,doutia;
+assign inst_o = pc_o[27]?doutia:douta;
 //AXI4L总线交互
-reg [clogb2(`IRamSize-1)-1:0]addrb;
+reg [`MemAddrBus]addrb;
 reg web,enb;
 reg [3:0] wemb;
-wire [`MemBus]doutb;
+reg bram_sel;
+wire [`MemBus]doutb,doutib;
 reg [`MemBus]dinb;
 wire axi_whsk = iram_axi_awvalid & iram_axi_wvalid;//写通道握手
 wire axi_rhsk = iram_axi_arvalid & (~iram_axi_rvalid | (iram_axi_rvalid & iram_axi_rready)) & ~axi_whsk;//读通道握手,没有读响应
@@ -75,11 +87,17 @@ else begin
     else
         iram_axi_rvalid <= iram_axi_rvalid;
 end
+always @(posedge clk) begin
+    if(axi_rhsk)
+        bram_sel <= iram_axi_araddr[27];
+    else
+        bram_sel <= bram_sel;
+end
 
 always @(*) begin
     iram_axi_awready = axi_whsk;//写地址数据同时准备好
     iram_axi_wready = axi_whsk;//写地址数据同时准备好
-    iram_axi_rdata = doutb;//读数据
+    iram_axi_rdata = bram_sel?doutib:doutb;//读数据
     iram_axi_arready = axi_rhsk;//读地址握手
     iram_axi_bvalid = 1'b1;
     iram_axi_bresp = 2'b00;//响应
@@ -109,8 +127,8 @@ dpram #(
     .RAM_DEPTH(`IRamSize)
 ) inst_dpram (
     .clka   (clk),
-    .addra  (addra),
-    .addrb  (addrb),
+    .addra  (addra[clogb2(`IRamSize-1)-1:0]),
+    .addrb  (addrb[clogb2(`IRamSize-1)-1:0]),
     .dina   (0),
     .dinb   (dinb),
     .wea    (1'b0),
@@ -123,9 +141,23 @@ dpram #(
     .rstb   (),
     .regcea (),
     .regceb (),
-    .douta  (inst_o),
+    .douta  (douta),
     .doutb  (doutb)
 );
+
+isp #(
+    .RAM_DEPTH(8192)
+) inst_isp (
+    .clk   (clk),
+    .ena   (iram_rd_i | iram_rstn_o),
+    .addra (addra[clogb2(8192-1)-1:0]),
+    .douta (doutia),
+    .enb   (enb),
+    .addrb (addrb[clogb2(8192-1)-1:0]),
+    .doutb (doutib)
+);
+
+
 function integer clogb2;
     input integer depth;
         for (clogb2=0; depth>0; clogb2=clogb2+1)

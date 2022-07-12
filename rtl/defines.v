@@ -1,13 +1,16 @@
+
+/*----------以下内容按需配置-------------*/
 `define CPU_CLOCK_HZ 25_000_000
 `define IRam_KB 32 //iram指令存储器大小，单位为KB
 `define SRam_KB 32 //sram数据存储器大小，单位为KB
-
 /*----------以上内容按需配置-------------*/
+
+
 
 /*----------以下内容不建议修改-------------*/
 `define IRamSize (`IRam_KB*1024/4) //kB->B->4B
 `define SRamSize (`SRam_KB*1024/4) //kB->B->4B
-`define RstPC 32'h0000_0000 //复位后PC值
+`define RstPC 32'h0800_0000 //复位后PC值
 
 `define RstEnable 1'b0
 `define RstDisable 1'b1
