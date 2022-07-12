@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "system.h": "c",
+        "utils.h": "c",
+        "uart.h": "c"
+    }
+}

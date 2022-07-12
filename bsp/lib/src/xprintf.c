@@ -156,6 +156,7 @@ void xprintf (			/* Put a formatted string to the default device */
 	va_end(arp);
 }
 
+
 // band = 25M/band
 void uart_init(uint32_t band)
 {

@@ -4,9 +4,10 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "utils.h"
+#include "trap.h"
 #include "xprintf.h"
 #include "uart.h"
-#include "trap.h"
+#include "spi.h"
 //系统主频
 #define SYS_FRE 25000000
 

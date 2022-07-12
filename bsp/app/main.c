@@ -20,4 +20,9 @@ int main()
     xprintf("%s", "Hello world\n");
     xprintf("%s", "SparrowRV ");
     xprintf("%s", a);
+    spi_cp_model(SPI0,SPI_CP_MODEL_3);
+    spi_sclk_div(SPI0,1);
+    spi_set_cs(SPI0,ENABLE);
+    spi_sdrv_byte(SPI0,0xF7);
+    spi_set_cs(SPI0,DISABLE);
 }

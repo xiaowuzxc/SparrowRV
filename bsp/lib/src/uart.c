@@ -1,16 +1,17 @@
 #include "uart.h"
 
+
 /*********************************************************************
  * @fn      uart_enable_ctr
  *
  * @brief   串口使能控制
  *
  * @param   UARTx - x可以为0,1 ，去选择操作的串口，如UART0
- *          uart_en - 串口使能选择位
+ * @param   uart_en - 串口使能选择位
  *            ENABLE - 使能.
  *            DISABLE - 关闭.
  *
- * @return  none
+ * @return  无
  */
 void uart_enable_ctr(uint32_t UARTx, uint32_t uart_en)
 {
@@ -31,13 +32,13 @@ void uart_enable_ctr(uint32_t UARTx, uint32_t uart_en)
  * @brief   串口波特率控制
  *
  * @param   UARTx - x可以为0,1 ，去选择操作的串口，如UART0
- *          uart_band - 写入所需的波特率值
+ * @param   uart_band - 写入所需的波特率值
  *
- * @return  none
+ * @return  无
  */
 void uart_band_ctr(uint32_t UARTx, uint32_t uart_band)
 {
-    UART_REG(UART_BAUD(UARTx)) = SYS_FRE / uart_band ;
+    UART_REG(UART_BAUD(UARTx)) = SYS_FRE / uart_band ; //计算出分频器的值
 }
 
 
@@ -47,13 +48,13 @@ void uart_band_ctr(uint32_t UARTx, uint32_t uart_band)
  * @brief   串口发送数据
  *
  * @param   UARTx - x可以为0,1 ，去选择操作的串口，如UART0
- *          uart_send - 需要发送的数据
+ * @param   uart_send - 需要发送的数据
  *
- * @return  none
+ * @return  无
  */
 void uart_send_date(uint32_t UARTx, uint32_t uart_send)
 {
-    while (UART_REG(UART_STATUS(UARTx)) & 0x1);
+    while (UART_REG(UART_STATUS(UARTx)) & 0x1); //等待上一个操作结束
     UART_REG(UART_TXDATA(UARTx)) = uart_send;
     write_csr(msprint, uart_send);//msprint
 }
