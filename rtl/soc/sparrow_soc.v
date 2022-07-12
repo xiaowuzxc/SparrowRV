@@ -24,6 +24,8 @@ module sparrow_soc (
     output wire spi1_ss  ,
     output wire spi1_clk ,
 
+    inout wire [31:0] muxio,//处理器IO接口
+
     input wire ex_trap_i//外部中断
 );
 
@@ -245,6 +247,7 @@ sysio inst_sysio
     .spi1_miso         (spi1_miso),
     .spi1_ss           (spi1_ss),
     .spi1_clk          (spi1_clk),
+    .muxio             (muxio),
 
     .sysio_axi_awaddr  (sysio_axi_awaddr ),
     .sysio_axi_awvalid (sysio_axi_awvalid),

@@ -19,6 +19,8 @@ module sysio (
     output wire spi1_ss  ,
     output wire spi1_clk ,
 
+    inout wire [31:0] muxio,//处理器IO接口
+
     //AXI4-Lite总线接口 Slave
     //AW写地址
     input wire [`MemAddrBus]    sysio_axi_awaddr ,//写地址
@@ -39,6 +41,10 @@ module sysio (
     input wire                  sysio_axi_rready //读数据准备好
 	
 );
+//外设线网
+wire [31:0] gpio_oe ;
+wire [31:0] gpio_out;
+wire [31:0] gpio_in ;
 //---------总线交互--------
 //写
 wire axi_whsk = sysio_axi_awvalid & sysio_axi_wvalid;//写通道、读地址握手
@@ -184,4 +190,43 @@ spi inst_spi1
     .spi_clk  (spi1_clk )
 );
 //4 gpio
+gpio inst_gpio
+(
+    .clk           (clk),
+    .rst_n         (rst_n),
+
+    .waddr_i       (waddr),
+    .data_i        (din),
+    .sel_i         (sel),
+    .we_i          (we_en[4]),
+    .raddr_i       (raddr),
+    .rd_i          (rd_en[4]),
+    .data_o        (data_o[4]),
+
+    .gpio_oe       (gpio_oe ),
+    .gpio_out      (gpio_out),
+    .gpio_trap_irq (gpio_trap_irq),
+    .gpio_in       (gpio_in )
+);
+//5 muxio
+muxio inst_muxio
+(
+    .clk      (clk),
+    .rst_n    (rst_n),
+
+    .waddr_i  (waddr),
+    .data_i   (din),
+    .sel_i    (sel),
+    .we_i     (we_en[5]),
+    .raddr_i  (raddr),
+    .rd_i     (rd_en[5]),
+    .data_o   (data_o[5]),
+
+    .gpio_oe  (gpio_oe ),
+    .gpio_out (gpio_out),
+    .gpio_in  (gpio_in ),
+
+    .muxio    (muxio)
+);
+
 endmodule
