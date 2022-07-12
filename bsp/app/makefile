@@ -14,12 +14,10 @@ all: $(TARGET)
 ASM_SRCS += ../lib/start.S
 ASM_SRCS += ../lib/trap/trap_entry.S
 
-C_SRCS += ../app/main.c
-C_SRCS += ../lib/init.c
-C_SRCS += ../lib/trap/trap_handler.c
-C_SRCS += ../lib/src/utils.c
-C_SRCS += ../lib/src/xprintf.c
-C_SRCS += ../lib/src/uart.c
+C_SRCS += ${wildcard ../app/*.c}
+C_SRCS += ${wildcard ../lib/*.c}
+C_SRCS += ${wildcard ../lib/trap/*.c}
+C_SRCS += ${wildcard ../lib/src/*.c}
 
 LINKER_SCRIPT := ../link.lds
 
