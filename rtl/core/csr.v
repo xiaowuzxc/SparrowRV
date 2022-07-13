@@ -60,7 +60,7 @@ wire mip_MEIP11=ex_trap_trig_r;//外部中断等待
 wire mip_MTIP7=tcmp_trap_trig_r;//定时器中断等待
 wire mip_MSIP3=soft_trap_trig_r;//软件中断等待
 reg [`RegBus] msip;//写非0软件中断
-reg [5:0] mtrig;//中断触发控制，功能见-中断相关-
+reg [2:0] mtrig;//中断触发控制，功能见-中断相关-
 
 reg [63:0] mcycle;//运行周期计数
 reg [63:0] minstret;//指令计数
@@ -84,9 +84,9 @@ reg mends;//仿真结束
 
 //---------------中断相关-------------------
 /* mtrig是三条中断的触发控制器
- * [1:0]外部中断触发方式配置，00:高电平，01低电平，10上升沿，11下降沿
- * [3:2]定时器中断触发方式配置，00:高电平，01低电平，10上升沿，11下降沿
- * [5:4]软件中断触发方式配置，00:高电平，01低电平，10上升沿，11下降沿
+ * [0]外部中断触发方式配置，0:高电平，1:上升沿
+ * [1]定时器中断触发方式配置，0:高电平，1:上升沿
+ * [2]软件中断触发方式配置，0:高电平，1:上升沿
 */
 assign tcmp_trap = (mtime >= mtimecmp) ? 1'b1 : 1'b0;//生成定时器中断标志
 assign soft_trap = (msip != 32'h0) ? 1'b1 : 1'b0;//生成软件中断标志
@@ -102,23 +102,17 @@ end
 
 //中断触发控制
 always @(*) begin
-    case (mtrig[1:0])//外部中断
-        2'b00: ex_trap_trig = ex_trap_i;
-        2'b01: ex_trap_trig = ~ex_trap_i;
-        2'b10: ex_trap_trig =(ex_trap_i && ~ex_trap_r)?1'b1:1'b0;
-        2'b11: ex_trap_trig =(~ex_trap_i && ex_trap_r)?1'b1:1'b0;
+    case (mtrig[0])//外部中断
+        1'b0: ex_trap_trig = ex_trap_i;
+        1'b1: ex_trap_trig =(ex_trap_i && ~ex_trap_r)?1'b1:1'b0;
     endcase
-    case (mtrig[3:2])//定时器中断
-        2'b00: tcmp_trap_trig = tcmp_trap;
-        2'b01: tcmp_trap_trig = ~tcmp_trap;
-        2'b10: tcmp_trap_trig =(tcmp_trap && ~tcmp_trap_r)?1'b1:1'b0;
-        2'b11: tcmp_trap_trig =(~tcmp_trap && tcmp_trap_r)?1'b1:1'b0;
+    case (mtrig[1])//定时器中断
+        1'b0: tcmp_trap_trig = tcmp_trap;
+        1'b1: tcmp_trap_trig =(tcmp_trap && ~tcmp_trap_r)?1'b1:1'b0;
     endcase
-    case (mtrig[5:4])//软件中断
-        2'b00: soft_trap_trig = soft_trap;
-        2'b01: soft_trap_trig = ~soft_trap;
-        2'b10: soft_trap_trig =(soft_trap && ~soft_trap_r)?1'b1:1'b0;
-        2'b11: soft_trap_trig =(~soft_trap && soft_trap_r)?1'b1:1'b0;
+    case (mtrig[2])//软件中断
+        1'b0: soft_trap_trig = soft_trap;
+        1'b1: soft_trap_trig =(soft_trap && ~soft_trap_r)?1'b1:1'b0;
     endcase
 end
 
@@ -271,7 +265,7 @@ always @ (posedge clk or negedge rst_n) begin
         msip <= 0;
         mprints <= 0;
         mends <= 0;
-        mtimecmp <= 64'hffff_ffff_ffff_ffff;//比较器复位为最大值
+        mtimecmp <= 64'hffff_ffff_ffff_ffff;//比较器复位为最大值，防止误触发
         mcctr <= 4'b0;
     end else begin
         if (idex_csr_we_i) begin //优先idex写

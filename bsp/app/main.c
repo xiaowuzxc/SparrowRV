@@ -6,8 +6,10 @@ int main()
 {
     trap_en_ctrl(TRAP_GLBL,ENABLE);
     trap_en_ctrl(TRAP_EXTI,ENABLE);
-    trap_trig_ctrl(TRAP_EXTI,TRAP_TRIG_NE);
+    trap_trig_ctrl(TRAP_EXTI,TRAP_TRIG_HV);
     trap_trig_ctrl(TRAP_EXTI,TRAP_TRIG_PE);
+    trap_trig_ctrl(TRAP_SOFT,TRAP_TRIG_PE);
+    trap_trig_ctrl(TRAP_TCMP,TRAP_TRIG_PE);
     a[0]='R';
     a[1]='V';
     a[2]='3';

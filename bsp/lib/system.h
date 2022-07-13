@@ -19,7 +19,7 @@
 //自定义CSR
 #define msprint 0x346  //仿真打印
 #define mends   0x347  //仿真结束
-#define mtrig   0x306  //
-#define mcctr   0xB88  //
+#define mtrig   0x306  //触发系统
+#define mcctr   0xB88  //系统控制
 
 #endif
