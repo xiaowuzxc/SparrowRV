@@ -1,5 +1,5 @@
 `include "defines.v"
-module muxio (
+module fpioa (
     input wire clk,
     input wire rst_n,
 
@@ -15,20 +15,24 @@ module muxio (
 	input wire [31:0]gpio_out,//输出数据
     output wire [31:0]gpio_in,//输入数据
 
-    inout wire [31:0] muxio//处理器IO接口
+    inout wire [31:0] fpioa//处理器IO接口
 );
-assign gpio_in = muxio;
+assign gpio_in = fpioa;
 //GPIO中断
 genvar i;
 for (i = 0; i<32; i=i+1) begin
-    assign muxio[i] = gpio_oe[i] ? gpio_out[i] : 1'bz;
+    assign fpioa[i] = gpio_oe[i] ? gpio_out[i] : 1'bz;
 end
-/*
+
+wire [255:0]fpioa_sw[0:31];//位宽256，对应256个外设。深度32，对应32个IO口
+
 // 寄存器(偏移)地址
 localparam GPIO_DIN = 8'h0;//输入数据
 localparam GPIO_OPT = 8'h4;//输出数据
 localparam GPIO_OEC = 8'h8;//输出使能
 localparam GPIO_TAI = 8'hc;//外部中断控制
+/*
+
 
 // 输入数据，只读
 // [31:0]对应GPIO0-31的当前的高低电平

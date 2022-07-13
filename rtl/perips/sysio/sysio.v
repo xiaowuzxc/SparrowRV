@@ -19,7 +19,7 @@ module sysio (
     output wire spi1_ss  ,
     output wire spi1_clk ,
 
-    inout wire [31:0] muxio,//处理器IO接口
+    inout wire [31:0] fpioa,//处理器IO接口
 
     //AXI4-Lite总线接口 Slave
     //AW写地址
@@ -48,7 +48,7 @@ wire [31:0] gpio_in ;
 //---------总线交互--------
 //写
 wire axi_whsk = sysio_axi_awvalid & sysio_axi_wvalid;//写通道、读地址握手
-wire [7:0] waddr = sysio_axi_awaddr[7:0];//写地址
+wire [7:0] waddr = {sysio_axi_awaddr[7:2], 2'b00};//写地址，屏蔽低位，字节选通替代
 wire [`MemBus]din = sysio_axi_wdata;//写数据
 wire [3:0]sel = sysio_axi_wstrb;//写选通
 wire we = axi_whsk;//写使能
@@ -58,7 +58,7 @@ always @(*) begin
 end
 //读
 wire axi_rhsk = sysio_axi_arvalid & (~sysio_axi_rvalid | (sysio_axi_rvalid & sysio_axi_rready));//读通道握手,没有读响应或读响应握手成功
-wire [7:0] raddr = sysio_axi_araddr[7:0];//读地址
+wire [7:0] raddr = {sysio_axi_araddr[7:2], 2'b00};//读地址，屏蔽低位，译码执行部分替代
 wire rd = axi_rhsk;//读使能
 wire [`MemBus]dout;//读数据
 always @(posedge clk or negedge rst_n)//读响应控制
@@ -205,11 +205,11 @@ gpio inst_gpio
 
     .gpio_oe       (gpio_oe ),
     .gpio_out      (gpio_out),
-    .gpio_trap_irq (gpio_trap_irq),
+    .gpio_trap_irq (),
     .gpio_in       (gpio_in )
 );
-//5 muxio
-muxio inst_muxio
+//15 fpioa
+fpioa inst_fpioa
 (
     .clk      (clk),
     .rst_n    (rst_n),
@@ -217,16 +217,16 @@ muxio inst_muxio
     .waddr_i  (waddr),
     .data_i   (din),
     .sel_i    (sel),
-    .we_i     (we_en[5]),
+    .we_i     (we_en[15]),
     .raddr_i  (raddr),
-    .rd_i     (rd_en[5]),
-    .data_o   (data_o[5]),
+    .rd_i     (rd_en[15]),
+    .data_o   (data_o[15]),
 
     .gpio_oe  (gpio_oe ),
     .gpio_out (gpio_out),
     .gpio_in  (gpio_in ),
 
-    .muxio    (muxio)
+    .fpioa    (fpioa)
 );
 
 endmodule

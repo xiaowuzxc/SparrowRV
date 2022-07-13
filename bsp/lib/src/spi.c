@@ -18,7 +18,7 @@
  */
 void spi_cp_model(uint32_t SPIx, uint32_t spi_cpmodel)
 {
-    SPI_REG(SPI_CTRL(SPIx)) = spi_cpmodel;            
+    SPI_REG_B(SPI_CTRL(SPIx),0) = spi_cpmodel;
 }
 
 /*********************************************************************
@@ -33,10 +33,7 @@ void spi_cp_model(uint32_t SPIx, uint32_t spi_cpmodel)
  */
 void spi_sclk_div(uint32_t SPIx, uint32_t spi_div)
 {
-    spi_div = spi_div << 8;
-    SPI_REG(SPI_CTRL(SPIx)) |= spi_div;
-    spi_div = spi_div & 0x00ff;
-    SPI_REG(SPI_CTRL(SPIx)) &= spi_div;
+    SPI_REG_B(SPI_CTRL(SPIx),1) = spi_div;
 }
 /*********************************************************************
  * @fn      spi_set_cs

@@ -60,12 +60,12 @@ module jtag_top (
     wire[31:0] mem_rdata_i;
     wire[3:0] mem_sel_o;
 
-    assign jtag_axi_awaddr = mem_addr_o;
+    assign jtag_axi_awaddr = {mem_addr_o[31:2], 2'b00};//屏蔽低位，字节选通替代
     assign jtag_axi_awvalid = req_valid_o & mem_we_o;//请求内存且写使能
     assign jtag_axi_wdata = mem_wdata_o;
     assign jtag_axi_wstrb = mem_sel_o;
     assign jtag_axi_wvalid = req_valid_o & mem_we_o;
-    assign jtag_axi_araddr = mem_addr_o;
+    assign jtag_axi_araddr = {mem_addr_o[31:2], 2'b00};//屏蔽低位，译码执行部分替代
     assign jtag_axi_arvalid = req_valid_o & ~mem_we_o;
     assign mem_rdata_i = jtag_axi_rdata;
 

@@ -16,12 +16,15 @@ int main()
     a[5]='M';
     a[6]='\n';
     a[7]=0x00;
+
+    spi_cp_model(SPI0,SPI_CP_MODEL_3);
+    spi_sclk_div(SPI0,2);
+
     uart_init(25000000);
     xprintf("%s", "Hello world\n");
     xprintf("%s", "SparrowRV ");
     xprintf("%s", a);
-    spi_cp_model(SPI0,SPI_CP_MODEL_3);
-    spi_sclk_div(SPI0,1);
+
     spi_set_cs(SPI0,ENABLE);
     spi_sdrv_byte(SPI0,0xF7);
     spi_set_cs(SPI0,DISABLE);

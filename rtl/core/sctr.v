@@ -132,12 +132,12 @@ always @(*) begin//总线控制
     sctr_axi_rready  = 1'b1;//读数据准备好
     if(sta_p == 1'b0) begin
         mem_rdata_o      = 0;
-        sctr_axi_awaddr  = mem_addr_i;//写地址
+        sctr_axi_awaddr  = {mem_addr_i[31:2], 2'b00};//写地址，屏蔽低位，字节选通替代
         sctr_axi_awvalid = mem_en_i & ~trap_in_i & ~halt_req_i;//写地址有效
         sctr_axi_wdata   = mem_wdata_i;//写数据
         sctr_axi_wstrb   = mem_wem_i;//写数据选通
         sctr_axi_wvalid  = mem_en_i & mem_we_i & ~trap_in_i & ~halt_req_i;//写数据有效
-        sctr_axi_araddr  = mem_addr_i;//读地址
+        sctr_axi_araddr  = {mem_addr_i[31:2], 2'b00};//读地址，屏蔽低位，译码执行部分替代
         sctr_axi_arvalid = mem_en_i & ~mem_we_i & ~trap_in_i & ~halt_req_i;//读地址有效
     end
     else begin

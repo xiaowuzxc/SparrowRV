@@ -10,7 +10,8 @@
 /*----------以下内容不建议修改-------------*/
 `define IRamSize (`IRam_KB*1024/4) //kB->B->4B
 `define SRamSize (`SRam_KB*1024/4) //kB->B->4B
-`define RstPC 32'h0800_0000 //复位后PC值
+//`define RstPC 32'h0800_0000 //复位后PC值
+`define RstPC 32'h0000_0000 //复位后PC值在0000
 
 `define RstEnable 1'b0
 `define RstDisable 1'b1

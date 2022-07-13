@@ -9,7 +9,7 @@ logic ex_trap_i;
 logic JTAG_TCK,JTAG_TMS,JTAG_TDI,JTAG_TDO;//jtag
 logic uart0_tx,uart0_rx,uart1_tx,uart1_rx;
 wire spi0_mosi,spi0_miso,spi0_ss,spi0_clk,spi1_mosi,spi1_miso,spi1_ss,spi1_clk;
-wire [31:0]muxio;
+wire [31:0]fpioa;
 integer r;//计数工具人
 
 //寄存器监测
@@ -129,7 +129,7 @@ sparrow_soc inst_sparrow_soc (
     .spi1_ss           (spi1_ss),
     .spi1_clk          (spi1_clk),
 
-    .muxio             (muxio),//处理器IO接口
+    .fpioa             (fpioa),//处理器IO接口
 
 	.ex_trap_i         (ex_trap_i)
 );

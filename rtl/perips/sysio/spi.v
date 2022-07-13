@@ -66,7 +66,10 @@ always @ (posedge clk or negedge rst_n) begin
         if (we_i == 1'b1) begin
             case (waddr_i[3:0])
                 SPI_CTRL: begin
-                    spi_ctrl <= data_i[15:0];
+                    if(sel_i[0])
+                        spi_ctrl[7:0] <= data_i[7:0];
+                    if(sel_i[1])
+                        spi_ctrl[15:8] <= data_i[15:8];
                 end
                 SPI_DATA: begin
                     spi_data <= data_i[15:0];
