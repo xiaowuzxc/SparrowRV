@@ -16,8 +16,6 @@ list:
 	@echo 2: .bin file turn into inst.txt
 	@echo 3: load .bin file and sim rtl----iverilog   
 	@echo 4: show last wave file-----------gtkwave
-	@echo 5: load inst.txt and sim rtl-----modelsim
-	@echo 6: load .bin file and sim rtl----modelsim
 	@echo c: clean tb file
 	@echo ==============================
 #-------------------------------------------------------------------------------------------------------
@@ -40,15 +38,6 @@ list:
 .PHONY : 4
 4 : 
 	python gtkwave tb.lxt
-
-.PHONY : 5
-5 : 
-	vsim -do msim.tcl
-
-.PHONY : 6
-6 : 
-	python tools/isa_test.py tsr_bin
-	vsim -do ./msim.tcl
 
 #-------------------------------------------------------------------------------------------------------
 .PHONY : c
