@@ -70,7 +70,10 @@ cd ..
 rm -rf iverilog/
 ```
 其他Linux发行版暂不提供支持，请自行探索。  
-`/tb/makefile`是Linux环境下的各项功能的启动器。进入`/tb/`目录，终端输入`make`即可启动人机交互界面。根据提示，输入`make`+`空格`+`单个数字或符号`，按下回车即可执行对应项目。   
+
+- `/tb/makefile`是Linux环境下的实现各项仿真功能的启动器  
+进入`/tb/`目录，终端输入`make`即可启动人机交互界面。根据提示，输入`make`+`空格`+`单个数字或符号`，按下回车即可执行对应项目。   
+
 目前支持的命令：  
 - [0]导入inst.txt，RTL仿真并显示波形  
 - [1]收集指令测试集程序，测试所有指令  
@@ -124,6 +127,7 @@ iverilog是仿真工具，gtkwave用于查看波形。
 - Makefile环境下可能会出现gtkwave开着的情况下不显示打印信息  
 - Windows下`make`建议使用Powershell，经测试Bash存在未知bug   
 - run_zh.bat是中文的启动器，但是由于`git CRLF`相关问题无法使用  
+- 若出现`WARNING: tb_core.sv:23: $readmemh(inst.txt):...`或`ERROR: tb_core.sv:24: $readmemh:`警告或错误信息，请忽略，它不会有任何影响  
 
 
 ## 板级支持包BSP

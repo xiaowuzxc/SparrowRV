@@ -1,9 +1,15 @@
 #include <stdint.h>
 
-#include "../include/utils.h"
+#include "utils.h"
 
 
-
+/*********************************************************************
+ * @fn      get_cycle_value
+ *
+ * @brief   XXX
+ *
+ * @return  cycle
+ */
 uint64_t get_cycle_value()
 {
     uint64_t cycle;
@@ -14,6 +20,15 @@ uint64_t get_cycle_value()
     return cycle;
 }
 
+/*********************************************************************
+ * @fn      busy_wait
+ *
+ * @brief   XXX
+ *
+ * @param   us - YYY
+ *
+ * @return  无
+ */
 void busy_wait(uint32_t us)
 {
     uint64_t tmp;

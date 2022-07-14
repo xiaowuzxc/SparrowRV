@@ -15,7 +15,7 @@ module spi(
 
     output reg spi_mosi,             // spi控制器输出、spi设备输入信号
     input wire spi_miso,             // spi控制器输入、spi设备输出信号
-    output wire spi_ss,              // spi设备片选
+    output wire spi_cs,              // spi设备片选
     output reg spi_clk               // spi设备时钟，最大频率为输入clk的一半
 
 );
@@ -51,7 +51,7 @@ reg[3:0] bit_index;             // 数据bit索引
 wire[8:0] div_cnt;
 
 
-assign spi_ss = ~spi_ctrl[3];   // SPI设备片选信号
+assign spi_cs = ~spi_ctrl[3];   // SPI设备片选信号
 
 assign div_cnt = spi_ctrl[15:8];// 0: 2分频，1：4分频，2：8分频，3：16分频，4：32分频，以此类推，分频数=2^(div_cnt+1)
 

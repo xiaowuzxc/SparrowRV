@@ -16,12 +16,12 @@ module sparrow_soc (
 
     output wire spi0_mosi,
     input  wire spi0_miso,
-    output wire spi0_ss  ,
+    output wire spi0_cs  ,
     output wire spi0_clk ,
 
     output wire spi1_mosi,
     input  wire spi1_miso,
-    output wire spi1_ss  ,
+    output wire spi1_cs  ,
     output wire spi1_clk ,
 
     inout wire [31:0] fpioa,//处理器IO接口
@@ -241,11 +241,11 @@ sysio inst_sysio
     .uart1_rx          (uart1_rx),
     .spi0_mosi         (spi0_mosi),
     .spi0_miso         (spi0_miso),
-    .spi0_ss           (spi0_ss),
+    .spi0_cs           (spi0_cs),
     .spi0_clk          (spi0_clk),
     .spi1_mosi         (spi1_mosi),
     .spi1_miso         (spi1_miso),
-    .spi1_ss           (spi1_ss),
+    .spi1_cs           (spi1_cs),
     .spi1_clk          (spi1_clk),
     .fpioa             (fpioa),
 

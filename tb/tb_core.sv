@@ -8,7 +8,7 @@ logic rst_n;
 logic ex_trap_i;
 logic JTAG_TCK,JTAG_TMS,JTAG_TDI,JTAG_TDO;//jtag
 logic uart0_tx,uart0_rx,uart1_tx,uart1_rx;
-wire spi0_mosi,spi0_miso,spi0_ss,spi0_clk,spi1_mosi,spi1_miso,spi1_ss,spi1_clk;
+wire spi0_mosi,spi0_miso,spi0_cs,spi0_clk,spi1_mosi,spi1_miso,spi1_cs,spi1_clk;
 wire [31:0]fpioa;
 integer r;//计数工具人
 
@@ -122,11 +122,11 @@ sparrow_soc inst_sparrow_soc (
     .uart1_rx          (uart1_rx),
     .spi0_mosi         (spi0_mosi),
     .spi0_miso         (spi0_miso),
-    .spi0_ss           (spi0_ss),
+    .spi0_cs           (spi0_cs),
     .spi0_clk          (spi0_clk),
     .spi1_mosi         (spi1_mosi),
     .spi1_miso         (spi1_miso),
-    .spi1_ss           (spi1_ss),
+    .spi1_cs           (spi1_cs),
     .spi1_clk          (spi1_clk),
 
     .fpioa             (fpioa),//处理器IO接口
@@ -138,7 +138,7 @@ sparrow_soc inst_sparrow_soc (
 pullup(WPn);
 pullup(HOLDn);
 W25Q128JVxIM inst_W25Q128JVxIM (
-	.CSn   (spi0_ss),
+	.CSn   (spi0_cs),
 	.CLK   (spi0_clk),
 	.DIO   (spi0_mosi),
 	.DO    (spi0_miso),

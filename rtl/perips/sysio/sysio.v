@@ -11,12 +11,12 @@ module sysio (
 
     output wire spi0_mosi,
     input  wire spi0_miso,
-    output wire spi0_ss  ,
+    output wire spi0_cs  ,
     output wire spi0_clk ,
 
     output wire spi1_mosi,
     input  wire spi1_miso,
-    output wire spi1_ss  ,
+    output wire spi1_cs  ,
     output wire spi1_clk ,
 
     inout wire [31:0] fpioa,//处理器IO接口
@@ -167,7 +167,7 @@ spi inst_spi0
 
     .spi_mosi (spi0_mosi),
     .spi_miso (spi0_miso),
-    .spi_ss   (spi0_ss  ),
+    .spi_cs   (spi0_cs  ),
     .spi_clk  (spi0_clk )
 );
 //3 spi1
@@ -186,7 +186,7 @@ spi inst_spi1
 
     .spi_mosi (spi1_mosi),
     .spi_miso (spi1_miso),
-    .spi_ss   (spi1_ss  ),
+    .spi_cs   (spi1_cs  ),
     .spi_clk  (spi1_clk )
 );
 //4 gpio
