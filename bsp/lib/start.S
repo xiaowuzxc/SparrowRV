@@ -6,6 +6,7 @@ _start:
 .option push /*保存编译设置*/
 .option norelax /*禁用相对寻址*/
 	nop /*空操作*/
+
 	la gp, __global_pointer$ /*设置gp全局指针，__global_pointer$来源于链接脚本，与data段关联，指向全局变量*/
 .option pop
 	la sp, _sp /*设置sp堆栈指针，_sp来源于链接脚本，指向普通的局部变量*/
@@ -41,3 +42,9 @@ _start:
 	csrwi 0x347,1  /*仿真专用，退出仿真*/
 loop:  /*无限循环*/
 	j loop
+
+trap_vector_base:/*备用中断向量表*/
+	j _start
+	.word   0
+	.word   0
+	.word   0
