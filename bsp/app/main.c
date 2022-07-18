@@ -4,6 +4,7 @@ uint8_t a[60];
 //测试
 int main()
 {
+    
     trap_en_ctrl(TRAP_GLBL,ENABLE);
     trap_en_ctrl(TRAP_EXTI,ENABLE);
     trap_trig_ctrl(TRAP_EXTI,TRAP_TRIG_HV);

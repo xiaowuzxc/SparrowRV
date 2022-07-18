@@ -8,9 +8,9 @@
 #include "xprintf.h"
 #include "uart.h"
 #include "spi.h"
+#include "fpioa.h"
 //系统主频
 #define SYS_FRE 25000000
-
 
 
 #define ENABLE 1

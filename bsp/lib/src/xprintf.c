@@ -160,6 +160,12 @@ void xprintf (			/* Put a formatted string to the default device */
 // band = 25M/band
 void uart_init(uint32_t band)
 {
+	//FPIOA
+	fpioa_setio(0,UART0_TX);
+	fpioa_setio(31,UART0_TX);
+	fpioa_setio(30,UART0_TX);
+	fpioa_setio(27,UART0_TX);
+	fpioa_setio(16,UART0_TX);
     //配置波特率
     UART_REG(UART_BAUD(UART0)) = SYS_FRE / band ;
     // enable tx and rx

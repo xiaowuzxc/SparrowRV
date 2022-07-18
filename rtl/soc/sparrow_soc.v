@@ -8,22 +8,6 @@ module sparrow_soc (
     input  wire JTAG_TDI,
     output wire JTAG_TDO,
 
-    output wire uart0_tx,
-    input  wire uart0_rx,
-
-    output wire uart1_tx,
-    input  wire uart1_rx,
-
-    output wire spi0_mosi,
-    input  wire spi0_miso,
-    output wire spi0_cs  ,
-    output wire spi0_clk ,
-
-    output wire spi1_mosi,
-    input  wire spi1_miso,
-    output wire spi1_cs  ,
-    output wire spi1_clk ,
-
     inout wire [31:0] fpioa,//处理器IO接口
 
     input wire ex_trap_i//外部中断
@@ -235,18 +219,6 @@ sysio inst_sysio
     .clk               (clk),
     .rst_n             (rst_n),
 
-    .uart0_tx          (uart0_tx),
-    .uart0_rx          (uart0_rx),
-    .uart1_tx          (uart1_tx),
-    .uart1_rx          (uart1_rx),
-    .spi0_mosi         (spi0_mosi),
-    .spi0_miso         (spi0_miso),
-    .spi0_cs           (spi0_cs),
-    .spi0_clk          (spi0_clk),
-    .spi1_mosi         (spi1_mosi),
-    .spi1_miso         (spi1_miso),
-    .spi1_cs           (spi1_cs),
-    .spi1_clk          (spi1_clk),
     .fpioa             (fpioa),
 
     .sysio_axi_awaddr  (sysio_axi_awaddr ),

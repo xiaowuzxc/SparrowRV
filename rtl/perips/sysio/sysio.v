@@ -3,22 +3,6 @@ module sysio (
 	input clk,
 	input rst_n,
 
-    output wire uart0_tx,
-    input  wire uart0_rx,
-
-    output wire uart1_tx,
-    input  wire uart1_rx,
-
-    output wire spi0_mosi,
-    input  wire spi0_miso,
-    output wire spi0_cs  ,
-    output wire spi0_clk ,
-
-    output wire spi1_mosi,
-    input  wire spi1_miso,
-    output wire spi1_cs  ,
-    output wire spi1_clk ,
-
     inout wire [31:0] fpioa,//处理器IO接口
 
     //AXI4-Lite总线接口 Slave
@@ -221,7 +205,20 @@ fpioa inst_fpioa
     .raddr_i  (raddr),
     .rd_i     (rd_en[15]),
     .data_o   (data_o[15]),
-
+    //通信接口
+    .SPI0_SCK  (spi0_clk),
+    .SPI0_MOSI (spi0_mosi),
+    .SPI0_MISO (spi0_miso),
+    .SPI0_CS   (spi0_cs),
+    .SPI1_SCK  (spi1_clk),
+    .SPI1_MOSI (spi1_mosi),
+    .SPI1_MISO (spi1_miso),
+    .SPI1_CS   (spi1_cs),
+    .UART0_TX  (uart0_tx),
+    .UART0_RX  (uart0_rx),
+    .UART1_TX  (uart1_tx),
+    .UART1_RX  (uart1_rx),
+    //GPIO
     .gpio_oe  (gpio_oe ),
     .gpio_out (gpio_out),
     .gpio_in  (gpio_in ),
