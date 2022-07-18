@@ -1,5 +1,5 @@
-`timescale 1ns/100ps
-module tb_core(); /* this is automatically generated */
+`timescale 1ns/1ns
+module tb_core(); 
 //`define W25Q//启用w25q spi flash的仿真模型
 `define CorePath inst_sparrow_soc.inst_core
 //测试用信号
@@ -7,10 +7,17 @@ logic clk;
 logic rst_n;
 logic ex_trap_i;
 logic JTAG_TCK,JTAG_TMS,JTAG_TDI,JTAG_TDO;//jtag
-logic uart0_tx,uart0_rx,uart1_tx,uart1_rx;
-wire spi0_mosi,spi0_miso,spi0_cs,spi0_clk,spi1_mosi,spi1_miso,spi1_cs,spi1_clk;
+wire spi0_miso;
 wire [31:0]fpioa;
-integer r;//计数工具人
+wire uart0_rx=1'b1;//fpioa[0]
+assign fpioa[0]=uart0_rx;
+wire uart0_tx=fpioa[1];//fpioa[1]
+wire spi0_cs=fpioa[2];//fpioa[2]
+assign fpioa[3]=spi0_miso;//fpioa[3]
+wire spi0_mosi=fpioa[4];//fpioa[4]
+wire spi0_clk=fpioa[5];//fpioa[5]
+
+genvar i,r;//计数工具人
 
 //寄存器监测
 wire [31:0] x3  = `CorePath.inst_regs.regs[3];
@@ -27,17 +34,17 @@ end
 // 生成clk
 initial begin
 	clk = '0;
-	forever #(0.5) clk = ~clk;
+	forever #(5) clk = ~clk;
 end
 
 //启动测试
 initial begin
 	sysrst();//复位系统
 	#900;
-	ex_trap_i=1;
+	/*ex_trap_i=1;
 	#7;
 	ex_trap_i=0;
-
+*/
 `ifdef ISA_TEST  //通过宏定义，控制是否是指令集测试程序
 	wait(x26 == 32'b1)   // x26 == 1，结束仿真
 	#10
@@ -72,9 +79,9 @@ end
 
 initial begin
 `ifndef MODELSIM
-	#30000;//iverilog
+	#300000;//iverilog
 `else 
-	#300000;//modeslsim
+	#3000000;//modeslsim
 `endif
 `ifdef ISA_TEST
 	$display("ISA_TEST Timeout, Err");//ISA测试超时
@@ -93,8 +100,6 @@ initial begin
 end
 
 task sysrst;//复位任务
-	uart0_rx = 1;
-	uart1_rx = 1;
 	ex_trap_i=0;
 	JTAG_TCK=0;
 	JTAG_TMS=0;
@@ -105,6 +110,10 @@ task sysrst;//复位任务
 	#5;
 endtask : sysrst
 
+
+for ( i=6 ; i<32 ; i=i+1 ) begin
+	assign fpioa[i] = (fpioa[i]);
+end
 
 
 sparrow_soc inst_sparrow_soc (

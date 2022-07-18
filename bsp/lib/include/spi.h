@@ -27,7 +27,8 @@ void spi_sclk_div(uint32_t SPIx, uint32_t spi_div);//SPI SCLK分频器配置
 void spi_set_cs(uint32_t SPIx, uint32_t spi_cs);//SPI CS片选信号控制
 void spi_send_byte(uint32_t SPIx, uint32_t data);//SPI发送字节，发完不管
 uint8_t spi_sdrv_byte(uint32_t SPIx, uint32_t data);//SPI发送1字节接收1字节
-//void spi_write_bytes(uint8_t data[], uint32_t len);
-//void spi_read_bytes(uint8_t data[], uint32_t len);
+uint32_t spi_busy_chk(uint32_t SPIx);//SPI状态检查
+void spi_send_bytes(uint32_t SPIx, uint8_t data[], uint32_t len);
+void spi_read_bytes(uint32_t SPIx, uint8_t data[], uint32_t len);
 
 #endif

@@ -9,6 +9,8 @@
 #include "uart.h"
 #include "spi.h"
 #include "fpioa.h"
+
+#include "n25q_flash.h"
 //系统主频
 #define SYS_FRE 25000000
 

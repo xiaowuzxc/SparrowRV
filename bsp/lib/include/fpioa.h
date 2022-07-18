@@ -273,12 +273,12 @@ uint8_t fpioa_read(uint32_t FPIOAx);
  */
 #define  DEF_Null      0 
 #define  SPI0_SCK      1 
-#define  SPI0_MOS      2 
-#define  SPI0_MIS      3 
+#define  SPI0_MOSI     2 
+#define  SPI0_MISO     3 
 #define  SPI0_CS       4 
 #define  SPI1_SCK      5 
-#define  SPI1_MOS      6 
-#define  SPI1_MIS      7 
+#define  SPI1_MOSI     6 
+#define  SPI1_MISO     7 
 #define  SPI1_CS       8 
 #define  UART0_TX      9 
 #define  UART0_RX      10

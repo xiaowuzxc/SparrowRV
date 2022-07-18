@@ -1,34 +1,45 @@
 #include "system.h"
 
-uint8_t a[60];
+uint8_t astr[60];
+uint8_t program_data[N25Q_PAGE_SIZE];
+uint8_t read_data[N25Q_PAGE_SIZE];
 //测试
 int main()
 {
-    
-    trap_en_ctrl(TRAP_GLBL,ENABLE);
-    trap_en_ctrl(TRAP_EXTI,ENABLE);
-    trap_trig_ctrl(TRAP_EXTI,TRAP_TRIG_HV);
-    trap_trig_ctrl(TRAP_EXTI,TRAP_TRIG_PE);
-    trap_trig_ctrl(TRAP_SOFT,TRAP_TRIG_PE);
-    trap_trig_ctrl(TRAP_TCMP,TRAP_TRIG_PE);
-    a[0]='R';
-    a[1]='V';
-    a[2]='3';
-    a[3]='2';
-    a[4]='I';
-    a[5]='M';
-    a[6]='\n';
-    a[7]=0x00;
-
-    spi_cp_model(SPI0,SPI_CP_MODEL_3);
-    spi_sclk_div(SPI0,2);
-
+    fpioa_setio(0, UART0_RX);
+    fpioa_setio(1,UART1_TX);
+    fpioa_setio(2,SPI0_CS);
+    fpioa_setio(3,SPI0_MISO);
+    fpioa_setio(4,SPI0_MOSI);
+    fpioa_setio(5,SPI0_SCK);
+    n25q_init(SPI0,1);
     uart_init(25000000);
     xprintf("%s", "Hello world\n");
-    xprintf("%s", "SparrowRV ");
-    xprintf("%s", a);
+    n25q_read_id(astr, 3);
+    xprintf("manu id = 0x%x\n", astr[0]);
+    xprintf("device id = 0x%x, 0x%x\n", astr[1], astr[2]);
 
-    spi_set_cs(SPI0,ENABLE);
-    spi_sdrv_byte(SPI0,0xF7);
-    spi_set_cs(SPI0,DISABLE);
+    uint16_t i;
+
+    // 初始化要编程的数据
+    for (i = 0; i < N25Q_PAGE_SIZE; i++)
+        program_data[i] = 0x55;
+/*
+    xprintf("start erase subsector...\n");
+    // 擦除第0个子扇区
+    n25q_subsector_erase(0x00);
+    */
+    xprintf("start program page...\n");
+    // 编程第1页
+    n25q_page_program(program_data, N25Q_PAGE_SIZE, 0);
+    xprintf("start read page...\n");
+    // 读第1页
+    n25q_read_data(read_data, N25Q_PAGE_SIZE, 0);
+
+    xprintf("read data: \n");
+    // 打印读出来的数据
+    for (i = 0; i < N25Q_PAGE_SIZE; i++)
+        xprintf("0x%x\n", read_data[i]);
+
+    
 }

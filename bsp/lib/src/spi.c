@@ -65,7 +65,7 @@ void spi_set_cs(uint32_t SPIx, uint32_t spi_cs)
  */
 void spi_send_byte(uint32_t SPIx, uint32_t data)
 {
-    while (SPI_REG(SPI_STATUS(SPIx)) & 0x1); //等待上一个操作结束
+    while (spi_busy_chk(SPIx)); //等待上一个操作结束
     SPI_REG(SPI_DATA(SPIx)) = data;
     SPI_REG(SPI_CTRL(SPIx)) |= 1 << 0; // spi en
 }
@@ -82,28 +82,39 @@ void spi_send_byte(uint32_t SPIx, uint32_t data)
  */
 uint8_t spi_sdrv_byte(uint32_t SPIx, uint32_t data)//SPI发送1字节接收1字节
 {
-    while (SPI_REG(SPI_STATUS(SPIx)) & 0x1); //等待上一个操作结束
+    while (spi_busy_chk(SPIx)); //等待上一个操作结束
     SPI_REG(SPI_DATA(SPIx)) = data;
     SPI_REG(SPI_CTRL(SPIx)) |= 1 << 0; // spi en
-    while (SPI_REG(SPI_STATUS(SPIx)) & 0x1); //等待一次收发结束
+    while (spi_busy_chk(SPIx)); //等待一次收发结束
     return (uint8_t)(SPI_REG(SPI_DATA(SPIx)) & 0xff);//返回收到的数据
 }
 
-/*
-void spi_write_bytes(uint8_t data[], uint32_t len)
+/*********************************************************************
+ * @fn      spi_busy_chk
+ *
+ * @brief   SPI工作状态检查
+ *
+ * @param   SPIx - x可以为0,1 ，去选择操作的SPI，如SPI0
+ *
+ * @return  1:SPI工作中; 0:SPI空闲
+ */
+uint32_t spi_busy_chk(uint32_t SPIx)//SPI状态检查
+{
+    return (SPI_REG(SPI_STATUS(SPIx)) & 0x1);
+}
+
+void spi_send_bytes(uint32_t SPIx, uint8_t data[], uint32_t len)
 {
     uint32_t i;
-
     for (i = 0; i < len; i++)
-        spi_write_byte(data[i]);
+        spi_send_byte(SPIx, data[i]);
 }
-*/
-/*
-void spi_read_bytes(uint8_t data[], uint32_t len)
+
+
+void spi_read_bytes(uint32_t SPIx, uint8_t data[], uint32_t len)
 {
     uint32_t i;
-
     for (i = 0; i < len; i++)
-        data[i] = spi_read_byte();
+        data[i] = spi_sdrv_byte(SPIx, 0x00);
 }
-*/
+

@@ -82,7 +82,10 @@ always @ (posedge clk or negedge rst_n) begin
             spi_ctrl[0] <= 1'b0;
             // 发送完成后更新数据寄存器
             if (done == 1'b1) begin
-                spi_data <= {8'h0, rdata};
+                if(rdata===8'hXX)//仿真
+                    spi_data <= {8'h0, 8'h0};
+                else
+                    spi_data <= {8'h0, rdata};
             end
         end
     end
