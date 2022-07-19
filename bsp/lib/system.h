@@ -2,7 +2,7 @@
 #define SYSTEM_H_
 
 #include <stdint.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include "utils.h"
 #include "trap.h"
 #include "xprintf.h"

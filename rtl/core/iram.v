@@ -75,7 +75,8 @@ wire [`MemBus]doutb,doutib;
 reg [`MemBus]dinb;
 wire axi_whsk = iram_axi_awvalid & iram_axi_wvalid;//写通道握手
 wire axi_rhsk = iram_axi_arvalid & (~iram_axi_rvalid | (iram_axi_rvalid & iram_axi_rready)) & ~axi_whsk;//读通道握手,没有读响应
-
+reg wei;//AXI写ISP
+reg [`MemBus]dini;//AXI写ISP
 always @(posedge clk or negedge rst_n)//读响应控制
 if (~rst_n)
     iram_axi_rvalid <=1'b0;
@@ -102,9 +103,20 @@ always @(*) begin
     iram_axi_bvalid = 1'b1;
     iram_axi_bresp = 2'b00;//响应
     iram_axi_rresp = 2'b00;//响应
+    dinb = iram_axi_wdata;
+    dini = iram_axi_wdata;//AXI写ISP
+    enb = axi_whsk | axi_rhsk;
+    wemb = iram_axi_wstrb;
     if(axi_whsk) begin//写握手
         addrb = iram_axi_awaddr[31:2];
-        web = 1;
+        if(iram_axi_awaddr[27]==1'b0) begin//AXI写ISP
+            web = 1;
+            wei = 0;//AXI写ISP
+        end
+        else begin
+            web = 0;
+            wei = 1;//AXI写ISP
+        end
     end
     else begin
         if (axi_rhsk) begin//读握手
@@ -116,9 +128,7 @@ always @(*) begin
             web = 0;
         end
     end
-    dinb = iram_axi_wdata;
-    enb = axi_whsk | axi_rhsk;
-    wemb = iram_axi_wstrb;
+
 end
 
 
@@ -149,6 +159,8 @@ isp #(
     .RAM_DEPTH(8192)
 ) inst_isp (
     .clk   (clk),
+    .wen   (wei),
+    .din   (dini),
     .ena   (iram_rd_i | iram_rstn_o),
     .addra (addra[clogb2(8192-1)-1:0]),
     .douta (doutia),
