@@ -11,17 +11,18 @@ module gpio (
     input wire rd_i,
     output reg[`MemBus] data_o,
 
-	output wire [31:0]gpio_oe,//输出使能
-	output wire [31:0]gpio_out,//输出数据
-	output wire [15:0]gpio_trap_irq,//gpio中断
+	output reg [31:0]gpio_oe,//输出使能
+	output reg [31:0]gpio_out,//输出数据
+	output reg [15:0]gpio_trap_irq,//gpio中断
     input wire [31:0]gpio_in//输入数据
 );
-
+genvar i;//for循环专用
 // 寄存器(偏移)地址
 localparam GPIO_DIN = 8'h0;//输入数据
 localparam GPIO_OPT = 8'h4;//输出数据
 localparam GPIO_OEC = 8'h8;//输出使能
-localparam GPIO_TAI = 8'hc;//外部中断控制
+localparam GPIO_OMD = 8'hc;//输出模式
+localparam GPIO_TAI = 8'h10;//外部中断控制
 
 // 输入数据，只读
 // [31:0]对应GPIO0-31的当前的高低电平
@@ -35,10 +36,23 @@ reg [31:0] gpio_opt;
 // [31:0]对应GPIO0-31的输出使能状态
 reg [31:0] gpio_oec;
 
-// 输出数据，读写
-// GPIO0-15的外部中断使能与控制
-// [x*2]:  GPIOx中断使能
-// [x*2+1]:GPIOx中断为 1:高电平, 2:低电平触发
+/* 端口模式，读写
+ * GPIO_OEC与GPIO_OMD共同决定GPIOx端口模式
+ * | GPIO_OEC  | GPIO_OMD  | GPIOx  
+ * |-----------|-----------|---------------
+ * |     0     |     0     | 高阻输入
+ * |     0     |     1     | 高阻输入且锁存
+ * |     1     |     0     | 推挽输出
+ * |     1     |     1     | 开漏输出
+ * |-----------|-----------|---------------*/
+reg [31:0] gpio_omd;
+
+/* GPIO[31:16]外部中断使能与控制
+ * GPIOx配置位[(x-16)*2+1: (x-16)*2]
+ * 00:关闭外部中断
+ * 01:上升沿触发
+ * 10:下降沿触发
+ * 11:双沿触发*/
 reg [31:0] gpio_tai;
 
 // 总线接口 写
@@ -49,10 +63,11 @@ always @ (posedge clk or negedge rst_n) begin
 		gpio_tai <= 32'h0;
     end else begin
         if (we_i == 1'b1) begin
-            case (waddr_i[3:0])
+            case (waddr_i)
                 GPIO_DIN: ;
 				GPIO_OPT: gpio_opt <= data_i;
 				GPIO_OEC: gpio_oec <= data_i;
+                GPIO_OMD: gpio_omd <= data_i;
 				GPIO_TAI: gpio_tai <= data_i;
                 default: ;
             endcase
@@ -66,10 +81,11 @@ end
 // 总线接口 读
 always @ (posedge clk) begin
     if (rd_i == 1'b1) begin
-        case (raddr_i[3:0])
+        case (raddr_i)
                 GPIO_DIN: data_o <= gpio_din;
 				GPIO_OPT: data_o <= gpio_opt;
 				GPIO_OEC: data_o <= gpio_oec;
+                GPIO_OMD: data_o <= gpio_omd;
 				GPIO_TAI: data_o <= gpio_tai;
             default: begin
                 data_o <= 32'h0;
@@ -87,13 +103,56 @@ always @(posedge clk) begin
 	gpio_in_r <= gpio_in;
 	gpio_din  <= gpio_in_r;
 end
+for (i=0; i<32; i=i+1) begin
+    always @(posedge clk) begin
+        if(gpio_oec[i]==1'b0 & gpio_omd[i]==1'b1)//锁存上一次的输入
+            gpio_din[i] <= gpio_din[i];
+        else
+            gpio_din[i] <= gpio_in_r[i];
+    end
+end
 
-assign gpio_oe = gpio_oec;// 输出使能
-assign gpio_out = gpio_opt;// 输出数据
+//输出模式、使能
+for (i=0; i<32; i=i+1) begin
+    always @(*) begin
+        case ({gpio_oec[i], gpio_omd[i]})
+            2'b00: begin
+                gpio_oe [i] = 1'b0;
+                gpio_out[i] = 1'b0;
+            end
+            2'b01: begin
+                gpio_oe [i] = 1'b0;
+                gpio_out[i] = 1'b0;
+            end
+            2'b10: begin
+                gpio_oe [i] = 1'b1;
+                gpio_out[i] = gpio_opt[i];
+            end
+            2'b11: begin
+                gpio_oe [i] = ~gpio_opt[i];
+                gpio_out[i] = 1'b0;
+            end
+        endcase
+    end
+end
+
 
 //GPIO中断
-genvar i;
-for (i = 0; i<16; i=i+1) begin
-    assign gpio_trap_irq[i] = gpio_tai[i*2] ? (gpio_tai[i*2+1] ? gpio_din[i] : ~gpio_din[i]) : 1'b0;
+//第一拍gpio_trap,第二拍gpio_trap_r
+reg [15:0] gpio_trap,gpio_trap_r;
+always @(posedge clk ) begin
+    gpio_trap <= gpio_in_r[31:16];
+    gpio_trap_r <= gpio_trap;
 end
+for (i=0; i<16; i=i+1) begin
+    always @(*) begin
+        case (gpio_tai[i*2+1: i*2])
+            2'b00: gpio_trap_irq[i] = 1'b0;// 00:关闭外部中断
+            2'b01: gpio_trap_irq[i] = gpio_trap[i] & ~gpio_trap_r[i];// 01:上升沿触发
+            2'b10: gpio_trap_irq[i] = ~gpio_trap[i] & gpio_trap_r[i];// 10:下降沿触发
+            2'b11: gpio_trap_irq[i] = gpio_trap[i] ^ gpio_trap_r[i];// 11:双沿触发
+        endcase
+    end
+end
+
 endmodule
