@@ -46,7 +46,7 @@ initial begin
 	ex_trap_i=0;
 */
 `ifdef ISA_TEST  //通过宏定义，控制是否是指令集测试程序
-	wait(x26 == 32'b1)   // x26 == 1，结束仿真
+	wait(x26 == 32'b1);   // x26 == 1，结束仿真
 	#10
 	if (x27 == 32'b1) begin
 	$display("~~~~~~~~~~~~~~~~~~~ TEST_PASS ~~~~~~~~~~~~~~~~~~~");
@@ -84,9 +84,9 @@ initial begin
 	#3000000;//modeslsim
 `endif
 `ifdef ISA_TEST
-	$display("ISA_TEST Timeout, Err");//ISA测试超时
+	$display("*Sim tool:ISA_TEST Timeout, Err");//ISA测试超时
 `else 
-	$display("Normal Sim Timeout");//普通仿真超时
+	$display("*Sim tool:Normal Sim Timeout");//普通仿真超时
 `endif
 	$stop;
 end
@@ -94,7 +94,7 @@ end
 initial begin
 	#30;
 	wait(mends === 1'b1)//软件控制仿真结束
-	$display("CSR MENDS END");
+	$display("*Sim tool:CSR MENDS END, stop sim");
 	#10;
 	$stop;
 end
@@ -105,17 +105,23 @@ task sysrst;//复位任务
 	JTAG_TMS=0;
 	JTAG_TDI=0;
 	rst_n <= '0;
-	#10
+	#15
 	rst_n <= '1;
-	#5;
+	#10;
 endtask : sysrst
 
-
-for ( i=6 ; i<32 ; i=i+1 ) begin
-	assign fpioa[i] = (fpioa[i]);
+for ( i=0; i <32 ; i++) begin//fpioa信号弱下拉
+	assign (weak1,weak0) fpioa[i] = 1'b0;
 end
 
-
+initial begin
+	wait(rst_n===1'b1);
+	if(`CorePath.inst_iram.inst_dpram.BRAM[0][0]===1'bx) begin//如果inst.txt读入失败，停止仿真
+		$display("*Sim tool:Inst load error");
+		#10;
+		$stop;
+	end
+end
 sparrow_soc inst_sparrow_soc (
 	.clk               (clk), 
 	.hard_rst_n        (rst_n), 
@@ -147,7 +153,8 @@ W25Q128JVxIM inst_W25Q128JVxIM (
 `ifndef MODELSIM
 initial begin
 	$dumpfile("tb.lxt");  //生成lxt的文件名称
-	$dumpvars(0,tb_core);   //tb中实例化的仿真目标实例名称
+	$dumpvars(0,tb_core);   //tb中实例化的仿真目标实例名称	
 end
 `endif
+
 endmodule
