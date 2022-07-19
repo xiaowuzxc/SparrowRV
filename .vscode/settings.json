@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "system.h": "c",
-        "utils.h": "c",
-        "uart.h": "c",
-        "n25_flash.h": "c",
-        "spi.h": "c"
-    }
-}
