@@ -429,24 +429,31 @@ always @ (posedge clk) begin
 end
 
 //连接开关阵列
+generate
 for ( j=0 ; j<32 ; j=j+1 ) begin//选择FPIOA
     for ( i=0 ; i<256 ; i=i+1 ) begin//选择某一位
         assign fpioa_sw[j][i] = (fpioa_reg[j] == i) ? 1'b1 : 1'b0;
     end
 end
+endgenerate
 
 //输出使能控制
+generate
 for ( i=0 ; i<32 ; i=i+1 ) begin
     assign fpioa[i] = fpioa_oe[i]?fpioa_out[i]:1'bz;
 end
+endgenerate
 assign fpioa_in = fpioa;//数据输入
 
 //fpioa_out,fpioa_oe
+generate
 for ( i=0 ; i<32 ; i=i+1 ) begin
     assign fpioa_out[i] = perips_out[fpioa_reg[i]];
     assign fpioa_oe [i] = perips_oe [fpioa_reg[i]];
 end
+endgenerate
 
+generate
 for ( i=0 ; i<256 ; i=i+1 ) begin
         assign perips_in[i] = fpioa_sw[0][i] & fpioa_in[0]
                             |fpioa_sw[1][i] & fpioa_in[1]
@@ -482,7 +489,7 @@ for ( i=0 ; i<256 ; i=i+1 ) begin
                             |fpioa_sw[31][i] & fpioa_in[31]
         ;
 end
-
+endgenerate
 
 
 endmodule

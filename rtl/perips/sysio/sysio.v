@@ -67,15 +67,19 @@ end
 //写通道处理
 wire [15:0]we_en;
 genvar i;
+generate
 for (i = 0; i<16; i=i+1) begin
     assign we_en[i] = (sysio_axi_awaddr[11:8] == i)? axi_whsk : 1'b0;
 end
+endgenerate
 
 //读通道处理
 wire [15:0]rd_en;
+generate
 for (i = 0; i<16; i=i+1) begin
     assign rd_en[i] = (sysio_axi_araddr[11:8] == i)? axi_rhsk : 1'b0;
 end
+endgenerate
 reg [15:0]rd_en_r;
 always @(posedge clk ) begin
     if(axi_rhsk)

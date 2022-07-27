@@ -103,6 +103,7 @@ always @(posedge clk) begin
 	gpio_in_r <= gpio_in;
 	gpio_din  <= gpio_in_r;
 end
+generate
 for (i=0; i<32; i=i+1) begin
     always @(posedge clk) begin
         if(gpio_oec[i]==1'b0 & gpio_omd[i]==1'b1)//锁存上一次的输入
@@ -111,8 +112,10 @@ for (i=0; i<32; i=i+1) begin
             gpio_din[i] <= gpio_in_r[i];
     end
 end
+endgenerate
 
 //输出模式、使能
+generate
 for (i=0; i<32; i=i+1) begin
     always @(*) begin
         case ({gpio_oec[i], gpio_omd[i]})
@@ -135,7 +138,7 @@ for (i=0; i<32; i=i+1) begin
         endcase
     end
 end
-
+endgenerate
 
 //GPIO中断
 //第一拍gpio_trap,第二拍gpio_trap_r
@@ -144,6 +147,7 @@ always @(posedge clk ) begin
     gpio_trap <= gpio_in_r[31:16];
     gpio_trap_r <= gpio_trap;
 end
+generate
 for (i=0; i<16; i=i+1) begin
     always @(*) begin
         case (gpio_tai[i*2+1: i*2])
@@ -154,5 +158,5 @@ for (i=0; i<16; i=i+1) begin
         endcase
     end
 end
-
+endgenerate
 endmodule
