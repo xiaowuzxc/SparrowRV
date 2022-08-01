@@ -19,6 +19,6 @@
 /tools/*
 /bsp/obj/*
 /isp/obj/*
-/rtl/W25Q128JVxIM.v
+#/rtl/W25Q128JVxIM.v
 
 /.vscode
