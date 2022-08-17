@@ -72,6 +72,10 @@ always @(*) begin
                     mcause_gen[30:0] = 31'd3;
                     psoft_trap_rsp = 1;
                 end
+                else begin//其他
+                    mcause_gen[30:0] = 31'd0;
+                    psoft_trap_rsp = 1;
+                end
     end
     else begin//异常
         mcause_gen[31] = 1'b0;

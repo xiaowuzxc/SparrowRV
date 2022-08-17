@@ -63,11 +63,12 @@ always @(posedge clk or negedge rst_n) begin
     end
 end
 wire [31:0] rst_addr = `RstPC;
-wire [`InstAddrBus]addra = iram_rstn_o ? rst_addr[31:2] : pc_n_i[31:2];
+wire [clogb2(`IRamSize-1)-1:0]addra = iram_rstn_o ? rst_addr[clogb2(`IRamSize-1)-1+2:2] : pc_n_i[clogb2(`IRamSize-1)-1+2:2];
 wire [`MemBus]douta,doutia;
 assign inst_o = pc_o[27]?doutia:douta;
+
 //AXI4L总线交互
-reg [`MemAddrBus]addrb;
+reg [clogb2(`IRamSize-1)-1:0]addrb;
 reg web,enb;
 reg [3:0] wemb;
 reg bram_sel;
@@ -77,6 +78,7 @@ wire axi_whsk = iram_axi_awvalid & iram_axi_wvalid;//写通道握手
 wire axi_rhsk = iram_axi_arvalid & (~iram_axi_rvalid | (iram_axi_rvalid & iram_axi_rready)) & ~axi_whsk;//读通道握手,没有读响应
 reg wei;//AXI写ISP
 reg [`MemBus]dini;//AXI写ISP
+
 always @(posedge clk or negedge rst_n)//读响应控制
 if (~rst_n)
     iram_axi_rvalid <=1'b0;
@@ -88,6 +90,7 @@ else begin
     else
         iram_axi_rvalid <= iram_axi_rvalid;
 end
+
 always @(posedge clk) begin
     if(axi_rhsk)
         bram_sel <= iram_axi_araddr[27];
@@ -108,10 +111,10 @@ always @(*) begin
     enb = axi_whsk | axi_rhsk;
     wemb = iram_axi_wstrb;
     if(axi_whsk) begin//写握手
-        addrb = iram_axi_awaddr[31:2];
+        addrb = iram_axi_awaddr[clogb2(`IRamSize-1)-1+2:2];
         if(iram_axi_awaddr[27]==1'b0) begin//AXI写ISP
-            web = 1;
-            wei = 0;//AXI写ISP
+            web = 1;//AXI写iram
+            wei = 0;
         end
         else begin
             web = 0;
@@ -119,16 +122,10 @@ always @(*) begin
         end
     end
     else begin
-        if (axi_rhsk) begin//读握手
-            addrb = iram_axi_araddr[31:2];
-            web = 0;
-        end
-        else begin
-            addrb = 0;
-            web = 0;
-        end
+        web = 0;
+        wei = 0;
+        addrb = iram_axi_araddr[clogb2(`IRamSize-1)-1+2:2];
     end
-
 end
 
 
@@ -147,25 +144,21 @@ dpram #(
     .wemb   (wemb),
     .ena    (iram_rd_i | iram_rstn_o),
     .enb    (enb),
-    .rsta   (),
-    .rstb   (),
-    .regcea (),
-    .regceb (),
     .douta  (douta),
     .doutb  (doutb)
 );
 
 isp #(
-    .RAM_DEPTH(8192)
+    .RAM_DEPTH(4096)
 ) inst_isp (
     .clk   (clk),
     .wen   (wei),
     .din   (dini),
     .ena   (iram_rd_i | iram_rstn_o),
-    .addra (addra[clogb2(8192-1)-1:0]),
+    .addra (addra[clogb2(4096-1)-1:0]),
     .douta (doutia),
     .enb   (enb),
-    .addrb (addrb[clogb2(8192-1)-1:0]),
+    .addrb (addrb[clogb2(4096-1)-1:0]),
     .doutb (doutib)
 );
 

@@ -14,10 +14,6 @@ module dpram #(
     input [3:0] wemb,
     input ena,                            // Port A RAM Enable, for additional power savings, disable port when not in use
     input enb,                            // Port B RAM Enable, for additional power savings, disable port when not in use
-    input rsta,                           // Port A output reset (does not affect memory contents)
-    input rstb,                           // Port B output reset (does not affect memory contents)
-    input regcea,                         // Port A output register enable
-    input regceb,                         // Port B output register enable
     output [RAM_WIDTH-1:0] douta,         // Port A RAM output data
     output [RAM_WIDTH-1:0] doutb          // Port B RAM output data
 );

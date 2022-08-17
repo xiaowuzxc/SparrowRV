@@ -72,10 +72,6 @@ wire [`InstAddrBus] idex_pc_n;//idex下一条指令PC
 wire [`InstAddrBus] trap_pc_n;//中断仲裁后的下一条指令PC
 wire [`InstAddrBus] pc;//当前指令的PC
 wire [`InstBus] inst;//当前指令
-wire [`MemBus] iram_cmd_wdata;
-wire [`MemBus] iram_rsp_rdata;
-wire [`MemAddrBus] iram_cmd_addr;  
-wire [3:0] iram_cmd_wem;
 wire [`CsrAddrBus] idex_csr_addr;//idex访问csr地址
 wire [`RegBus] idex_csr_wdata;//idex写csr数据
 wire [`RegBus] idex_csr_rdata;//idex读csr数据

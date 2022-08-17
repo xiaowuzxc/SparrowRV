@@ -101,7 +101,6 @@ end
 reg [31:0] gpio_in_r;
 always @(posedge clk) begin
 	gpio_in_r <= gpio_in;
-	gpio_din  <= gpio_in_r;
 end
 generate
 for (i=0; i<32; i=i+1) begin
