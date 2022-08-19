@@ -5,9 +5,9 @@ from tkinter import filedialog
 def 找到所有bin文件(path):
 	找到的文件列表 = []
 	list_dir = os.walk(path)
-	for maindir, subdir, all_file in list_dir:
-		for filename in all_file:
-			找到的文件 = os.path.join(maindir, filename)
+	for 主目录, 子目录, 所有文件 in list_dir:
+		for 文件的名称 in 所有文件:
+			找到的文件 = os.path.join(主目录, 文件的名称)
 			if 找到的文件.endswith('.bin'):
 				找到的文件列表.append(找到的文件)
 

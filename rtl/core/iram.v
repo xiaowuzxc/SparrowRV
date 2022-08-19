@@ -48,6 +48,24 @@ module iram (
  * 用途: 复位后PC指向此处，完成数据搬移、UART烧录
  * 
 */
+
+wire [31:0] rst_addr = `RstPC;//复位地址
+wire [clogb2(`IRamSize-1)-1:0]addra = iram_rstn_o ? rst_addr[clogb2(`IRamSize-1)-1+2:2] : pc_n_i[clogb2(`IRamSize-1)-1+2:2];
+wire [`MemBus]douta,doutia;
+reg axi_ram_sel,inst_ram_sel;//根据地址选择访问的存储器
+assign inst_o = pc_o[27]?doutia:douta;
+
+//AXI4L总线交互
+reg [clogb2(`IRamSize-1)-1:0]addrb;
+reg web,enb;
+reg [3:0] wemb;
+wire [`MemBus]doutb,doutib;
+reg [`MemBus]dinb;
+wire axi_whsk = iram_axi_awvalid & iram_axi_wvalid;//写通道握手
+wire axi_rhsk = iram_axi_arvalid & (~iram_axi_rvalid | (iram_axi_rvalid & iram_axi_rready)) & ~axi_whsk;//读通道握手,没有读响应
+reg wei;//AXI写ISP
+reg [`MemBus]dini;//AXI写ISP
+
 //PC复位
 always @(posedge clk or negedge rst_n) begin
     if(~rst_n) begin
@@ -56,28 +74,16 @@ always @(posedge clk or negedge rst_n) begin
     end 
     else begin
         iram_rstn_o <= 1'b0;
-        if(iram_rd_i)
+        if(iram_rd_i) begin
             pc_o <= pc_n_i;
-        else
-            pc_o <= pc_o ;    
+            inst_ram_sel <= pc_n_i[27];
+        end
+        else begin
+            pc_o <= pc_o;
+            inst_ram_sel <= inst_ram_sel;
+        end
     end
 end
-wire [31:0] rst_addr = `RstPC;
-wire [clogb2(`IRamSize-1)-1:0]addra = iram_rstn_o ? rst_addr[clogb2(`IRamSize-1)-1+2:2] : pc_n_i[clogb2(`IRamSize-1)-1+2:2];
-wire [`MemBus]douta,doutia;
-assign inst_o = pc_o[27]?doutia:douta;
-
-//AXI4L总线交互
-reg [clogb2(`IRamSize-1)-1:0]addrb;
-reg web,enb;
-reg [3:0] wemb;
-reg bram_sel;
-wire [`MemBus]doutb,doutib;
-reg [`MemBus]dinb;
-wire axi_whsk = iram_axi_awvalid & iram_axi_wvalid;//写通道握手
-wire axi_rhsk = iram_axi_arvalid & (~iram_axi_rvalid | (iram_axi_rvalid & iram_axi_rready)) & ~axi_whsk;//读通道握手,没有读响应
-reg wei;//AXI写ISP
-reg [`MemBus]dini;//AXI写ISP
 
 always @(posedge clk or negedge rst_n)//读响应控制
 if (~rst_n)
@@ -93,15 +99,15 @@ end
 
 always @(posedge clk) begin
     if(axi_rhsk)
-        bram_sel <= iram_axi_araddr[27];
+        axi_ram_sel <= iram_axi_araddr[27];
     else
-        bram_sel <= bram_sel;
+        axi_ram_sel <= axi_ram_sel;
 end
 
 always @(*) begin
     iram_axi_awready = axi_whsk;//写地址数据同时准备好
     iram_axi_wready = axi_whsk;//写地址数据同时准备好
-    iram_axi_rdata = bram_sel?doutib:doutb;//读数据
+    iram_axi_rdata = axi_ram_sel?doutib:doutb;//读数据
     iram_axi_arready = axi_rhsk;//读地址握手
     iram_axi_bvalid = 1'b1;
     iram_axi_bresp = 2'b00;//响应
@@ -149,16 +155,16 @@ dpram #(
 );
 
 isp #(
-    .RAM_DEPTH(4096)
+    .RAM_DEPTH(1024)
 ) inst_isp (
     .clk   (clk),
     .wen   (wei),
     .din   (dini),
     .ena   (iram_rd_i | iram_rstn_o),
-    .addra (addra[clogb2(4096-1)-1:0]),
+    .addra (addra[clogb2(1024-1)-1:0]),
     .douta (doutia),
     .enb   (enb),
-    .addrb (addrb[clogb2(4096-1)-1:0]),
+    .addrb (addrb[clogb2(1024-1)-1:0]),
     .doutb (doutib)
 );
 

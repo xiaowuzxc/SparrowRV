@@ -99,4 +99,36 @@ module regs(
         end
     end
 
+//仿真观测专用
+wire [31:0] ra  = regs[1];
+wire [31:0] sp  = regs[2];
+wire [31:0] gp  = regs[3];
+wire [31:0] tp  = regs[4];
+wire [31:0] t0  = regs[5];
+wire [31:0] t1  = regs[6];
+wire [31:0] t2  = regs[7];
+wire [31:0] s0  = regs[8];
+wire [31:0] s1  = regs[9];
+wire [31:0] a0  = regs[10];
+wire [31:0] a1  = regs[11];
+wire [31:0] a2  = regs[12];
+wire [31:0] a3  = regs[13];
+wire [31:0] a4  = regs[14];
+wire [31:0] a5  = regs[15];
+wire [31:0] a6  = regs[16];
+wire [31:0] a7  = regs[17];
+wire [31:0] s2  = regs[18];
+wire [31:0] s3  = regs[19];
+wire [31:0] s4  = regs[20];
+wire [31:0] s5  = regs[21];
+wire [31:0] s6  = regs[22];
+wire [31:0] s7  = regs[23];
+wire [31:0] s8  = regs[24];
+wire [31:0] s9  = regs[25];
+wire [31:0] s10 = regs[26];
+wire [31:0] s11 = regs[27];
+wire [31:0] t3  = regs[28];
+wire [31:0] t4  = regs[29];
+wire [31:0] t5  = regs[30];
+wire [31:0] t6  = regs[31];
 endmodule
