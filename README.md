@@ -1,8 +1,8 @@
 # 小麻雀处理器
 ![rvlogo](/pic/img/rvlogo.bmp)[已被RISC-V官网收录](https://riscv.org/exchange/?_sf_s=sparrowrv)  
-![teelogo](/pic/img/giteetj.bmp)Gitee推荐项目  
+![teelogo](/pic/img/giteetj.bmp)[Gitee推荐项目](https://gitee.com/explore/risc-v)  
 ## 简介
-小麻雀处理器(SparrowRV)是一款单周期32位，支持RV32IM指令集的嵌入式处理器。它的控制逻辑简单，没有复杂的流水线控制结构，没有冗余的线网连接，代码注释完备，整体可读性强。  
+小麻雀处理器(SparrowRV)是一款单周期32位，支持RV32IM指令集的嵌入式处理器。它的控制逻辑简单，没有复杂的流水线控制结构，没有冗余的线网连接，代码注释完备，适合用于学习。  
 
 **设计指标：**  
 - 兼容RV32IM指令集  
