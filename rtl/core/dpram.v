@@ -1,6 +1,6 @@
 module dpram #(
     parameter RAM_WIDTH = 32,                       // Specify RAM data width
-    parameter RAM_DEPTH = 65536                     // Specify RAM depth (number of entries)
+    parameter RAM_DEPTH = 1024                     // Specify RAM depth (number of entries)
 
 ) (
     input [clogb2(RAM_DEPTH-1)-1:0] addra,  // Port A address bus, width determined from RAM_DEPTH
