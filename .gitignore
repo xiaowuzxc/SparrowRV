@@ -2,6 +2,7 @@
 *.drawio.bkp
 /tb/tb
 /tb/*.lxt
+/tb/*.vcd
 /tb/inst.txt
 /tb/isp.txt
 /tb/MEM.TXT

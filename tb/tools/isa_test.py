@@ -63,12 +63,12 @@ def 编译并仿真():
 	if sys.argv[1] != 'all_isa':
 		print(编译进程.read())
 	编译进程.close()
-	仿真进程 = os.popen(r'vvp -n tb -lxt2')
+	仿真进程 = os.popen(r'vvp -n tb')
 	仿真输出 = 仿真进程.read()
 	仿真进程.close()
 	if sys.argv[1] != 'all_isa':
 		print(仿真输出)
-		波形进程 = os.popen(r'gtkwave tb.lxt')
+		波形进程 = os.popen(r'gtkwave tb.vcd')
 		波形进程.close()
 	return 仿真输出
 
@@ -139,4 +139,5 @@ if __name__ == '__main__':
 		sys.exit(启动modelsim仿真())
 	else:
 		print(r'isa_test.py找不到指令')
+		print(sys.argv[1])
 		sys.exit()
