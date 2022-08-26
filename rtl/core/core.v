@@ -181,6 +181,7 @@ iram inst_iram
 
 idex inst_idex
 (
+    .clk          (clk),
     .inst_i       (inst),
     .pc_i         (pc),
     .reg_rdata1_i (reg_rdata1),

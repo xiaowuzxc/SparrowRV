@@ -7,6 +7,9 @@
 //sram数据存储器大小，单位为KB
 `define SRam_KB 32 
 
+//启用M扩展(乘法/除法)
+`define RV32_M_ISA
+
 //启用mcycle运行周期计数器
 `define CSR_MCYCLE_EN
 

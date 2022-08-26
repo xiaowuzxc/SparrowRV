@@ -41,7 +41,11 @@ wire soft_trap_valid;//软件中断请求
 
 //---CSR寄存器定义---
 reg mstatus_MPIE7;//mstatus状态寄存器
-wire[`RegBus] misa=32'b01_0000_0000000000000_1_000_1_00000000;//RV32IM ISA寄存器
+`ifdef RV32_M_ISA
+    wire[`RegBus] misa=32'b01_0000_0000000000000_1_000_1_00000000;//RV32IM ISA寄存器
+`else
+    wire[`RegBus] misa=32'b01_0000_0000000000000_0_000_1_00000000;//RV32I ISA寄存器
+`endif
 reg mie_MEIE11, mie_MTIE7, mie_MSIE3;//中断屏蔽，1使能，0屏蔽
 reg [`RegBus] mtvec;//[32:2]中断入口,[1:0]=0
 reg [`RegBus] mscratch;//mscratch寄存器
@@ -52,10 +56,10 @@ wire mip_MTIP7=tcmp_trap_valid;//MEIP7定时器中断等待
 wire mip_MSIP3=soft_trap_valid;//MEIP3软件中断等待
 reg msip;//软件中断，写1软件中断
 `ifdef CSR_MCYCLE_EN
-reg [63:0] mcycle;//运行周期计数
+    reg [63:0] mcycle;//运行周期计数
 `endif
 `ifdef CSR_MINSTRET_EN
-reg [63:0] minstret;//指令计数
+    reg [63:0] minstret;//指令计数
 `endif
 reg [63:0] mtime;//定时器
 reg [63:0] mtimecmp;//定时器比较

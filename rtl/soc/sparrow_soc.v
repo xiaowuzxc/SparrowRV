@@ -148,7 +148,7 @@ core inst_core
     .iram_axi_wready  (iram_axi_wready ),
     .iram_axi_bresp   (),
     .iram_axi_bvalid  (),
-    .iram_axi_bready  (),
+    .iram_axi_bready  (1'b0),
     .iram_axi_araddr  (iram_axi_araddr ),
     .iram_axi_arprot  (3'h0),
     .iram_axi_arvalid (iram_axi_arvalid),
@@ -336,7 +336,7 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s3_axi_araddr   (),
     .s3_axi_arvalid  (),
     .s3_axi_arready  (1'b0),
-    .s3_axi_rdata    (),
+    .s3_axi_rdata    (32'b0),
     .s3_axi_rvalid   (1'b0),
     .s3_axi_rready   (),
 
@@ -350,7 +350,7 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s4_axi_araddr   (),
     .s4_axi_arvalid  (),
     .s4_axi_arready  (1'b0),
-    .s4_axi_rdata    (),
+    .s4_axi_rdata    (32'b0),
     .s4_axi_rvalid   (1'b0),
     .s4_axi_rready   (),
 
@@ -364,7 +364,7 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s5_axi_araddr   (),
     .s5_axi_arvalid  (),
     .s5_axi_arready  (1'b0),
-    .s5_axi_rdata    (),
+    .s5_axi_rdata    (32'b0),
     .s5_axi_rvalid   (1'b0),
     .s5_axi_rready   (),
 
@@ -378,7 +378,7 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s6_axi_araddr   (),
     .s6_axi_arvalid  (),
     .s6_axi_arready  (1'b0),
-    .s6_axi_rdata    (),
+    .s6_axi_rdata    (32'b0),
     .s6_axi_rvalid   (1'b0),
     .s6_axi_rready   (),
 
@@ -392,7 +392,7 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s7_axi_araddr   (),
     .s7_axi_arvalid  (),
     .s7_axi_arready  (1'b0),
-    .s7_axi_rdata    (),
+    .s7_axi_rdata    (32'b0),
     .s7_axi_rvalid   (1'b0),
     .s7_axi_rready   (),
 
@@ -406,7 +406,7 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s8_axi_araddr   (),
     .s8_axi_arvalid  (),
     .s8_axi_arready  (1'b0),
-    .s8_axi_rdata    (),
+    .s8_axi_rdata    (32'b0),
     .s8_axi_rvalid   (1'b0),
     .s8_axi_rready   (),
 
@@ -420,7 +420,7 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s9_axi_araddr   (),
     .s9_axi_arvalid  (),
     .s9_axi_arready  (1'b0),
-    .s9_axi_rdata    (),
+    .s9_axi_rdata    (32'b0),
     .s9_axi_rvalid   (1'b0),
     .s9_axi_rready   (),
 
@@ -434,7 +434,7 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s10_axi_araddr  (),
     .s10_axi_arvalid (),
     .s10_axi_arready (1'b0),
-    .s10_axi_rdata   (),
+    .s10_axi_rdata   (32'b0),
     .s10_axi_rvalid  (1'b0),
     .s10_axi_rready  (),
 
@@ -448,7 +448,7 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s11_axi_araddr  (),
     .s11_axi_arvalid (),
     .s11_axi_arready (1'b0),
-    .s11_axi_rdata   (),
+    .s11_axi_rdata   (32'b0),
     .s11_axi_rvalid  (1'b0),
     .s11_axi_rready  (),
 
@@ -462,7 +462,7 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s12_axi_araddr  (),
     .s12_axi_arvalid (),
     .s12_axi_arready (1'b0),
-    .s12_axi_rdata   (),
+    .s12_axi_rdata   (32'b0),
     .s12_axi_rvalid  (1'b0),
     .s12_axi_rready  (),
 
@@ -476,7 +476,7 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s13_axi_araddr  (),
     .s13_axi_arvalid (),
     .s13_axi_arready (1'b0),
-    .s13_axi_rdata   (),
+    .s13_axi_rdata   (32'b0),
     .s13_axi_rvalid  (1'b0),
     .s13_axi_rready  (),
 
@@ -490,7 +490,7 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s14_axi_araddr  (),
     .s14_axi_arvalid (),
     .s14_axi_arready (1'b0),
-    .s14_axi_rdata   (),
+    .s14_axi_rdata   (32'b0),
     .s14_axi_rvalid  (1'b0),
     .s14_axi_rready  (),
 
@@ -504,7 +504,7 @@ axi4lite_2mt16s inst_axi4lite_2mt16s
     .s15_axi_araddr  (),
     .s15_axi_arvalid (),
     .s15_axi_arready (1'b0),
-    .s15_axi_rdata   (),
+    .s15_axi_rdata   (32'b0),
     .s15_axi_rvalid  (1'b0),
     .s15_axi_rready  ()
 );

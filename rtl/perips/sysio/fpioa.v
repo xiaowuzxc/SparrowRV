@@ -453,6 +453,7 @@ for ( i=0 ; i<32 ; i=i+1 ) begin
 end
 endgenerate
 
+
 generate
 for ( i=0 ; i<256 ; i=i+1 ) begin
         assign perips_in[i] = fpioa_sw[0][i] & fpioa_in[0]
