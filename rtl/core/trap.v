@@ -9,20 +9,16 @@ module trap (
     output reg csr_we_o,                    //写CSR寄存器请求
     output reg[`CsrAddrBus] csr_addr_o,     //访问CSR寄存器地址
 
-    //中断响应指示
-    output reg pex_trap_rsp  ,//外部中断响应
-    output reg ptcmp_trap_rsp,//定时器响应
-    output reg psoft_trap_rsp,//软件中断响应
-
-    //中断输入接口
+    //异常输入接口
     input wire ecall_i,//ecall指令中断
     input wire ebreak_i,//ebreak指令中断
     input wire inst_err_i,//指令解码错误中断
     input wire mem_err_i,//访存错误-------未使用
 
-    input wire pex_trap_i,//外部中断，需锁存
-    input wire ptcmp_trap_i,//定时器中断，需锁存
-    input wire psoft_trap_i,//软件中断，需锁存
+    //中断输入接口
+    input wire ex_trap_valid_i,//外部中断，需锁存
+    input wire tcmp_trap_valid_i,//定时器中断，需锁存
+    input wire soft_trap_valid_i,//软件中断，需锁存
 
     input wire mstatus_MIE3,//全局中断使能标志
     input wire wfi_i,//wfi指令休眠
@@ -30,6 +26,9 @@ module trap (
     input wire[`InstAddrBus] pc_i,            //当前条指令地址
     input wire[`InstBus] inst_i,              //指令内容
     input wire [`MemAddrBus] mem_addr_i,      //访存地址
+
+    //中断响应接口
+    output reg ex_trap_ready_o  ,//外部中断响应
 
     //下一个PC控制
     input wire[`InstAddrBus] pc_n_i,          //idex提供的下一条指令地址
@@ -44,37 +43,32 @@ module trap (
 reg pex_trap_r;//外部中断
 reg ptcmp_trap_r;//定时器中断
 reg psoft_trap_r;//软件中断
-//-------进中断需要锁存的信息-----
 
+//-------进入陷阱使能-----
 wire trap_exception_en = ecall_i | ebreak_i | inst_err_i | mem_err_i;//有异常到达，不可屏蔽
-wire trap_interrupt_en = pex_trap_i | ptcmp_trap_i | psoft_trap_i;//有中断到达，可屏蔽
+wire trap_interrupt_en = ex_trap_valid_i | tcmp_trap_valid_i | soft_trap_valid_i;//有中断到达，可屏蔽
 
 reg [`RegBus] mcause_gen;//生成mcause信息
 reg [`RegBus] mtval_gen;//生成mtval信息
 
 always @(*) begin
-    pex_trap_rsp   = 0;
-    ptcmp_trap_rsp = 0;
-    psoft_trap_rsp = 0;
+    ex_trap_ready_o = 0;
     if(trap_interrupt_en) begin//中断
         mcause_gen[31] = 1'b1;
         if(pex_trap_r) begin//优先外部中断 
             mcause_gen[30:0] = 31'd11;
-            pex_trap_rsp   = 1;
+            ex_trap_ready_o  = 1;
         end
         else
             if(ptcmp_trap_r) begin//其次定时器中断
                 mcause_gen[30:0] = 7;
-                ptcmp_trap_rsp = 1;
             end
             else
                 if(psoft_trap_r) begin//其次软件中断
                     mcause_gen[30:0] = 31'd3;
-                    psoft_trap_rsp = 1;
                 end
                 else begin//其他
                     mcause_gen[30:0] = 31'd0;
-                    psoft_trap_rsp = 1;
                 end
     end
     else begin//异常
@@ -231,9 +225,9 @@ end
 
 always @(posedge clk) begin
     if(sta_n == CMIE) begin//若即将进入中断/异常，则锁存必要信息
-        pex_trap_r   <= pex_trap_i   ;//锁存外部中断
-        ptcmp_trap_r <= ptcmp_trap_i ;//锁存定时器中断
-        psoft_trap_r <= psoft_trap_i ;//锁存软件中断     
+        pex_trap_r   <= ex_trap_valid_i   ;//锁存外部中断
+        ptcmp_trap_r <= tcmp_trap_valid_i ;//锁存定时器中断
+        psoft_trap_r <= soft_trap_valid_i ;//锁存软件中断     
     end
     else begin
         

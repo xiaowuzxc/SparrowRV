@@ -1,15 +1,5 @@
+`include "config.v"
 
-/*----------以下内容按需配置-------------*/
-`define CPU_CLOCK_HZ 25_000_000
-`define IRam_KB 32 //iram指令存储器大小，单位为KB
-`define SRam_KB 32 //sram数据存储器大小，单位为KB
-//`define EG4_FPGA //启用安路EG4 FPGA原语生成BRAM
-//`define Flash25 //启用w25模型，会降低仿真速度
-/*----------以上内容按需配置-------------*/
-
-
-
-/*----------以下内容不建议修改-------------*/
 `define IRamSize (`IRam_KB*1024/4) //kB->B->4B
 `define SRamSize (`SRam_KB*1024/4) //kB->B->4B
 //`define RstPC 32'h0800_0000 //复位后PC值
@@ -144,7 +134,6 @@
 `define CSR_MISA       12'h301
 `define CSR_MIE        12'h304
 `define CSR_MTVEC      12'h305
-`define CSR_MTRIG      12'h306//触发系统
 `define CSR_MSCRATCH   12'h340
 `define CSR_MEPC       12'h341
 `define CSR_MCAUSE     12'h342

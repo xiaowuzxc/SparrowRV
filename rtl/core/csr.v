@@ -24,46 +24,39 @@ module csr(
 
     //中断处理通道
     //输入
-    input wire ex_trap_i,//外部中断标志
+    input wire ex_trap_valid_i,//外部中断标志
     //屏蔽后输出
-    output reg ex_trap_o,//外部中断信号
-    output reg tcmp_trap_o,//定时器中断信号
-    output reg soft_trap_o,//软件中断信号
+    output reg ex_trap_valid_o,//外部中断信号
+    output reg tcmp_trap_valid_o,//定时器中断信号
+    output reg soft_trap_valid_o,//软件中断信号
     //全局中断使能标志
     output reg mstatus_MIE3,//全局中断使能，1表示可以中断
-    //中断响应指示
-    input wire pex_trap_rsp  ,//外部中断响应
-    input wire ptcmp_trap_rsp,//定时器响应
-    input wire psoft_trap_rsp,//软件中断响应
 
     input wire hx_valid//回写使能信号
 
-
 );
-wire tcmp_trap;//定时器中断标志
-wire soft_trap;//软件中断标志
-reg ex_trap_trig  ;//外部中断信号触发
-reg tcmp_trap_trig;//定时器中断信号触发
-reg soft_trap_trig;//软件中断信号触发
-reg ex_trap_trig_r  ;//外部中断信号触发
-reg tcmp_trap_trig_r;//定时器中断信号触发
-reg soft_trap_trig_r;//软件中断信号触发
+wire tcmp_trap_valid;//定时器中断请求
+wire soft_trap_valid;//软件中断请求
 
-reg mstatus_MPIE7;
-wire[`RegBus] misa=32'b01_0000_0000000000000_1_000_1_00000000;//RV32IM
+
+//---CSR寄存器定义---
+reg mstatus_MPIE7;//mstatus状态寄存器
+wire[`RegBus] misa=32'b01_0000_0000000000000_1_000_1_00000000;//RV32IM ISA寄存器
 reg mie_MEIE11, mie_MTIE7, mie_MSIE3;//中断屏蔽，1使能，0屏蔽
 reg [`RegBus] mtvec;//[32:2]中断入口,[1:0]=0
-reg [`RegBus] mscratch;//寄存器
+reg [`RegBus] mscratch;//mscratch寄存器
 reg [`RegBus] mcause;//中断原因，[31]:1中断,0异常，[30:0]:编号
 reg [`RegBus] mtval;//异常原因寄存器
-wire mip_MEIP11=ex_trap_trig_r;//外部中断等待
-wire mip_MTIP7=tcmp_trap_trig_r;//定时器中断等待
-wire mip_MSIP3=soft_trap_trig_r;//软件中断等待
-reg [`RegBus] msip;//写非0软件中断
-reg [2:0] mtrig;//中断触发控制，功能见-中断相关-
-
+wire mip_MEIP11=ex_trap_valid_i;//MEIP11外部中断等待
+wire mip_MTIP7=tcmp_trap_valid;//MEIP7定时器中断等待
+wire mip_MSIP3=soft_trap_valid;//MEIP3软件中断等待
+reg msip;//软件中断，写1软件中断
+`ifdef CSR_MCYCLE_EN
 reg [63:0] mcycle;//运行周期计数
+`endif
+`ifdef CSR_MINSTRET_EN
 reg [63:0] minstret;//指令计数
+`endif
 reg [63:0] mtime;//定时器
 reg [63:0] mtimecmp;//定时器比较
 reg [3 :0] mcctr;//系统控制
@@ -71,122 +64,42 @@ reg [3 :0] mcctr;//系统控制
 //[1]:minstret使能
 //[2]:mtime使能
 //[3]:soft_rst写1复位
-assign soft_rst = mcctr[3];
 wire[`RegBus] mvendorid=32'h0;//Vendor ID
 wire[`RegBus] marchid=32'd1;//微架构编号
 wire[`RegBus] mimpid=32'd1;//硬件实现编号
 wire[`RegBus] mhartid=32'h0;//线程编号
 
-//仿真模式专用
+//---仿真模式专用---
 reg [7:0] mprints;//仿真标准输出
 reg mends;//仿真结束
-//仿真模式专用
 
-//---------------中断相关-------------------
-/* mtrig是三条中断的触发控制器
- * [0]外部中断触发方式配置，0:高电平，1:上升沿
- * [1]定时器中断触发方式配置，0:高电平，1:上升沿
- * [2]软件中断触发方式配置，0:高电平，1:上升沿
-*/
-assign tcmp_trap = (mtime >= mtimecmp) ? 1'b1 : 1'b0;//生成定时器中断标志
-assign soft_trap = (msip != 32'h0) ? 1'b1 : 1'b0;//生成软件中断标志
-//ex_trap_i  外部中断标志
-reg ex_trap_r  ;//外部中断信号打一拍
-reg tcmp_trap_r;//定时器中断信号打一拍
-reg soft_trap_r;//软件中断信号打一拍
-always @(posedge clk) begin//打一拍
-    ex_trap_r   <= ex_trap_i;
-    tcmp_trap_r <= tcmp_trap;
-    soft_trap_r <= soft_trap;
-end
-
-//中断触发控制
-always @(*) begin
-    case (mtrig[0])//外部中断
-        1'b0: ex_trap_trig = ex_trap_i;
-        1'b1: ex_trap_trig =(ex_trap_i && ~ex_trap_r)?1'b1:1'b0;
-    endcase
-    case (mtrig[1])//定时器中断
-        1'b0: tcmp_trap_trig = tcmp_trap;
-        1'b1: tcmp_trap_trig =(tcmp_trap && ~tcmp_trap_r)?1'b1:1'b0;
-    endcase
-    case (mtrig[2])//软件中断
-        1'b0: soft_trap_trig = soft_trap;
-        1'b1: soft_trap_trig =(soft_trap && ~soft_trap_r)?1'b1:1'b0;
-    endcase
-end
-
-//中断等待控制
-always @(posedge clk or negedge rst_n) begin
-    if (~rst_n) begin
-        ex_trap_trig_r   <= 0;
-        tcmp_trap_trig_r <= 0;
-        soft_trap_trig_r <= 0;
-    end
-    else begin
-        if(ex_trap_trig_r) begin//外部中断等待中
-            if(pex_trap_rsp)//外部中断被响应
-                ex_trap_trig_r <= 0;//清除等待
-            else
-                ex_trap_trig_r <= ex_trap_trig_r;//不变
-        end
-        else begin//没有外部中断
-            if(ex_trap_trig)//外部中断被触发
-                ex_trap_trig_r <= 1;//开始等待
-            else
-                ex_trap_trig_r <= ex_trap_trig_r;//不变
-        end
-
-        if(tcmp_trap_trig_r) begin//定时器中断等待中
-            if(ptcmp_trap_rsp)//定时器中断被响应
-                tcmp_trap_trig_r <= 0;//清除等待
-            else
-                tcmp_trap_trig_r <= tcmp_trap_trig_r;//不变
-        end
-        else begin//没有定时器中断
-            if(tcmp_trap_trig)//定时器中断被触发
-                tcmp_trap_trig_r <= 1;//开始等待
-            else
-                tcmp_trap_trig_r <= tcmp_trap_trig_r;//不变
-        end
-
-        if(soft_trap_trig_r) begin//软件中断等待中
-            if(psoft_trap_rsp)//软件中断被响应
-                soft_trap_trig_r <= 0;//清除等待
-            else
-                soft_trap_trig_r <= soft_trap_trig_r;//不变
-        end
-        else begin//没有软件中断
-            if(soft_trap_trig)//软件中断被触发
-                soft_trap_trig_r <= 1;//开始等待
-            else
-                soft_trap_trig_r <= soft_trap_trig_r;//不变
-        end
-    end
-end
+//---生成信号---
+assign tcmp_trap_valid = (mtime >= mtimecmp) ? 1'b1 : 1'b0;//生成定时器中断标志
+assign soft_trap_valid = msip;//生成软件中断标志
+assign soft_rst = mcctr[3];
 
 //中断信号门控
 always @(posedge clk or negedge rst_n) begin
     if (~rst_n) begin
-        ex_trap_o   <= 0;
-        tcmp_trap_o <= 0;
-        soft_trap_o <= 0;
+        ex_trap_valid_o   <= 0;
+        tcmp_trap_valid_o <= 0;
+        soft_trap_valid_o <= 0;
     end
     else begin
         if(hx_valid) begin
-            ex_trap_o   <= (mie_MEIE11)? ex_trap_trig_r   : 1'b0 ;//经过屏蔽处理
-            tcmp_trap_o <= (mie_MTIE7) ? tcmp_trap_trig_r : 1'b0 ;//经过屏蔽处理
-            soft_trap_o <= (mie_MSIE3) ? soft_trap_trig_r : 1'b0 ;//经过屏蔽处理
+            ex_trap_valid_o   <= (mie_MEIE11)? ex_trap_valid_i : 1'b0 ;//经过屏蔽处理
+            tcmp_trap_valid_o <= (mie_MTIE7) ? tcmp_trap_valid : 1'b0 ;//经过屏蔽处理
+            soft_trap_valid_o <= (mie_MSIE3) ? soft_trap_valid : 1'b0 ;//经过屏蔽处理
         end
         else begin
-            ex_trap_o   <= ex_trap_o   ;
-            tcmp_trap_o <= tcmp_trap_o ;
-            soft_trap_o <= soft_trap_o ;
+            ex_trap_valid_o   <= ex_trap_valid_o   ;
+            tcmp_trap_valid_o <= tcmp_trap_valid_o ;
+            soft_trap_valid_o <= soft_trap_valid_o ;
         end
     end
 end
 //---------------中断相关-------------------
-
+`ifdef CSR_MCYCLE_EN
 // mcycle
 always @ (posedge clk or negedge rst_n) begin
     if (~rst_n) begin
@@ -206,7 +119,9 @@ always @ (posedge clk or negedge rst_n) begin
                 mcycle <= mcycle + 64'b1;
     end
 end
+`endif
 
+`ifdef CSR_MINSTRET_EN
 // minstret
 always @ (posedge clk or negedge rst_n) begin
     if (~rst_n) begin
@@ -226,6 +141,7 @@ always @ (posedge clk or negedge rst_n) begin
                 minstret <= minstret + 64'b1;
     end
 end
+`endif
 
 // mtime
 always @ (posedge clk or negedge rst_n) begin
@@ -257,7 +173,6 @@ always @ (posedge clk or negedge rst_n) begin
         mie_MTIE7 <= 1'b0;
         mie_MSIE3 <= 1'b0;
         mtvec <= 32'h0;
-        mtrig <= 6'h0;
         mscratch <= 0;
         mepc <= 0;
         mcause <= 0;
@@ -294,11 +209,8 @@ always @ (posedge clk or negedge rst_n) begin
                 `CSR_MTVAL: begin
                     mtval <= idex_csr_wdata_i;
                 end
-                `CSR_MTRIG: begin
-                    mtrig <= idex_csr_wdata_i[5:0];
-                end
                 `CSR_MSIP: begin
-                    msip <= idex_csr_wdata_i;
+                    msip <= idex_csr_wdata_i[0];
                 end
                 `CSR_MPRINTS: begin
                     mprints <= idex_csr_wdata_i[7:0];
@@ -375,30 +287,31 @@ always @ (*) begin
         `CSR_MTVAL: begin
             idex_csr_rdata_o = mtval;
         end
-        `CSR_MTRIG: begin
-            idex_csr_rdata_o = {26'h0 , mtrig};
-        end
         `CSR_MIP: begin
             idex_csr_rdata_o = {20'h0, mip_MEIP11, 3'h0, mip_MTIP7, 3'h0, mip_MSIP3, 3'h0};
         end
         `CSR_MSIP: begin
-            idex_csr_rdata_o = msip;
+            idex_csr_rdata_o = {31'd0, msip};
         end
         `CSR_MPRINTS: begin
             idex_csr_rdata_o = {24'h0 , mprints};
         end
+        `ifdef CSR_MCYCLE_EN
         `CSR_MCYCLE: begin
             idex_csr_rdata_o = mcycle[31:0];
         end
         `CSR_MCYCLEH: begin
             idex_csr_rdata_o = mcycle[63:32];
         end
+        `endif
+        `ifdef CSR_MINSTRET_EN
         `CSR_MINSTRET: begin
             idex_csr_rdata_o = minstret[31:0];
         end
         `CSR_MINSTRETH: begin
             idex_csr_rdata_o = minstret[63:32];
         end
+        `endif
         `CSR_MTIME: begin
             idex_csr_rdata_o = mtime[31:0];
         end

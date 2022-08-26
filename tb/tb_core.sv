@@ -6,7 +6,7 @@ module tb_core();
 //测试用信号
 logic clk;
 logic rst_n;
-logic ex_trap_i;
+logic core_ex_trap_valid, core_ex_trap_ready;//外部中断线
 logic JTAG_TCK,JTAG_TMS,JTAG_TDI,JTAG_TDO;//jtag
 wire spi0_miso;
 wire [31:0]fpioa;
@@ -41,11 +41,9 @@ end
 //启动测试
 initial begin
     sysrst();//复位系统
-    #900;
-    /*ex_trap_i=1;
-    #7;
-    ex_trap_i=0;
-*/
+    #10;
+    //ex_trap();
+
 `ifdef ISA_TEST  //通过宏定义，控制是否是指令集测试程序
     wait(x26 == 32'b1);   // x26 == 1，结束仿真
     @(posedge clk);
@@ -103,7 +101,7 @@ initial begin
 end
 
 task sysrst;//复位任务
-    ex_trap_i=0;
+    core_ex_trap_valid=0;
     JTAG_TCK=0;
     JTAG_TMS=0;
     JTAG_TDI=0;
@@ -113,6 +111,13 @@ task sysrst;//复位任务
     #10;
 endtask : sysrst
 
+task ex_trap;
+    #15000;
+    core_ex_trap_valid=1;
+    #30;
+    wait(core_ex_trap_ready);
+    core_ex_trap_valid=0;
+endtask : ex_trap
 genvar i;//计数工具人
 generate
     for ( i=0; i <32 ; i++) begin//fpioa信号弱下拉
@@ -140,7 +145,8 @@ sparrow_soc inst_sparrow_soc (
 
     .fpioa             (fpioa),//处理器IO接口
 
-    .ex_trap_i         (ex_trap_i)
+    .core_ex_trap_valid(core_ex_trap_valid),
+    .core_ex_trap_ready(core_ex_trap_ready)
 );
 
 `ifdef Flash25

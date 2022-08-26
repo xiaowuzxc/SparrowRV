@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 from tkinter import filedialog
 
 def 找到所有bin文件(path):
@@ -94,7 +95,8 @@ def 启动modelsim仿真():
 	仿真进程.close()
 
 
-def main():
+def 指令集测试():
+	开始时间 = time.time()
 	bin文件列表 = 找到所有bin文件(r'tools/isa/generated')
 	错误标志 = False
 	for file in bin文件列表:
@@ -109,17 +111,18 @@ def main():
 			print('  ------------------------------------  ')
 			print('----     打开 ' + file[29:] + '    波形     ----')
 			print('  ------------------------------------  ')
-			显示波形 = os.popen(r'gtkwave tb.lxt')
+			显示波形 = os.popen(r'gtkwave tb.vcd')
 			显示波形.close()
 			错误标志 = True
 			break
+	print('本次指令集测试用时 ', round(time.time() - 开始时间, 1),' 秒')
 
 	if (错误标志 == False):
 		print('--  RV32IM 指令全部通过！  --')
 
 if __name__ == '__main__':
 	if sys.argv[1] == 'all_isa':
-		sys.exit(main())
+		sys.exit(指令集测试())
 	elif sys.argv[1] == 'tsr_bin':
 		sys.exit(bin文件转文本())
 	elif sys.argv[1] == 'tsr_isp':

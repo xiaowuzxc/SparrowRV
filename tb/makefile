@@ -21,23 +21,23 @@ list:
 #-------------------------------------------------------------------------------------------------------
 .PHONY : 0
 0 : 
-	python tools/isa_test.py sim_rtl
+	python3 tools/isa_test.py sim_rtl
 
 .PHONY : 1
 1 : 
-	python tools/isa_test.py all_isa
+	python3 tools/isa_test.py all_isa
 
 .PHONY : 2
 2 : 
-	python tools/isa_test.py tsr_bin
+	python3 tools/isa_test.py tsr_bin
 
 .PHONY : 3
 3 : 
-	python tools/isa_test.py sim_bin
+	python3 tools/isa_test.py sim_bin
 
 .PHONY : 4
 4 : 
-	python gtkwave tb.lxt
+	python3 gtkwave tb.lxt
 
 #-------------------------------------------------------------------------------------------------------
 .PHONY : c

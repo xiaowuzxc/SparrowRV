@@ -1,12 +1,16 @@
 `include "defines.v"
 module core (
-    input wire clk,
-    input wire rst_n,
+    input  wire clk,
+    input  wire rst_n,
 
-    input wire ex_trap_i,//外部中断
-    input wire halt_req_i,//jtag停住cpu
+
+    input  wire halt_req_i,//jtag停住cpu
 
     output wire soft_rst,//mcctr[3]软件复位
+
+    //外部中断
+    input  wire core_ex_trap_valid,//外部中断请求
+    output wire core_ex_trap_ready,//外部中断被响应
 
     //AXI4-Lite总线接口 Master core
     //AW写地址
@@ -240,44 +244,40 @@ csr inst_csr
     .trap_csr_rdata_o (trap_csr_rdata),
     .mepc             (mepc),
     .soft_rst         (soft_rst),
-    .ex_trap_i        (ex_trap_i),
-    .ex_trap_o        (pex_trap),
-    .tcmp_trap_o      (ptcmp_trap),
-    .soft_trap_o      (psoft_trap),
+    .ex_trap_valid_i  (core_ex_trap_valid),
+    .ex_trap_valid_o  (ex_trap_valid),
+    .tcmp_trap_valid_o(tcmp_trap_valid),
+    .soft_trap_valid_o(soft_trap_valid),
     .mstatus_MIE3     (mstatus_MIE3),
-    .pex_trap_rsp     (pex_trap_rsp  ),
-    .ptcmp_trap_rsp   (ptcmp_trap_rsp),
-    .psoft_trap_rsp   (psoft_trap_rsp),
+
     .hx_valid         (hx_valid)
 );
 
 trap inst_trap
 (
-    .clk           (clk),
-    .rst_n         (rst_n),
-    .csr_rdata_i   (trap_csr_rdata),
-    .csr_wdata_o   (trap_csr_wdata),
-    .csr_we_o      (trap_csr_we),
-    .csr_addr_o    (trap_csr_addr),
-    .pex_trap_rsp  (pex_trap_rsp  ),
-    .ptcmp_trap_rsp(ptcmp_trap_rsp),
-    .psoft_trap_rsp(psoft_trap_rsp),
-    .ecall_i       (ecall_trap),
-    .ebreak_i      (ebreak_trap),
-    .wfi_i         (wfi_trap),
-    .inst_err_i    (inst_err_trap),
-    .mem_err_i     (1'b0),//访存错误
-    .pex_trap_i    (pex_trap),
-    .ptcmp_trap_i  (ptcmp_trap),
-    .psoft_trap_i  (psoft_trap),
-    .mstatus_MIE3  (mstatus_MIE3),
-    .pc_i          (pc),
-    .inst_i        (inst),
-    .mem_addr_i    (mem_addr),
-    .pc_n_i        (idex_pc_n),
-    .pc_n_o        (trap_pc_n),
-    .trap_jump_o   (trap_jump),
-    .trap_in_o     (trap_in)
+    .clk                (clk),
+    .rst_n              (rst_n),
+    .csr_rdata_i        (trap_csr_rdata),
+    .csr_wdata_o        (trap_csr_wdata),
+    .csr_we_o           (trap_csr_we),
+    .csr_addr_o         (trap_csr_addr),
+    .ex_trap_ready_o    (core_ex_trap_ready),
+    .ecall_i            (ecall_trap),
+    .ebreak_i           (ebreak_trap),
+    .wfi_i              (wfi_trap),
+    .inst_err_i         (inst_err_trap),
+    .mem_err_i          (1'b0),//访存错误
+    .ex_trap_valid_i    (ex_trap_valid),
+    .tcmp_trap_valid_i  (tcmp_trap_valid),
+    .soft_trap_valid_i  (soft_trap_valid),
+    .mstatus_MIE3       (mstatus_MIE3),
+    .pc_i               (pc),
+    .inst_i             (inst),
+    .mem_addr_i         (mem_addr),
+    .pc_n_i             (idex_pc_n),
+    .pc_n_o             (trap_pc_n),
+    .trap_jump_o        (trap_jump),
+    .trap_in_o          (trap_in)
 );
 
 endmodule

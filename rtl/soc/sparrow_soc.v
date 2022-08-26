@@ -10,7 +10,8 @@ module sparrow_soc (
 
     inout wire [31:0] fpioa,//处理器IO接口
 
-    input wire ex_trap_i//外部中断
+    input wire core_ex_trap_valid,//外部中断
+    output wire core_ex_trap_ready
 );
 
 //*********************************
@@ -112,9 +113,10 @@ core inst_core
 (
     .clk              (clk),
     .rst_n            (rst_n),
-    .ex_trap_i        (ex_trap_i),
     .halt_req_i       (halt_req),
     .soft_rst         (soft_rst_en),
+    .core_ex_trap_valid  (core_ex_trap_valid),
+    .core_ex_trap_ready  (core_ex_trap_ready),
 //m1 内核
     .core_axi_awaddr  (core_axi_awaddr ),
     .core_axi_awprot  (core_axi_awprot ),

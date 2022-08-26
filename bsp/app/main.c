@@ -6,6 +6,8 @@ uint8_t read_data[N25Q_PAGE_SIZE];
 //测试
 int main()
 {
+    trap_en_ctrl(TRAP_GLBL,ENABLE);
+    trap_en_ctrl(TRAP_EXTI,ENABLE);
     uint32_t isp_base = 0x08000000;
     fpioa_setio(0,UART0_RX);
     fpioa_setio(1,UART1_TX);
