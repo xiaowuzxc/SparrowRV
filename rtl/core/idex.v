@@ -3,6 +3,7 @@
 
 //译码执行，组合逻辑
 module idex(
+    input wire clk,
     //读操作通道
         //inst
     input wire[`InstBus] inst_i,            //指令内容
@@ -77,6 +78,10 @@ reg signed[32:0] mul_in1;//乘法器有符号33位输入1
 reg signed[32:0] mul_in2;//乘法器有符号33位输入2
 wire signed[65:0]mul_res;//乘法器有符号66位结果
 assign mul_res=mul_in1*mul_in2;
+/*reg signed[65:0]mul_res;//乘法器有符号66位结果
+always @(posedge clk ) begin
+    mul_res<=mul_in1*mul_in2;
+end*/
 wire [`RegBus]mul_resl=mul_res[31: 0];//乘法器低32位结果
 wire [`RegBus]mul_resh=mul_res[63:32];//乘法器高32位结果
 //比较器，(in1 >= in2) ? 1 : 0
@@ -94,14 +99,14 @@ always @ (*) begin
     divisor_o = reg_rdata2_i;      //除数直连
     div_op_o = funct3;       //除法指令直连
     div_start_o = 0;    //除法运算开始标志
-    reg_wdata_o = 0;    //写寄存器数据
+    reg_wdata_o = {32{1'bx}};    //写寄存器数据
     reg_we_o = 0;       //是否要写通用寄存器
-    reg_waddr_o = 0;    //写通用寄存器地址
-    csr_wdata_o = 0;    //写CSR寄存器数据
+    reg_waddr_o = {5{1'bx}};    //写通用寄存器地址
+    csr_wdata_o = {32{1'bx}};    //写CSR寄存器数据
     csr_we_o = 0;       //写CSR寄存器请求
-    csr_addr_o = 0;     //访问CSR寄存器地址
-    mem_wdata_o = 0;    //写内存数据
-    mem_addr_o = 0;     //访问内存地址，复用读
+    csr_addr_o = {12{1'bx}};     //访问CSR寄存器地址
+    mem_wdata_o = {32{1'bx}};    //写内存数据
+    mem_addr_o = {32{1'bx}};     //访问内存地址，复用读
     mem_we_o = 0;       //写内存使能
     mem_wem_o = 4'h0;   //写内存掩码
     mem_en_o = 0;       //访问内存使能，复用读
@@ -116,10 +121,8 @@ always @ (*) begin
     add1_in2 = 0;       //加法器1输入2
     add2_in1 = 0;       //加法器2输入1
     add2_in2 = 0;       //加法器2输入2
-    mul_in1 = 0;        //乘法器有符号33位输入1
-    mul_in2 = 0;        //乘法器有符号33位输入2
-    op_in1 = 0;         //比较器输入1
-    op_in2 = 0;         //比较器输入1
+    op_in1 = {32{1'bx}};         //比较器输入1
+    op_in2 = {32{1'bx}};         //比较器输入1
     //读寄存器
     reg_raddr1_o = inst_i[19:15];   //读rs1地址
     reg_raddr2_o = inst_i[24:20];   //读rs2地址
@@ -205,177 +208,189 @@ always @ (*) begin
                 end
             endcase
         end
+
         `INST_TYPE_R_M: begin
-            if ((funct7 == 7'b0000000) || (funct7 == 7'b0100000)) begin
-                case (funct3)
-                    `INST_ADD_SUB: begin
-                        add1_in1 = reg_rdata1_i;
-                        add1_in2 = reg_rdata2_i;
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        if (inst_i[30] == 1'b0) begin//ADD rs1+rs2
+            case (funct7)
+                7'b0000000: begin
+                    case (funct3)
+                        `INST_ADD: begin
+                            add1_in1 = reg_rdata1_i;
+                            add1_in2 = reg_rdata2_i;
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
                             reg_wdata_o = add1_res;
-                        end else begin//SUB rs1-rs2
-                            reg_wdata_o = reg_rdata1_i - reg_rdata2_i;
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
                         end
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    `INST_SLL: begin//左移
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        reg_wdata_o = reg_rdata1_i << reg_rdata2_i[4:0];
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    `INST_SLT: begin//有符号(rs1 < rs2)?1:0
-                        op_in1 = reg_rdata1_i;
-                        op_in2 = reg_rdata2_i;
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        reg_wdata_o = {31'h0 , (~op_sres)};
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    `INST_SLTU: begin//无符号(rs1 < rs2)?1:0
-                        op_in1 = reg_rdata1_i;
-                        op_in2 = reg_rdata2_i;
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        reg_wdata_o = {31'h0 , (~op_ures)};
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    `INST_XOR: begin//rs1^rs2
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        reg_wdata_o = reg_rdata1_i ^ reg_rdata2_i;
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    `INST_SR: begin//右移
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        if (inst_i[30] == 1'b1) begin//SRAI算术右移
-                            reg_wdata_o = (reg_rdata1_i >> reg_rdata2_i[4:0]) | ({32{reg_rdata1_i[31]}} & (~(32'hffffffff >> reg_rdata2_i[4:0])));
-                        end else begin//SRLI普通右移
+                        `INST_SLL: begin//左移
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = reg_rdata1_i << reg_rdata2_i[4:0];
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                        `INST_SLT: begin//有符号(rs1 < rs2)?1:0
+                            op_in1 = reg_rdata1_i;
+                            op_in2 = reg_rdata2_i;
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = {31'h0 , (~op_sres)};
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                        `INST_SLTU: begin//无符号(rs1 < rs2)?1:0
+                            op_in1 = reg_rdata1_i;
+                            op_in2 = reg_rdata2_i;
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = {31'h0 , (~op_ures)};
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                        `INST_XOR: begin//rs1^rs2
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = reg_rdata1_i ^ reg_rdata2_i;
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                        `INST_SRL: begin//普通右移
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
                             reg_wdata_o = reg_rdata1_i >> reg_rdata2_i[4:0];
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
                         end
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    `INST_OR: begin//rs1|rs2
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        reg_wdata_o = reg_rdata1_i | reg_rdata2_i;
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    `INST_AND: begin//rs1&rs2
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        reg_wdata_o = reg_rdata1_i & reg_rdata2_i;
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    default: begin
-                        inst_err_o = 1;     //指令出错
-                    end
-                endcase
-            end else if (funct7 == 7'b0000001) begin
-                case (funct3)
-                    `INST_MUL: begin//rs1*rs2的低32位
-                        mul_in1 = {reg_rdata1_i[31] , reg_rdata1_i};
-                        mul_in2 = {reg_rdata2_i[31] , reg_rdata2_i};
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        reg_wdata_o = mul_resl;
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    `INST_MULHU: begin//无符号rs1*rs2的高32位
-                        mul_in1 = {1'b0 , reg_rdata1_i};//符号位扩展
-                        mul_in2 = {1'b0 , reg_rdata2_i};//符号位扩展
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        reg_wdata_o = mul_resh;
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    `INST_MULH: begin//有符号rs1*rs2的高32位
-                        mul_in1 = {reg_rdata1_i[31] , reg_rdata1_i};
-                        mul_in2 = {reg_rdata2_i[31] , reg_rdata2_i};
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        reg_wdata_o = mul_resh;
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    `INST_MULHSU: begin//有符号rs1*无符号rs2的高32位
-                        mul_in1 = {reg_rdata1_i[31] , reg_rdata1_i};
-                        mul_in2 = {1'b0 , reg_rdata2_i};
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        reg_wdata_o = mul_resh;
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    `INST_DIV: begin//除法，多周期，等结果
-                        div_start_o = 1;
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        reg_wdata_o = div_result_i;
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    `INST_DIVU: begin//除法，多周期，等结果
-                        div_start_o = 1;
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        reg_wdata_o = div_result_i;
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    `INST_REM: begin//除法，多周期，等结果
-                        div_start_o = 1;
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        reg_wdata_o = div_result_i;
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    `INST_REMU: begin//除法，多周期，等结果
-                        div_start_o = 1;
-                        reg_we_o = 1;
-                        reg_waddr_o = rd;
-                        reg_wdata_o = div_result_i;
-                        add2_in1 = pc_i;
-                        add2_in2 = 4;
-                        pc_n_o = add2_res;//PC+4
-                    end
-                    default: begin
-                        inst_err_o = 1;     //指令出错
-                    end
-                endcase
-            end else begin
-                inst_err_o = 1;     //指令出错
-            end
+                        `INST_OR: begin//rs1|rs2
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = reg_rdata1_i | reg_rdata2_i;
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                        `INST_AND: begin//rs1&rs2
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = reg_rdata1_i & reg_rdata2_i;
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                        default: begin
+                            inst_err_o = 1;     //指令出错
+                        end
+                    endcase
+                end
+                7'b0100000: begin
+                    case (funct3)
+                        `INST_SUB: begin
+                            add1_in1 = reg_rdata1_i;
+                            add1_in2 = reg_rdata2_i;
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = reg_rdata1_i - reg_rdata2_i;
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                        `INST_SRA: begin//算术右移
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = (reg_rdata1_i >> reg_rdata2_i[4:0]) | ({32{reg_rdata1_i[31]}} & (~(32'hffffffff >> reg_rdata2_i[4:0])));
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                    endcase
+                end
+`ifdef RV32_M_ISA
+                7'b0000001: begin
+                    case (funct3)
+                        `INST_MUL: begin//rs1*rs2的低32位
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = mul_resl;
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                        `INST_MULHU: begin//无符号rs1*rs2的高32位
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = mul_resh;
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                        `INST_MULH: begin//有符号rs1*rs2的高32位
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = mul_resh;
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                        `INST_MULHSU: begin//有符号rs1*无符号rs2的高32位
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = mul_resh;
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                        `INST_DIV: begin//除法，多周期，等结果
+                            div_start_o = 1;
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = div_result_i;
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                        `INST_DIVU: begin//除法，多周期，等结果
+                            div_start_o = 1;
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = div_result_i;
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                        `INST_REM: begin//除法，多周期，等结果
+                            div_start_o = 1;
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = div_result_i;
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                        `INST_REMU: begin//除法，多周期，等结果
+                            div_start_o = 1;
+                            reg_we_o = 1;
+                            reg_waddr_o = rd;
+                            reg_wdata_o = div_result_i;
+                            add2_in1 = pc_i;
+                            add2_in2 = 4;
+                            pc_n_o = add2_res;//PC+4
+                        end
+                        default: begin
+                            inst_err_o = 1;     //指令出错
+                        end
+                    endcase
+                end
+`endif
+                default: inst_err_o = 1;     //指令出错
+            endcase
         end
+
         `INST_TYPE_L: begin
             case (funct3)
                 `INST_LB: begin//多周期，等数据
@@ -472,6 +487,7 @@ always @ (*) begin
                 end
             endcase
         end
+
         `INST_TYPE_S: begin
             case (funct3)
                 `INST_SB: begin
@@ -530,6 +546,7 @@ always @ (*) begin
                 end
             endcase
         end
+
         `INST_TYPE_B: begin
             case (funct3)
                 `INST_BEQ: begin
@@ -627,6 +644,7 @@ always @ (*) begin
             add2_in2 = 4;
             pc_n_o = add2_res;//PC+4
         end
+
         `INST_SYS: begin
             case (funct3)
                 `INST_CSRRW: begin
@@ -730,4 +748,31 @@ always @ (*) begin
     endcase
 end
 
+always @(*) begin
+    case (funct3)
+`ifdef RV32_M_ISA
+        `INST_MUL: begin//rs1*rs2的低32位
+            mul_in1 = {reg_rdata1_i[31] , reg_rdata1_i};
+            mul_in2 = {reg_rdata2_i[31] , reg_rdata2_i};
+        end
+        `INST_MULHU: begin//无符号rs1*rs2的高32位
+            mul_in1 = {1'b0 , reg_rdata1_i};//符号位扩展
+            mul_in2 = {1'b0 , reg_rdata2_i};//符号位扩展
+        end
+        `INST_MULH: begin//有符号rs1*rs2的高32位
+            mul_in1 = {reg_rdata1_i[31] , reg_rdata1_i};
+            mul_in2 = {reg_rdata2_i[31] , reg_rdata2_i};
+        end
+        `INST_MULHSU: begin//有符号rs1*无符号rs2的高32位
+            mul_in1 = {reg_rdata1_i[31] , reg_rdata1_i};
+            mul_in2 = {1'b0 , reg_rdata2_i};
+        end 
+`endif
+        default: begin
+            mul_in1 = 0;
+            mul_in2 = 0;
+        end
+    endcase
+
+end
 endmodule
