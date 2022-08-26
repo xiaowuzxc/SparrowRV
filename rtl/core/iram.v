@@ -134,12 +134,17 @@ always @(*) begin
     end
 end
 
+`ifdef EG4_FPGA //如果定义了宏
+    localparam RAM_SEL="EG4_32K";//启用EG4原语
+`else 
+    localparam RAM_SEL="RTL_MODEL";//否则使用行为级建模
+`endif
 
 dpram #(
-    .RAM_WIDTH(32),
-    .RAM_DEPTH(`IRamSize)
+    .RAM_DEPTH(`IRamSize),
+    .RAM_SEL(RAM_SEL)
 ) inst_dpram (
-    .clka   (clk),
+    .clk    (clk),
     .addra  (addra[clogb2(`IRamSize-1)-1:0]),
     .addrb  (addrb[clogb2(`IRamSize-1)-1:0]),
     .dina   (0),
@@ -154,9 +159,10 @@ dpram #(
     .doutb  (doutb)
 );
 
-isp #(
+
+bootrom #(
     .RAM_DEPTH(1024)
-) inst_isp (
+) inst_bootrom (
     .clk   (clk),
     .wen   (wei),
     .din   (dini),

@@ -367,7 +367,7 @@ wire                  master_axi_arready;//读地址准备好s->
 wire [`MemBus]        master_axi_rdata  ;//读数据s->
 wire                  master_axi_rvalid ;//读数据有效s->
 wire                  master_axi_rready ;//读数据准备好m->
-//m->
+//mx->master
 assign master_axi_awaddr  = ({32{m0_wbus_en}} & m0_axi_awaddr)
                             | ({32{m1_wbus_en}} & m1_axi_awaddr);
 assign master_axi_awvalid = ({1{m0_wbus_en}} & m0_axi_awvalid)
@@ -384,7 +384,7 @@ assign master_axi_arvalid = ({1{m0_abus_en}} & m0_axi_arvalid)
                             | ({1{m1_abus_en}} & m1_axi_arvalid);
 assign master_axi_rready  = ({1{m0_rbus_en}} & m0_axi_rready)
                             | ({1{m1_rbus_en}} & m1_axi_rready);
-//s->
+//master->mx
 always @(*) begin
     m0_axi_awready = {1 {m0_wbus_en}} & master_axi_awready;
     m0_axi_wready  = {1 {m0_wbus_en}} & master_axi_wready ;

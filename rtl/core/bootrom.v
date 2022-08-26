@@ -1,5 +1,5 @@
 `include "defines.v"
-module isp #(
+module bootrom #(
     parameter RAM_DEPTH = 65536
 )(
 	input wire clk,

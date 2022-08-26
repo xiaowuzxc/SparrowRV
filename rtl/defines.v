@@ -3,6 +3,8 @@
 `define CPU_CLOCK_HZ 25_000_000
 `define IRam_KB 32 //iram指令存储器大小，单位为KB
 `define SRam_KB 32 //sram数据存储器大小，单位为KB
+//`define EG4_FPGA //启用安路EG4 FPGA原语生成BRAM
+//`define Flash25 //启用w25模型，会降低仿真速度
 /*----------以上内容按需配置-------------*/
 
 
