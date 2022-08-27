@@ -162,12 +162,19 @@ W25Q128JVxIM inst_W25Q128JVxIM (
 );
 `endif
 
-// 输出波形
-`ifndef MODELSIM
 initial begin
     $dumpfile("tb.vcd");  //生成lxt的文件名称
     $dumpvars(0,tb_core);   //tb中实例化的仿真目标实例名称   
 end
-`endif
+// 输出波形
+/*
+`ifdef MODELSIM
+initial begin
+$dumpvars();
+$dumpfile("dump.vcd");
+end
+`else 
 
+`endif
+*/
 endmodule
