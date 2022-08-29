@@ -23,6 +23,7 @@ module sctr (
     //阻塞指示
     input wire div_start_i,//除法启动
     input wire div_ready_i,//除法结束
+    input wire mult_inst_i,//乘法开始
     input wire iram_rstn_i,//iram模块阻塞
     input wire halt_req_i,//jtag停住cpu
 
@@ -80,13 +81,13 @@ end
 
 always @(*) begin//状态转移条件
     if (sta_p == 1'b0) begin
-        if( ~trap_in_i & ~halt_req_i & (div_start_i | ((~mem_we_i) & sctr_axi_arvalid & sctr_axi_arready)))//没有中断且(开始除法，或读总线)
+        if( ~trap_in_i & ~halt_req_i & (div_start_i | mult_inst_i | ((~mem_we_i) & sctr_axi_arvalid & sctr_axi_arready)))//没有中断且(开始除法，或乘法指令，或读总线)
             sta_n = 1'b1;
         else
             sta_n = 1'b0;
     end 
     else begin
-        if( div_ready_i | trap_in_i | halt_req_i | (sctr_axi_rvalid & sctr_axi_rready & sctr_axi_rresp==2'b00))//除法结束，或中断，或读返回成功
+        if( div_ready_i | mult_inst_i | trap_in_i | halt_req_i | (sctr_axi_rvalid & sctr_axi_rready & sctr_axi_rresp==2'b00))//除法结束，或乘法指令，或中断，或读返回成功
             sta_n = 1'b0;
         else
             sta_n = 1'b1;
@@ -95,13 +96,13 @@ end
 
 always @(*) begin//阻塞条件hx_valid控制
     if (sta_p == 1'b0) begin//初始状态
-        if( div_start_i | iram_rstn_i | trap_in_i | halt_req_i | (mem_en_i & (~mem_we_i)) | (mem_en_i & mem_we_i & ~(sctr_axi_wready | sctr_axi_awready)))//开始除法，或iram复位未结束，或中断，或halt，或总线等待
+        if( div_start_i | mult_inst_i | iram_rstn_i | trap_in_i | halt_req_i | (mem_en_i & (~mem_we_i)) | (mem_en_i & mem_we_i & ~(sctr_axi_wready | sctr_axi_awready)))//开始除法，或乘法指令，或iram复位未结束，或中断，或halt，或总线等待
             hx_valid = 1'b0;
         else
             hx_valid = 1'b1;
     end
     else begin//结束状态
-        if( ~trap_in_i & ~halt_req_i & (div_ready_i | (sctr_axi_rvalid & sctr_axi_rready & sctr_axi_rresp==2'b00 )))//没有中断且(除法结束，或读返回成功)
+        if( ~trap_in_i & ~halt_req_i & (div_ready_i | mult_inst_i | (sctr_axi_rvalid & sctr_axi_rready & sctr_axi_rresp==2'b00 )))//没有中断且(除法结束，或乘法指令，或读返回成功)
             hx_valid = 1'b1;
         else
             hx_valid = 1'b0;

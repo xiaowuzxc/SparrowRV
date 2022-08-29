@@ -21,6 +21,8 @@ module idex(
     output reg[2:0] div_op_o,               //除法指令标志
     output reg div_start_o,                 //除法运算开始标志
     input wire[`RegBus] div_result_i,       //除法运算结果
+        //mult
+    output reg mult_inst_o,                 //开始乘法
 
     //写操作通道
         //reg
@@ -74,14 +76,15 @@ reg [`RegBus] add2_in1;//加法器2输入1
 reg [`RegBus] add2_in2;//加法器2输入2
 wire [`RegBus] add2_res = add2_in1 + add2_in2;//加法器2结果
 //乘法器
-reg signed[32:0] mul_in1;//乘法器有符号33位输入1
-reg signed[32:0] mul_in2;//乘法器有符号33位输入2
+reg signed[32:0] mul_in1,mul_in1r;//乘法器有符号33位输入1
+reg signed[32:0] mul_in2,mul_in2r;//乘法器有符号33位输入2
 wire signed[65:0]mul_res;//乘法器有符号66位结果
-assign mul_res=mul_in1*mul_in2;
-/*reg signed[65:0]mul_res;//乘法器有符号66位结果
-always @(posedge clk ) begin
-    mul_res<=mul_in1*mul_in2;
-end*/
+assign mul_res=mul_in1r*mul_in2r;
+always @(posedge clk) begin
+    mul_in1r <= mul_in1;
+    mul_in2r <= mul_in2;
+end
+
 wire [`RegBus]mul_resl=mul_res[31: 0];//乘法器低32位结果
 wire [`RegBus]mul_resh=mul_res[63:32];//乘法器高32位结果
 //比较器r，(in1 >= in2) ? 1 : 0
@@ -124,6 +127,7 @@ always @ (*) begin
     wfi_o = 0;          //中断等待使能
     inst_err_o = 0;     //指令出错
     idex_mret_o = 0;
+    mult_inst_o = 0;    //当前为乘法指令
     //复用运算单元
     add1_in1 = {32{1'bx}};       //加法器1输入1
     add1_in2 = {32{1'bx}};       //加法器1输入2
@@ -281,24 +285,28 @@ always @ (*) begin
                 7'b0000001: begin
                     case (funct3)
                         `INST_MUL: begin//rs1*rs2的低32位
+                            mult_inst_o = 1;
                             reg_we_o = 1;
                             reg_waddr_o = rd;
                             reg_wdata_o = mul_resl;
                             pc_n_o = pc_n4;//PC+4
                         end
                         `INST_MULHU: begin//无符号rs1*rs2的高32位
+                            mult_inst_o = 1;
                             reg_we_o = 1;
                             reg_waddr_o = rd;
                             reg_wdata_o = mul_resh;
                             pc_n_o = pc_n4;//PC+4
                         end
                         `INST_MULH: begin//有符号rs1*rs2的高32位
+                            mult_inst_o = 1;
                             reg_we_o = 1;
                             reg_waddr_o = rd;
                             reg_wdata_o = mul_resh;
                             pc_n_o = pc_n4;//PC+4
                         end
                         `INST_MULHSU: begin//有符号rs1*无符号rs2的高32位
+                            mult_inst_o = 1;
                             reg_we_o = 1;
                             reg_waddr_o = rd;
                             reg_wdata_o = mul_resh;
