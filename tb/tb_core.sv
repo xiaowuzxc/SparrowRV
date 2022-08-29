@@ -18,6 +18,9 @@ assign fpioa[3]=spi0_miso;//fpioa[3]
 wire spi0_mosi=fpioa[4];//fpioa[4]
 wire spi0_clk=fpioa[5];//fpioa[5]
 
+assign fpioa[20] = 1'b0;
+assign fpioa[21] = 1'b1;
+assign fpioa[31] = 1'b1;
 
 integer r;//计数工具人
 //寄存器监测
@@ -118,6 +121,8 @@ task ex_trap;
     wait(core_ex_trap_ready);
     core_ex_trap_valid=0;
 endtask : ex_trap
+
+
 genvar i;//计数工具人
 generate
     for ( i=0; i <32 ; i++) begin//fpioa信号弱下拉
@@ -162,19 +167,10 @@ W25Q128JVxIM inst_W25Q128JVxIM (
 );
 `endif
 
+//输出波形
 initial begin
     $dumpfile("tb.vcd");  //生成lxt的文件名称
     $dumpvars(0,tb_core);   //tb中实例化的仿真目标实例名称   
 end
-// 输出波形
-/*
-`ifdef MODELSIM
-initial begin
-$dumpvars();
-$dumpfile("dump.vcd");
-end
-`else 
 
-`endif
-*/
 endmodule

@@ -193,7 +193,6 @@ gpio inst_gpio
 
     .gpio_oe       (gpio_oe ),
     .gpio_out      (gpio_out),
-    .gpio_trap_irq (),
     .gpio_in       (gpio_in )
 );
 //15 fpioa
