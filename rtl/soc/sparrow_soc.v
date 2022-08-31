@@ -1,6 +1,6 @@
 `include "defines.v"
 module sparrow_soc (
-    input wire clk,    // Clock
+    input wire clk,    //时钟输入
     input wire hard_rst_n,  //来自外部引脚的复位信号
 
     input  wire JTAG_TCK,

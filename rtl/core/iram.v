@@ -9,6 +9,8 @@ module iram (
 
     output reg iram_rstn_o,//iram模块阻塞
 
+    input wire insts_sel_i,//选择从bootrom(1'b0) / iram(1'b1) 取指
+
     //AXI4-Lite总线接口 Slave
     //AW写地址
     input wire [`MemAddrBus]    iram_axi_awaddr ,//写地址
@@ -52,8 +54,8 @@ module iram (
 wire [31:0] rst_addr = `RstPC;//复位地址
 wire [clogb2(`IRamSize-1)-1:0]addra = iram_rstn_o ? rst_addr[clogb2(`IRamSize-1)-1+2:2] : pc_n_i[clogb2(`IRamSize-1)-1+2:2];
 wire [`MemBus]douta,doutia;
-reg axi_ram_sel,inst_ram_sel;//根据地址选择访问的存储器
-assign inst_o = pc_o[27]?doutia:douta;
+reg axi_ram_sel;//根据insts_sel_i选择访问的存储器
+assign inst_o = insts_sel_i?douta:doutia;
 
 //AXI4L总线交互
 reg [clogb2(`IRamSize-1)-1:0]addrb;
@@ -63,8 +65,7 @@ wire [`MemBus]doutb,doutib;
 reg [`MemBus]dinb;
 wire axi_whsk = iram_axi_awvalid & iram_axi_wvalid;//写通道握手
 wire axi_rhsk = iram_axi_arvalid & (~iram_axi_rvalid | (iram_axi_rvalid & iram_axi_rready)) & ~axi_whsk;//读通道握手,没有读响应
-reg wei;//AXI写ISP
-reg [`MemBus]dini;//AXI写ISP
+
 
 //PC复位
 always @(posedge clk or negedge rst_n) begin
@@ -76,11 +77,9 @@ always @(posedge clk or negedge rst_n) begin
         iram_rstn_o <= 1'b0;
         if(iram_rd_i) begin
             pc_o <= pc_n_i;
-            inst_ram_sel <= pc_n_i[27];
         end
         else begin
             pc_o <= pc_o;
-            inst_ram_sel <= inst_ram_sel;
         end
     end
 end
@@ -99,7 +98,7 @@ end
 
 always @(posedge clk) begin
     if(axi_rhsk)
-        axi_ram_sel <= iram_axi_araddr[27];
+        axi_ram_sel <= insts_sel_i;
     else
         axi_ram_sel <= axi_ram_sel;
 end
@@ -107,29 +106,20 @@ end
 always @(*) begin
     iram_axi_awready = axi_whsk;//写地址数据同时准备好
     iram_axi_wready = axi_whsk;//写地址数据同时准备好
-    iram_axi_rdata = axi_ram_sel?doutib:doutb;//读数据
+    iram_axi_rdata = axi_ram_sel?doutb:doutib;//读数据
     iram_axi_arready = axi_rhsk;//读地址握手
     iram_axi_bvalid = 1'b1;
     iram_axi_bresp = 2'b00;//响应
     iram_axi_rresp = 2'b00;//响应
     dinb = iram_axi_wdata;
-    dini = iram_axi_wdata;//AXI写ISP
     enb = axi_whsk | axi_rhsk;
     wemb = iram_axi_wstrb;
     if(axi_whsk) begin//写握手
         addrb = iram_axi_awaddr[clogb2(`IRamSize-1)-1+2:2];
-        if(iram_axi_awaddr[27]==1'b0) begin//AXI写ISP
-            web = 1;//AXI写iram
-            wei = 0;
-        end
-        else begin
-            web = 0;
-            wei = 1;//AXI写ISP
-        end
+        web = 1;//AXI写iram
     end
     else begin
         web = 0;
-        wei = 0;
         addrb = iram_axi_araddr[clogb2(`IRamSize-1)-1+2:2];
     end
 end
@@ -164,8 +154,8 @@ bootrom #(
     .RAM_DEPTH(1024)
 ) inst_bootrom (
     .clk   (clk),
-    .wen   (wei),
-    .din   (dini),
+    .wen   (1'b0),
+    .din   (32'h0),
     .ena   (iram_rd_i | iram_rstn_o),
     .addra (addra[clogb2(1024-1)-1:0]),
     .douta (doutia),

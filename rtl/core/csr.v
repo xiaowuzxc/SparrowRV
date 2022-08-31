@@ -21,6 +21,7 @@ module csr(
     //直接输出通道
     output reg [`RegBus] mepc,//CSR mepc寄存器
     output wire soft_rst,//mcctr[3]软件复位
+    output wire insts_sel_o,//选择从哪取指
 
     //中断处理通道
     //输入
@@ -63,16 +64,18 @@ reg msip;//软件中断，写1软件中断
 `endif
 reg [63:0] mtime;//定时器
 reg [63:0] mtimecmp;//定时器比较
-reg [3 :0] mcctr;//系统控制
+wire[`RegBus] mvendorid = `MVENDORID_NUM;//Vendor ID
+wire[`RegBus] marchid   = `MARCHID_NUM;//微架构编号
+wire[`RegBus] mimpid    = `MIMPID_NUM;//硬件实现编号
+wire[`RegBus] mhartid   = `MHARTID_NUM;//线程编号
+
+//---自定义CSR---
+reg [4 :0] mcctr;//系统控制
 //[0]:mcycle使能
 //[1]:minstret使能
 //[2]:mtime使能
 //[3]:soft_rst写1复位
-wire[`RegBus] mvendorid=32'h0;//Vendor ID
-wire[`RegBus] marchid=32'd1;//微架构编号
-wire[`RegBus] mimpid=32'd1;//硬件实现编号
-wire[`RegBus] mhartid=32'h0;//线程编号
-
+//[4]:从bootrom 0 /iram 1 取指
 //---仿真模式专用---
 reg [7:0] mprints;//仿真标准输出
 reg mends;//仿真结束
@@ -80,8 +83,8 @@ reg mends;//仿真结束
 //---生成信号---
 assign tcmp_trap_valid = (mtime >= mtimecmp) ? 1'b1 : 1'b0;//生成定时器中断标志
 assign soft_trap_valid = msip;//生成软件中断标志
-assign soft_rst = mcctr[3];
-
+assign soft_rst = mcctr[3];//软件复位
+assign insts_sel_o = mcctr[4];//选择取指来源
 //中断信号门控
 always @(posedge clk or negedge rst_n) begin
     if (~rst_n) begin
@@ -185,7 +188,7 @@ always @ (posedge clk or negedge rst_n) begin
         mprints <= 0;
         mends <= 0;
         mtimecmp <= 64'hffff_ffff_ffff_ffff;//比较器复位为最大值，防止误触发
-        mcctr <= 4'b0;
+        mcctr <= {`INSTS_SEL, 4'h0};
     end else begin
         if (idex_csr_we_i) begin //优先idex写
             case (idex_csr_addr_i)
@@ -229,7 +232,7 @@ always @ (posedge clk or negedge rst_n) begin
                     mtimecmp[63:32] <= idex_csr_wdata_i;
                 end
                 `CSR_MCCTR: begin
-                    mcctr <= idex_csr_wdata_i[3:0];
+                    mcctr <= idex_csr_wdata_i[4:0];
                 end
 
                 default: begin
@@ -297,9 +300,6 @@ always @ (*) begin
         `CSR_MSIP: begin
             idex_csr_rdata_o = {31'd0, msip};
         end
-        `CSR_MPRINTS: begin
-            idex_csr_rdata_o = {24'h0 , mprints};
-        end
         `ifdef CSR_MCYCLE_EN
         `CSR_MCYCLE: begin
             idex_csr_rdata_o = mcycle[31:0];
@@ -329,7 +329,7 @@ always @ (*) begin
             idex_csr_rdata_o = mtimecmp[63:32];
         end
         `CSR_MCCTR: begin
-            idex_csr_rdata_o = {28'h0, mcctr};
+            idex_csr_rdata_o = {27'h0, mcctr};
         end
         `CSR_MVENDORID: begin
             idex_csr_rdata_o = mvendorid;
