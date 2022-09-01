@@ -27,9 +27,9 @@ module csr(
     //输入
     input wire ex_trap_valid_i,//外部中断标志
     //屏蔽后输出
-    output reg ex_trap_valid_o,//外部中断信号
-    output reg tcmp_trap_valid_o,//定时器中断信号
-    output reg soft_trap_valid_o,//软件中断信号
+    output reg ex_trap_valid_o,//外部中断请求信号
+    output reg tcmp_trap_valid_o,//定时器中断请求信号
+    output reg soft_trap_valid_o,//软件中断请求信号
     //全局中断使能标志
     output reg mstatus_MIE3,//全局中断使能，1表示可以中断
 
@@ -38,7 +38,7 @@ module csr(
 );
 wire tcmp_trap_valid;//定时器中断请求
 wire soft_trap_valid;//软件中断请求
-
+reg insts_sel_o_r;//取指来源打一拍
 
 //---CSR寄存器定义---
 reg mstatus_MPIE7;//mstatus状态寄存器
@@ -83,8 +83,16 @@ reg mends;//仿真结束
 //---生成信号---
 assign tcmp_trap_valid = (mtime >= mtimecmp) ? 1'b1 : 1'b0;//生成定时器中断标志
 assign soft_trap_valid = msip;//生成软件中断标志
-assign soft_rst = mcctr[3];//软件复位
+assign soft_rst = mcctr[3] | (insts_sel_o_r ^ insts_sel_o);//软件复位，或取指来源发生变化
+
 assign insts_sel_o = mcctr[4];//选择取指来源
+always @(posedge clk) begin
+    insts_sel_o_r <= insts_sel_o;
+end
+initial begin
+    mcctr[4] <= `INSTS_SEL;
+end
+
 //中断信号门控
 always @(posedge clk or negedge rst_n) begin
     if (~rst_n) begin
@@ -188,7 +196,7 @@ always @ (posedge clk or negedge rst_n) begin
         mprints <= 0;
         mends <= 0;
         mtimecmp <= 64'hffff_ffff_ffff_ffff;//比较器复位为最大值，防止误触发
-        mcctr <= {`INSTS_SEL, 4'h0};
+        mcctr[3:0] <= 4'h0;
     end else begin
         if (idex_csr_we_i) begin //优先idex写
             case (idex_csr_addr_i)

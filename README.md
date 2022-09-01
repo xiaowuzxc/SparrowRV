@@ -39,7 +39,6 @@ SoC RTL
 ```
 **当前任务**  
 - ISP系统，UART下载  
-- 大改FPIOA
 - FPGA板级调试  
 
 **未来任务**  
@@ -57,7 +56,7 @@ SoC RTL
 - 所有文本采用UTF-8编码，具备良好的多语言和跨平台支持。  
 
 ## 仿真
-本工程使用`批处理/Makefile + Python3 + Modelsim/iverilog`完成仿真全流程，可根据个人喜好与平台使用合适的工具。如果已配置相关工具，可跳过环境搭建步骤。    
+本工程使用`批处理/Makefile + Python3 + Modelsim/iverilog`可根据个人喜好与平台使用合适的工具完成仿真全流程。如果已配置相关工具，可跳过环境搭建步骤。    
 若需要编写c语言程序并仿真，请参阅[板级支持包BSP](#板级支持包bsp)  
 **仿真环境框架**  
 ![soc架构](/pic/img/仿真环境.svg)  
@@ -120,7 +119,7 @@ iverilog是仿真工具，gtkwave用于查看波形。
 本工程提供了Modelsim仿真脚本，启动方式与iverilog类似，软件安装问题请各显神通  
 - `/tb/run_zh.bat`是Windows环境下的启动器，进入`/tb/`目录，仅需双击`run_zh.bat`即可启动人机交互界面。根据提示，输入单个数字或符号，按下回车即可执行对应项目。   
 - 处理器运行C语言程序，见[板级支持包BSP](#板级支持包bsp)。需要将生成的`obj.bin`转换为`inst.txt`文件(命令2转换，命令3可以直接转换并仿真)，才能导入程序并执行仿真。  
-- `/tb/tools/msim.tcl`主导Modelsim的启动、配置、编译、仿真流程，由批处理脚本启动，Modelsim启动后读入。  
+- `/tb/tools/vsim_xxx.tcl`主导Modelsim的启动、配置、编译、仿真流程，由批处理脚本启动，Modelsim启动后读入。  
 
 目前支持的命令：  
 - [5]导入inst.txt，RTL仿真并显示波形  
@@ -190,7 +189,8 @@ SparrowRV
 4. 点击`构建项目`，编译并生成bin文件
 
 ## 致谢
-本项目借鉴了[tinyriscv](https://gitee.com/liangkangnan/tinyriscv)的RTL设计和Python脚本。tinyriscv使用[Apache-2.0](http://www.apache.org/licenses/LICENSE-2.0)协议    
+本项目借鉴了[tinyriscv](https://gitee.com/liangkangnan/tinyriscv)的RTL设计和Python脚本。tinyriscv使用[Apache-2.0](http://www.apache.org/licenses/LICENSE-2.0)协议。    
+本项目借鉴了[SM3_core](https://gitee.com/ljgibbs/sm3_core)的设计内容。SM3_core使用MIT协议。    
 感谢先驱者为我们提供的灵感  
 感谢众多开源软件提供的好用的工具  
 感谢MRS开发工具提供的便利   
