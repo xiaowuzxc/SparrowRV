@@ -94,7 +94,7 @@ rm -rf iverilog/
 - 进入[Python官网](https://www.python.org/)，下载并安装Python 3.x版本(建议使用稳定版)  
 - (可跳过)如果想在Win系统使用make，请参阅[Makefile开发](#Makefile开发)第2步。  
 #### iverilog仿真
-进入[iverilog Win官网](http://bleyer.org/icarus/)，下载并安装iverilog-v12-20220611-x64_setup[18.2MB]  
+进入[iverilog Win发行版](http://bleyer.org/icarus/)，下载并安装iverilog-v12-20220611-x64_setup[18.2MB]  
 Windows下iverilog安装流程及仿真可参考[视频教程](https://www.bilibili.com/video/bv1dS4y1H7zn)  
 **可选择以下任意一种方式进行仿真**  
 - `/tb/run_zh.bat`是Windows环境下的启动器，进入`/tb/`目录，仅需双击`run_zh.bat`即可启动人机交互界面。根据提示，输入单个数字或符号，按下回车即可执行对应项目。  
