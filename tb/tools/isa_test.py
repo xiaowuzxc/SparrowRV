@@ -97,7 +97,7 @@ def isp文件转文本():
     待转换的文件路径=filedialog.askopenfilename()
     if 待转换的文件路径:
         print(待转换的文件路径)
-        bin文件转换(待转换的文件路径, 'isp.txt')
+        bin文件转换(待转换的文件路径, 'btrm.txt')
 
 def 启动modelsim仿真():
     仿真进程 = os.popen(r'vsim -do vsim_gui.tcl')

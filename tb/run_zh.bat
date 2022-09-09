@@ -12,8 +12,8 @@
 @echo 5: 载入inst.txt并仿真---modelsim 
 @echo 6: 载入bin文件并仿真----modelsim 
 @echo 7: 执行RISC-V ISA测试集-modelsim 
-@echo 8: bin文件转为isp.txt 
-@echo 9: bin文件转isp.txt并仿真 
+@echo 8: bin文件转为btrm.txt 
+@echo 9: bin文件转btrm.txt并仿真 
 @echo c: 清理缓存文件  
 @echo ===============================
 

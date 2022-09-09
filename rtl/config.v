@@ -11,7 +11,7 @@
 `define SRam_KB 32 
 
 //复位后从bootrom(1'b0) / iram(1'b1) 取指
-`define INSTS_SEL 1'b1
+`define INSTS_SEL 1'b0
 
 //Vendor ID
 `define MVENDORID_NUM 32'h0
@@ -37,10 +37,10 @@
 `define RV32_M_ISA
 
 //启用mcycle运行周期计数器
-//`define CSR_MCYCLE_EN
+`define CSR_MCYCLE_EN
 
 //启用minstret指令计数器
-//`define CSR_MINSTRET_EN
+`define CSR_MINSTRET_EN
 
 //启用安路EG4 FPGA原语生成BRAM
 //`define EG4_FPGA 

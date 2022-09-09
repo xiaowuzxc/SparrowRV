@@ -7,8 +7,6 @@ module rstc (
 );
 reg [3:0] sys_rst_cnt = 4'h0;//系统复位计数器
 reg hard_rst_r,hard_rst_en;
-reg sys_rst_sta,pw_rst_sta;//硬件、软件复位状态
-
 
 //复位计数
 always @(posedge clk) begin
@@ -29,6 +27,5 @@ always @(posedge clk) begin
         end
     end
 end
-
 
 endmodule

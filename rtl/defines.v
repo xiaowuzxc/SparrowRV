@@ -153,7 +153,7 @@
 `define CSR_MTIMEH     12'hB83
 `define CSR_MTIMECMP   12'hB04
 `define CSR_MTIMECMPH  12'hB84
-`define CSR_MCCTR      12'hB88//计数器控制
+`define CSR_MCCTR      12'hB88//系统控制
 
 `define CSR_MVENDORID  12'hF11
 `define CSR_MARCHID    12'hF12

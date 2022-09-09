@@ -4,7 +4,6 @@
 /tb/*.lxt
 /tb/*.vcd
 /tb/inst.txt
-/tb/isp.txt
 /tb/MEM.TXT
 /tb/SFDP.TXT
 /tb/SREG.TXT

@@ -50,12 +50,11 @@ module iram (
  * 用途: 复位后PC指向此处，完成数据搬移、UART烧录
  * 
 */
-
+reg insts_sel_r,insts_sel_rr;//选择存储器打拍
 wire [31:0] rst_addr = `RstPC;//复位地址
 wire [clogb2(`IRamSize-1)-1:0]addra = iram_rstn_o ? rst_addr[clogb2(`IRamSize-1)-1+2:2] : pc_n_i[clogb2(`IRamSize-1)-1+2:2];
 wire [`MemBus]douta,doutia;
-reg axi_ram_sel;//根据insts_sel_i选择访问的存储器
-assign inst_o = insts_sel_i?douta:doutia;
+assign inst_o = insts_sel_rr?douta:doutia;
 
 //AXI4L总线交互
 reg [clogb2(`IRamSize-1)-1:0]addrb;
@@ -66,7 +65,11 @@ reg [`MemBus]dinb;
 wire axi_whsk = iram_axi_awvalid & iram_axi_wvalid;//写通道握手
 wire axi_rhsk = iram_axi_arvalid & (~iram_axi_rvalid | (iram_axi_rvalid & iram_axi_rready)) & ~axi_whsk;//读通道握手,没有读响应
 
-
+//选择存储器打拍
+always @(posedge clk) begin
+    insts_sel_r  <= insts_sel_i;
+    insts_sel_rr <= insts_sel_r;
+end
 //PC复位
 always @(posedge clk or negedge rst_n) begin
     if(~rst_n) begin
@@ -96,17 +99,10 @@ else begin
         iram_axi_rvalid <= iram_axi_rvalid;
 end
 
-always @(posedge clk) begin
-    if(axi_rhsk)
-        axi_ram_sel <= insts_sel_i;
-    else
-        axi_ram_sel <= axi_ram_sel;
-end
-
 always @(*) begin
     iram_axi_awready = axi_whsk;//写地址数据同时准备好
     iram_axi_wready = axi_whsk;//写地址数据同时准备好
-    iram_axi_rdata = axi_ram_sel?doutb:doutib;//读数据
+    iram_axi_rdata = insts_sel_rr?doutb:doutib;//读数据
     iram_axi_arready = axi_rhsk;//读地址握手
     iram_axi_bvalid = 1'b1;
     iram_axi_bresp = 2'b00;//响应

@@ -32,7 +32,7 @@ wire mends = `CorePath.inst_csr.mends;//仿真结束标志
 // 读入程序
 initial begin
     $readmemh ("inst.txt", `CorePath.inst_iram.inst_dpram.BRAM);
-    $readmemh ("isp.txt", `CorePath.inst_iram.inst_bootrom.BRAM);
+    $readmemh ("btrm.txt", `CorePath.inst_iram.inst_bootrom.BRAM);
 end
 
 // 生成clk
@@ -108,9 +108,9 @@ task sysrst;//复位任务
     JTAG_TCK=0;
     JTAG_TMS=0;
     JTAG_TDI=0;
-    rst_n <= '0;
+    //rst_n <= '0;
     #15
-    rst_n <= '1;
+    //rst_n <= '1;
     #10;
 endtask : sysrst
 
