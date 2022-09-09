@@ -8,13 +8,14 @@ vlib work
 vmap work work
 
 # 编译文件
+vlog +incdir+./../rtl/                                    ./../rtl/*.v
 vlog +incdir+./../rtl/  +define+MODELSIM +define+ISA_TEST ./tb_core.sv
-vlog +incdir+./../rtl/  ./../rtl/core/*.v
-vlog +incdir+./../rtl/  ./../rtl/soc/*.v
-vlog +incdir+./../rtl/  ./../rtl/perips/*.v
-vlog +incdir+./../rtl/  ./../rtl/perips/sysio/*.v
-vlog +incdir+./../rtl/  ./../rtl/jtag/*.v
-vlog +incdir+./../rtl/  ./../rtl/*.v
+vlog +incdir+./../rtl/  +define+INSTS_SEL=1'b1            ./../rtl/core/*.v
+vlog +incdir+./../rtl/                                    ./../rtl/soc/*.v
+vlog +incdir+./../rtl/                                    ./../rtl/perips/*.v
+vlog +incdir+./../rtl/                                    ./../rtl/perips/sysio/*.v
+vlog +incdir+./../rtl/                                    ./../rtl/jtag/*.v
+
 
 #vsim -voptargs=+acc work.tb_core
 #run -all

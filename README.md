@@ -129,6 +129,7 @@ iverilog是仿真工具，gtkwave用于查看波形。
   
 
 ### 问题说明
+- 若使用modelsim进行ISA测试，请将`config.v`的`PW_BOOT`设置为`1'b1`
 - inst.txt是被testbench读入指令存储器的文件，必须存在此文件处理器才可运行  
 - 程序编译生成的bin文件不能直接被读取，需要先转换为inst.txt  
 - iverilog版本建议大于v11，低于此版本可能会无法运行  
@@ -136,6 +137,7 @@ iverilog是仿真工具，gtkwave用于查看波形。
 - Windows下`make`建议使用Powershell，经测试Bash存在未知bug(实验性修复)   
 - (已修复)~~run_zh.bat是中文的启动器，但是由于`git CRLF`相关问题无法使用~~  
 - 若出现`WARNING: tb_core.sv:23: $readmemh(inst.txt):...`或`ERROR: tb_core.sv:24: $readmemh:`警告或错误信息，请忽略，它不会有任何影响  
+
 
 
 ## 板级支持包BSP

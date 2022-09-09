@@ -15,7 +15,7 @@ default: all
 # Build rules
 #--------------------------------------------------------------------
 
-RISCV_PREFIX ?= ../../tools/gnu-mcu-eclipse-riscv-none-gcc-8.2.0-2.2-20190521-0004-win64/bin/riscv-none-embed-
+RISCV_PREFIX ?= ../../../tools/RISC-V_Embedded_GCC/bin/riscv-none-embed-
 RISCV_GCC ?= $(RISCV_PREFIX)gcc
 RISCV_GCC_OPTS ?= -static -mcmodel=medany -fvisibility=hidden -nostdlib -nostartfiles
 RISCV_OBJDUMP ?= $(RISCV_PREFIX)objdump --disassemble-all
@@ -28,8 +28,8 @@ vpath %.S $(src_dir)
 # Build assembly tests
 
 %.dump: % 
-	$(RISCV_OBJDUMP) generated/$< > generated/$@
-	$(RISCV_OBJCOPY) -O verilog generated/$<   generated/$<.verilog
+	$(RISCV_OBJDUMP) -d generated/$< > generated/$@
+#	$(RISCV_OBJCOPY) -O verilog generated/$<   generated/$<.verilog
 	$(RISCV_OBJCOPY) -O binary generated/$<   generated/$<.bin
 
 
@@ -53,7 +53,7 @@ $(eval $(call compile_template,rv32ui,-march=rv32i -mabi=ilp32))
 $(eval $(call compile_template,rv32um,-march=rv32im -mabi=ilp32))
 
 
-tests_verilog = $(addsuffix .verilog, $(tests))
+#tests_verilog = $(addsuffix .verilog, $(tests))
 tests_dump = $(addsuffix .dump, $(tests))
 
 

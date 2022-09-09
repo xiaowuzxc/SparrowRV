@@ -2,9 +2,12 @@
 
 `define IRamSize (`IRam_KB*1024/4) //kB->B->4B
 `define SRamSize (`SRam_KB*1024/4) //kB->B->4B
-//`define RstPC 32'h0800_0000 //复位后PC值
 `define RstPC 32'h0000_0000 //复位后PC值在0000
-
+`ifdef ISA_TEST
+    `define INSTS_SEL 1'b1
+`else 
+    `define INSTS_SEL `PW_BOOT
+`endif
 `define RstEnable 1'b0
 `define RstDisable 1'b1
 `define ZeroWord 32'h0
