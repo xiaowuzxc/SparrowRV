@@ -163,7 +163,7 @@ core inst_core
 jtag_top inst_jtag_top
 (
     .clk              (clk),
-    .jtag_rst_n       (jtag_rst_n),
+    .jtag_rst_n       (rst_n),
     .jtag_pin_TCK     (JTAG_TCK),
     .jtag_pin_TMS     (JTAG_TMS),
     .jtag_pin_TDI     (JTAG_TDI),
@@ -515,8 +515,7 @@ rstc inst_rstc
     .hard_rst_n  (hard_rst_n),
     .soft_rst_en (soft_rst_en),
     .jtag_rst_en (jtag_rst_en),
-    .rst_n       (rst_n),
-    .jtag_rst_n  (jtag_rst_n)
+    .rst_n       (rst_n)
 );
 
 
