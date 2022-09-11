@@ -1,6 +1,7 @@
 # 小麻雀处理器
-![rvlogo](/pic/img/rvlogo.bmp)[已被RISC-V官网收录](https://riscv.org/exchange/?_sf_s=sparrowrv)  
-![teelogo](/pic/img/giteetj.bmp)[Gitee推荐项目](https://gitee.com/explore/risc-v)  
+![rvlogo](/doc/图库/Readme/rvlogo.bmp)[已被RISC-V官网收录](https://riscv.org/exchange/?_sf_s=sparrowrv)  
+![teelogo](/doc/图库/Readme/giteetj.bmp)[Gitee推荐项目](https://gitee.com/explore/risc-v)  
+[处理器文档导航页](/doc/文档导航.md)
 ## 简介
 小麻雀处理器(SparrowRV)是一款单周期32位，支持RV32IM指令集的嵌入式处理器。它的控制逻辑简单，没有复杂的流水线控制结构，没有冗余的线网连接，代码注释完备，适合用于学习。  
 此项目处于开发阶段，master分支更新频繁，稳定版请参阅[release发行版](https://gitee.com/xiaowuzxc/SparrowRV/releases)  
@@ -14,7 +15,7 @@
 - 支持片外Flash(25系列)启动  
 
 **功能框图**  
-![soc架构](/pic/img/soc架构.svg)  
+![soc架构](/doc/图库/Readme/soc架构.svg)  
 
 软件开发请参阅[板级支持包BSP](#板级支持包bsp)  
 仿真环境搭建请参阅[仿真流程](#仿真)  
@@ -59,7 +60,7 @@ SoC RTL
 本工程使用`批处理/Makefile + Python3 + Modelsim/iverilog`可根据个人喜好与平台使用合适的工具完成仿真全流程。如果已配置相关工具，可跳过环境搭建步骤。    
 若需要编写c语言程序并仿真，请参阅[板级支持包BSP](#板级支持包bsp)  
 **仿真环境框架**  
-![soc架构](/pic/img/仿真环境.svg)  
+![soc架构](/doc/图库/Readme/仿真环境.svg)  
 
 ### Linux环境搭建与仿真
 必须使用带有图形化界面的Linux的系统，否则无法正常仿真。    
