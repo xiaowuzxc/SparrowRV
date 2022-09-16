@@ -1,5 +1,5 @@
 # 小麻雀处理器
-[![rvlogo](/doc/图库/Readme/rvlogo.bmp)已被RISC-V官网收录](https://riscv.org/exchange/?_sf_s=sparrowrv)  
+[![rvlogo](/doc/图库/Readme/rvlogo.bmp)RISC-V官网收录](https://riscv.org/exchange/?_sf_s=sparrowrv)  
 [![teelogo](/doc/图库/Readme/giteetj.bmp)Gitee推荐项目](https://gitee.com/explore/risc-v)  
 [![book](/doc/图库/Readme/book.png)处理器文档导航页](/doc/文档导航.md)
 ## 简介
@@ -45,15 +45,14 @@ SoC RTL
 **未来任务**  
 - 向量化的中断系统  
 - 完善的文档  
-- 资源优化  
 
 
 ## 开发工具
 - 处理器RTL设计采用Verilog-2001可综合子集。此版本代码密度更高，可读性更强，并且受到综合器的广泛支持。  
 - 处理器RTL验证采用System Verilog-2005。此版本充分满足仿真需求，并且受到仿真器的广泛支持。   
-- 数字逻辑仿真采用iverilog。开源免费跨平台的轻量级HDL仿真器，适合仿真中小模块。  
-- 提供Modelsim仿真脚本，便于相关用户群体使用。  
+- 数字逻辑仿真采用iverilog/Modelsim。可根据使用平台与具体需求选择合适工具。  
 - 脚本采用 Batchfile批处理(Win)/Makefile(Linux) + Python3。发挥各种脚本语言的优势，最大程度地简化操作。  
+- 板级支持包采用Makefile/MRS + gcc交叉编译可根据喜好选择命令行/图形化开发环境。  
 - 所有文本采用UTF-8编码，具备良好的多语言和跨平台支持。  
 
 ## 仿真
@@ -83,7 +82,7 @@ rm -rf iverilog/
 
 进入`/tb/`目录，终端输入`make`即可启动人机交互界面。根据提示，输入`make`+`空格`+`单个数字或符号`，按下回车即可执行对应项目。   
 
-目前支持的命令：  
+Makefile支持以下命令：  
 - [0]导入inst.txt，RTL仿真并显示波形  
 - [1]收集指令测试集程序，测试所有指令  
 - [2]转换bin文件为inst.txt，可被testbench读取  
@@ -106,31 +105,17 @@ Windows下iverilog安装流程及仿真可参考[视频教程](https://www.bilib
 `/tb/tools/isa_test.py`是仿真脚本的核心，负责控制仿真流程，转换文件类型，数据收集。使用者通过启动器与此脚本交互，一般情况下不建议修改。  
 iverilog是仿真工具，gtkwave用于查看波形。  
 
-目前支持的命令：  
-- [0]导入inst.txt，RTL仿真并显示波形  
-- [1]执行RV32IM指令测试集，收集结果  
-- [2]转换bin文件为inst.txt，可被testbench读取  
-- [3]转换bin文件并进行RTL仿真、显示波形，主要用于仿真c语言程序  
-- [4]显示上一次的仿真波形  
-- [c]清理缓存文件  
-
-
 
 #### Modelsim仿真
+仅限Windows系统  
 本工程提供了Modelsim仿真脚本，启动方式与iverilog类似，软件安装问题请各显神通  
 - `/tb/run_zh.bat`是Windows环境下的启动器，进入`/tb/`目录，仅需双击`run_zh.bat`即可启动人机交互界面。根据提示，输入单个数字或符号，按下回车即可执行对应项目。   
 - 处理器运行C语言程序，见[板级支持包BSP](#板级支持包bsp)。需要将生成的`obj.bin`转换为`inst.txt`文件(命令2转换，命令3可以直接转换并仿真)，才能导入程序并执行仿真。  
 - `/tb/tools/vsim_xxx.tcl`主导Modelsim的启动、配置、编译、仿真流程，由批处理脚本启动，Modelsim启动后读入。  
 
-目前支持的命令：  
-- [5]导入inst.txt，RTL仿真并显示波形  
-- [6]转换bin文件并进行RTL仿真、显示波形，主要用于仿真c语言程序  
-- [7]执行RV32IM指令测试集，收集结果 
-- [c]清理缓存文件  
   
 
 ### 问题说明
-- 若使用modelsim进行ISA测试，请将`config.v`的`PW_BOOT`设置为`1'b1`
 - inst.txt是被testbench读入指令存储器的文件，必须存在此文件处理器才可运行  
 - 程序编译生成的bin文件不能直接被读取，需要先转换为inst.txt  
 - iverilog版本建议大于v11，低于此版本可能会无法运行  
