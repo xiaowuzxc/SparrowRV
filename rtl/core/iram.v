@@ -129,7 +129,7 @@ end
 dpram #(
     .RAM_DEPTH(`IRamSize),
     .RAM_SEL(RAM_SEL)
-) inst_dpram (
+) inst_appram (
     .clk    (clk),
     .addra  (addra[clogb2(`IRamSize-1)-1:0]),
     .addrb  (addrb[clogb2(`IRamSize-1)-1:0]),

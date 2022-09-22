@@ -31,7 +31,7 @@ wire mends = `CorePath.inst_csr.mends;//仿真结束标志
 
 // 读入程序
 initial begin
-    $readmemh ("inst.txt", `CorePath.inst_iram.inst_dpram.BRAM);
+    $readmemh ("inst.txt", `CorePath.inst_iram.inst_appram.BRAM);
     $readmemh ("btrm.txt", `CorePath.inst_iram.inst_bootrom.BRAM);
 end
 
@@ -133,7 +133,7 @@ endgenerate
 
 initial begin
     wait(rst_n===1'b1);
-    if(`CorePath.inst_iram.inst_dpram.BRAM[0][0]===1'bx) begin//如果inst.txt读入失败，停止仿真
+    if(`CorePath.inst_iram.inst_appram.BRAM[0][0]===1'bx) begin//如果inst.txt读入失败，停止仿真
         $display("*Sim tool:Inst load error");
         #10;
         $stop;
