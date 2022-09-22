@@ -1,20 +1,8 @@
-`timescale 1ns / 1ps
-// `include "./inc/sm3_cfg.v"
-`include "sm3_cfg.v"
-//////////////////////////////////////////////////////////////////////////////////
-// Author:        ljgibbs / lf_gibbs@163.com
-// Create Date: 2020/07/19 
-// Design Name: sm3
-// Module Name: sm3_pad_core
-// Description:
-//      SM3 填充模块-SM3 填充核心单元
-//      输入位宽：INPT_DW1 定义，支持32/64
-//      输出位宽：与输入位宽一致
-// Dependencies: 
-//      inc/sm3_cfg.v
-// Revision:
-// Revision 0.01 - File Created
-//////////////////////////////////////////////////////////////////////////////////
+`define SM3_INPT_DW_32
+`define INPT_DW    32
+`define INPT_DW1        (`INPT_DW - 1)
+`define INPT_BYTE_DW1   (`INPT_DW/8 - 1)
+`define INPT_BYTE_DW    (`INPT_BYTE_DW1 + 1)
 module sm3_pad_core (
     input                       clk,
     input                       rst_n,

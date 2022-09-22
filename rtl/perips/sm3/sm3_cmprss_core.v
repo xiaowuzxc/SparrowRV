@@ -1,20 +1,8 @@
-`timescale 1ns / 1ps
-`include "sm3_cfg.v"
-//////////////////////////////////////////////////////////////////////////////////
-// Author:        ljgibbs / lf_gibbs@163.com
-// Create Date: 2020/07/27 
-// Design Name: sm3
-// Module Name: sm3_cmprss_core
-// Description:
-//      SM3 迭代压缩模块-SM3 迭代压缩核心单元
-//      输入位宽：INPT_DW1 定义，支持32/64bit
-//      输出位宽：与输入位宽对应
-//      特性：在 64bit 位宽下，采用二度展开结构（暂未）
-// Dependencies: 
-//      inc/sm3_cfg.v
-// Revision:
-// Revision 0.01 - File Created
-//////////////////////////////////////////////////////////////////////////////////
+`define SM3_INPT_DW_32
+`define INPT_DW    32
+`define INPT_DW1        (`INPT_DW - 1)
+`define INPT_BYTE_DW1   (`INPT_DW/8 - 1)
+`define INPT_BYTE_DW    (`INPT_BYTE_DW1 + 1)
 module sm3_cmprss_core (
     input                       clk,
     input                       rst_n,
@@ -356,30 +344,12 @@ end
 assign                      cmprss_otpt_vld_o     =   sm3_res_valid_r1;
 assign                      cmprss_otpt_res_o     =   sm3_res;
 
-`ifdef SM3_CMPRS_SIM_DBG
-    `ifdef SM3_CMPRS_SIM_FILE_LOG
-        integer file;
-        initial begin:inital_file
-            
-            file = $fopen("wj.txt","w");
-        end
-    `endif
+always@(*) begin		
+    if(cmprss_otpt_vld_o)
+    begin
+            $display("LOG: res : %64h",cmprss_otpt_res_o);
+    end
+end
 
-    generate
-        if(1) begin
-            always@(*) begin		
-                if(cmprss_otpt_vld_o)
-                begin
-                    `ifdef SM3_CMPRS_SIM_FILE_LOG
-                        $fdisplay(file,"LOG: res : %64h",cmprss_otpt_res_o);
-                    `else
-                        $display("LOG: res : %64h",cmprss_otpt_res_o);
-                    `endif
-                    
-                end
-            end
-        end
-    endgenerate
-`endif
 
 endmodule

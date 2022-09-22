@@ -1,20 +1,9 @@
-`timescale 1ns / 1ps
-`include "sm3_cfg.v"
-//////////////////////////////////////////////////////////////////////////////////
-// Author:        ljgibbs / lf_gibbs@163.com
-// Create Date: 2020/07/26 
-// Design Name: sm3
-// Module Name: sm3_expnd_core
-// Description:
-//      SM3 扩展模块-SM3 扩展核心单元
-//      输入位宽：INPT_DW1 定义，支持32/64bit
-//      输出位宽：与输入位宽对应
-//      特性：预载寄存器（68->65clk(32b)/66->65clk(64b)）,目前仅支持32bit，默认开启
-// Dependencies: 
-//      inc/sm3_cfg.v
-// Revision:
-// Revision 0.01 - File Created
-//////////////////////////////////////////////////////////////////////////////////
+`define SM3_EXPND_PRE_LOAD_REG
+`define SM3_INPT_DW_32
+`define INPT_DW    32
+`define INPT_DW1        (`INPT_DW - 1)
+`define INPT_BYTE_DW1   (`INPT_DW/8 - 1)
+`define INPT_BYTE_DW    (`INPT_BYTE_DW1 + 1)
 module sm3_expnd_core (
     input                       clk,
     input                       rst_n,

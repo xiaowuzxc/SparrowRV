@@ -1,18 +1,8 @@
-`timescale 1ns / 1ps
-`include "sm3_cfg.v"
-//////////////////////////////////////////////////////////////////////////////////
-// Author:        ljgibbs / lf_gibbs@163.com
-// Create Date: 2020/07/28
-// Design Name: sm3
-// Module Name: sm3_cmprss_ceil_comb
-// Description:
-//      SM3 单轮迭代压缩模块 由组合逻辑构成
-//      
-// Dependencies: 
-//      inc/sm3_cfg.v
-// Revision:
-// Revision 0.01 - File Created
-//////////////////////////////////////////////////////////////////////////////////
+`define SM3_INPT_DW_32
+`define INPT_DW    32
+`define INPT_DW1        (`INPT_DW - 1)
+`define INPT_BYTE_DW1   (`INPT_DW/8 - 1)
+`define INPT_BYTE_DW    (`INPT_BYTE_DW1 + 1)
 module sm3_cmprss_ceil_comb(
     input                   cmprss_round_sm_16_i,
     input [31:0]            tj_i,
@@ -56,62 +46,22 @@ wire [31:0]	tt2_after_p0	;
 wire [31:0]	TJ				=	tj_i;
 
 //加法器0
-`ifdef SM3_CMPRSS_DIRECT_ADD
-    assign  tmp_for_ss1_0	=	{reg_a_i[31-12:0], reg_a_i[31:31-12+1]} + reg_e_i;
-    assign  tmp_for_ss1_2	=	tmp_for_ss1_0 + TJ;
-`else
-    sm3_adder U_ss1(
-        .A({reg_a_i[31-12:0], reg_a_i[31:31-12+1]}),
-        .B(reg_e_i),
-        .C(TJ),
-        .R(tmp_for_ss1_2) 
-    );
-`endif
+assign  tmp_for_ss1_0	=	{reg_a_i[31-12:0], reg_a_i[31:31-12+1]} + reg_e_i;
+assign  tmp_for_ss1_2	=	tmp_for_ss1_0 + TJ;
 
 assign      ss1				=	{tmp_for_ss1_2[31 - 7 : 0], tmp_for_ss1_2[31 : 31 - 7 + 1]};
 assign  	ss2				=	ss1 ^ {reg_a_i[31 - 12 : 0], reg_a_i[31 : 31 - 12 + 1]};
 
 //加法器1
 assign  	tmp_for_tt1_0	=	cmprss_round_sm_16_i? reg_a_i ^ reg_b_i ^ reg_c_i : (reg_a_i & reg_b_i | reg_a_i & reg_c_i | reg_b_i & reg_c_i);
-`ifdef SM3_CMPRSS_DIRECT_ADD
-    assign  	tmp_for_tt1_1	=	reg_d_i + ss2 + wjj_i;
-    assign  	tt1				=	tmp_for_tt1_0 + tmp_for_tt1_1;
-`else
-    //tmp_for_tt1_1 = reg_d_i + tmp_for_tt1_0 + wjj_i
-    sm3_adder U_tmp_for_tt1_1(
-        .A(reg_d_i),
-        .B(tmp_for_tt1_0),
-        .C(wjj_i),
-        .R(tmp_for_tt1_1) 
-    );
-    //tt1 = ss2 + tmp_for_tt1_1
-    adder_32b U_tt1(
-        .A(ss2),
-        .B(tmp_for_tt1_1),
-        .R(tt1) 
-    );
-`endif
+assign  	tmp_for_tt1_1	=	reg_d_i + ss2 + wjj_i;
+assign  	tt1				=	tmp_for_tt1_0 + tmp_for_tt1_1;
+
 
 //加法器2
 assign  	tmp_for_tt2_0	=	cmprss_round_sm_16_i? reg_e_i ^ reg_f_i ^ reg_g_i : (reg_e_i & reg_f_i | ~reg_e_i & reg_g_i);
-`ifdef SM3_CMPRSS_DIRECT_ADD
-    assign  	tmp_for_tt2_1	=	reg_h_i + ss1 + wj_i;
-    assign  	tt2				=	tmp_for_tt2_0 + tmp_for_tt2_1;
-`else
-    //tmp_for_tt2_1 = reg_h_i + tmp_for_tt2_0 + wj_i
-    sm3_adder U_tmp_for_tt2_1(
-        .A(reg_h_i),
-        .B(tmp_for_tt2_0),
-        .C(wj_i),
-        .R(tmp_for_tt2_1) 
-    );
-    //tt2 = ss1 + tmp_for_tt2_1
-    adder_32b U_tt2(
-        .A(ss1),
-        .B(tmp_for_tt2_1),
-        .R(tt2) 
-    );
-`endif
+assign  	tmp_for_tt2_1	=	reg_h_i + ss1 + wj_i;
+assign  	tt2				=	tmp_for_tt2_0 + tmp_for_tt2_1;
 
 assign  	tt2_after_p0	=	tt2 ^ {tt2[31-9:0], tt2[31:31-9+1]} ^ {tt2[31-17:0], tt2[31:31-17+1]};
 
