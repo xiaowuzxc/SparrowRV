@@ -13,6 +13,9 @@
 /tb/transcript
 /tb/work
 
+/rtl/perips/sm3/tb/tb
+/rtl/perips/sm3/tb/tb_sm3_core_top.sv
+
 /py_gen
 
 /syn

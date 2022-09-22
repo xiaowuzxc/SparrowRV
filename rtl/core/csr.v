@@ -75,7 +75,7 @@ reg [4 :0] mcctr;//系统控制
 //[1]:minstret使能
 //[2]:mtime使能
 //[3]:soft_rst写1复位
-//[4]:从bootrom 0 /iram 1 取指
+//[4]:从bootrom 0 / appram 1 取指
 //---仿真模式专用---
 reg [7:0] mprints;//仿真标准输出
 reg mends;//仿真结束

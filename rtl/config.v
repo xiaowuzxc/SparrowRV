@@ -10,7 +10,7 @@
 //sram数据存储器大小，单位为KB
 `define SRam_KB 32 
 
-//复位后从bootrom(1'b0) / iram(1'b1) 取指
+//复位后从bootrom(1'b0) / appram(1'b1) 取指
 `define PW_BOOT 1'b0
 
 //Vendor ID

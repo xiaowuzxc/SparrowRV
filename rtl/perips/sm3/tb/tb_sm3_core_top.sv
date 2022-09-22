@@ -5,6 +5,7 @@
 `define INPT_BYTE_DW1   (`INPT_DW/8 - 1)
 `define INPT_BYTE_DW    (`INPT_BYTE_DW1 + 1)
 module tb_sm3_core_top;
+localparam max_cnt = 32768;
 
 localparam [1:0]            INPT_WORD_NUM               =   2'd1;
 bit [31:0]                  urand_num;
@@ -84,12 +85,18 @@ initial begin
     @(posedge clk); 
     
     msg_inpt_vld_byte = 4'b1111;
-    while (cnt<32768) begin
+    while (cnt<max_cnt) begin
         @(posedge clk);
         #1;
+        if(cnt>=max_cnt)
+            msg_inpt_lst      = 1'b0;
         if(msg_inpt_rdy) begin
             msg_inpt_vld      = 1'b1;
             msg_inpt_d        = 32'h6162_6300;
+            if(cnt==max_cnt-1)
+                msg_inpt_lst      = 1'b1;
+            else
+                msg_inpt_lst      = 1'b0;
         end
         else begin
             msg_inpt_vld      = 1'b0;
@@ -97,7 +104,7 @@ initial begin
         end
     end
     msg_inpt_vld      = 1'b0;
-    msg_inpt_lst      = 1'b1;
+    msg_inpt_lst      = 1'b0;
     msg_inpt_d      = 0;
     @(posedge clk);
     msg_inpt_lst      = 1'b0;
