@@ -44,13 +44,7 @@ reg [31:0] gpio_omd;
 
 
 // 总线接口 写
-always @ (posedge clk/* or negedge rst_n*/) begin
-//    if (~rst_n) begin
-//        gpio_opt <= 32'hffff_ffff;
-//        gpio_oec <= 32'hffff_0000;
-//        gpio_omd <= 32'h0;
-//    end
-//    else begin
+always @ (posedge clk) begin
         if (we_i == 1'b1) begin
             case (waddr_i)
                 GPIO_DIN: ;
@@ -69,7 +63,7 @@ end
 always @ (posedge clk) begin
     if (rd_i == 1'b1) begin
         case (raddr_i)
-                GPIO_DIN: data_o <= gpio_din;
+                GPIO_DIN: data_o <= gpio_in_r;
                 GPIO_OPT: data_o <= gpio_opt;
                 GPIO_OEC: data_o <= gpio_oec;
                 GPIO_OMD: data_o <= gpio_omd;
@@ -91,7 +85,7 @@ end
 generate
 for (i=0; i<32; i=i+1) begin
     always @(posedge clk) begin
-        if({gpio_oec, gpio_omd[i]}==2'b01)//锁存上一次的输入
+        if({gpio_oec[i], gpio_omd[i]}==2'b01)//锁存上一次的输入
             gpio_din[i] <= gpio_din[i];
         else
             gpio_din[i] <= gpio_in_r[i];

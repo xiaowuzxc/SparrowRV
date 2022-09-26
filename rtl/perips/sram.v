@@ -29,12 +29,12 @@ module sram (
 reg [clogb2(`SRamSize-1)-1:0]addr;
 reg we,en;
 reg [3:0] wem;
-reg [`MemBus]dout;
+wire [`MemBus]dout;
 reg [`MemBus]din;
 wire axi_whsk = sram_axi_awvalid & sram_axi_wvalid;//写通道握手
 wire axi_rhsk = sram_axi_arvalid & (~sram_axi_rvalid | (sram_axi_rvalid & sram_axi_rready)) & ~axi_whsk;//读通道握手,没有读响应或读响应握手成功
 
-
+localparam [clogb2(`SRamSize-1)-1:0] addr_zero0 = 0;
 
 always @(posedge clk or negedge rst_n)//读响应控制
 if (~rst_n)
@@ -72,28 +72,31 @@ always @(*) begin
     wem = sram_axi_wstrb;
 end
 
-localparam RAM_DEPTH = `SRamSize;//SRAM存储器深度
-localparam RAM_WIDTH = 32;//位宽
+`ifdef EG4_FPGA //如果定义了宏
+    localparam RAM_SEL="EG4_32K";//启用EG4原语
+`else 
+    localparam RAM_SEL="RTL_MODEL";//否则使用行为级建模
+`endif
 
-reg [RAM_WIDTH-1:0] BRAM [0:RAM_DEPTH-1];
-
-always @(posedge clk)
-    if (en) begin//en则可读可写
-        if (we) begin//写使能
-            if(wem[0])//写选通
-                BRAM[addr][7:0] <= din[7:0];
-            if(wem[1])//写选通
-                BRAM[addr][15:8] <= din[15:8];
-            if(wem[2])//写选通
-                BRAM[addr][23:16] <= din[23:16];
-            if(wem[3])//写选通
-                BRAM[addr][31:24] <= din[31:24];
-        end
-        else begin
-            dout <= BRAM[addr];
-        end
-    end
-
+dpram #(
+    .RAM_DEPTH(`SRamSize),
+    .RAM_SEL(RAM_SEL),
+    .BRAM_EN("9K")
+) inst_sram (
+    .clk    (clk),
+    .addra  (addr),
+    .addrb  (addr_zero0),
+    .dina   (din),
+    .dinb   (32'h0),
+    .wea    (we),
+    .web    (1'b0),
+    .wema   (wem),
+    .wemb   (4'h0),
+    .ena    (en),
+    .enb    (1'b0),
+    .douta  (dout),
+    .doutb  ()
+);
 
 function integer clogb2;
     input integer depth;

@@ -12,7 +12,7 @@
  */
 void fpioa_perips_out_set(uint8_t FPIOAx, uint8_t fpioa_perips_o)
 {
-    FPIOA_REG_B(FPIOA_OT_BASE, FPIOAx) = fpioa_perips_o;
+    SYS_RWMEM_B(FPIOA_OT_BASE + FPIOAx) = fpioa_perips_o;
 }
 
 /*********************************************************************
@@ -27,7 +27,7 @@ void fpioa_perips_out_set(uint8_t FPIOAx, uint8_t fpioa_perips_o)
  */
 void fpioa_perips_in_set(uint8_t fpioa_perips_i, uint8_t FPIOAx)
 {
-    FPIOA_REG_B(FPIOA_IN_BASE, fpioa_perips_i) = FPIOAx;
+    SYS_RWMEM_B(FPIOA_IN_BASE + fpioa_perips_i) = FPIOAx;
 }
 
 /*********************************************************************
@@ -41,7 +41,7 @@ void fpioa_perips_in_set(uint8_t fpioa_perips_i, uint8_t FPIOAx)
  */
 uint8_t fpioa_out_read(uint8_t FPIOAx)
 {
-    return FPIOA_REG_B(FPIOA_OT_BASE, FPIOAx);
+    return SYS_RWMEM_B(FPIOA_OT_BASE + FPIOAx);
 }
 
 /*********************************************************************
@@ -55,6 +55,6 @@ uint8_t fpioa_out_read(uint8_t FPIOAx)
  */
 uint8_t fpioa_in_read(uint8_t fpioa_perips_i)
 {
-    return FPIOA_REG_B(FPIOA_IN_BASE, fpioa_perips_i);
+    return SYS_RWMEM_B(FPIOA_IN_BASE + fpioa_perips_i);
 }
 

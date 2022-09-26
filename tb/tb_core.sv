@@ -142,6 +142,7 @@ end
 sparrow_soc inst_sparrow_soc (
     .clk               (clk), 
     .hard_rst_n        (rst_n), 
+    .hx_valid          (),
 
     .JTAG_TCK          (JTAG_TCK),
     .JTAG_TMS          (JTAG_TMS),

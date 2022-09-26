@@ -19,8 +19,6 @@
 #define SPI0 SPI0_BASE
 #define SPI1 SPI1_BASE
 
-#define SPI_REG(addr) (*((volatile uint32_t *)addr))
-#define SPI_REG_B(addr,byte_sel) (*((volatile uint8_t *)(addr + byte_sel)))
 
 void spi_cp_model(uint32_t SPIx, uint32_t spi_cpmodel);//SPI相位控制
 void spi_sclk_div(uint32_t SPIx, uint32_t spi_div);//SPI SCLK分频器配置

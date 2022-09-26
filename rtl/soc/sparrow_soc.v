@@ -3,6 +3,8 @@ module sparrow_soc (
     input wire clk,    //时钟输入
     input wire hard_rst_n,  //来自外部引脚的复位信号
 
+    output wire hx_valid,//处理器运行指示
+
     input  wire JTAG_TCK,
     input  wire JTAG_TMS,
     input  wire JTAG_TDI,
@@ -114,6 +116,7 @@ core inst_core
     .clk              (clk),
     .rst_n            (rst_n),
     .halt_req_i       (halt_req),
+    .hx_valid         (hx_valid),
     .soft_rst         (soft_rst_en),
     .core_ex_trap_valid  (core_ex_trap_valid),
     .core_ex_trap_ready  (core_ex_trap_ready),

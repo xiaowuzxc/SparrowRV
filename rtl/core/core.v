@@ -6,6 +6,8 @@ module core (
 
     input  wire halt_req_i,//jtag停住cpu
 
+    output wire hx_valid,//处理器运行指示
+
     output wire soft_rst,//mcctr[3]软件复位
 
     //外部中断

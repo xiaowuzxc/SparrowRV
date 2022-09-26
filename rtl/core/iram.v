@@ -128,7 +128,8 @@ end
 
 dpram #(
     .RAM_DEPTH(`IRamSize),
-    .RAM_SEL(RAM_SEL)
+    .RAM_SEL(RAM_SEL),
+    .BRAM_EN("32K")
 ) inst_appram (
     .clk    (clk),
     .addra  (addra[clogb2(`IRamSize-1)-1:0]),
@@ -167,4 +168,7 @@ function integer clogb2;
         for (clogb2=0; depth>0; clogb2=clogb2+1)
             depth = depth >> 1;
 endfunction
+
+
+
 endmodule

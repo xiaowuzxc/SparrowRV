@@ -16,7 +16,7 @@
  */
 void spi_cp_model(uint32_t SPIx, uint32_t spi_cpmodel)
 {
-    SPI_REG_B(SPI_CTRL(SPIx),0) = spi_cpmodel;
+    SYS_RWMEM_B(SPI_CTRL(SPIx)+0) = spi_cpmodel;
 }
 
 /*********************************************************************
@@ -31,7 +31,7 @@ void spi_cp_model(uint32_t SPIx, uint32_t spi_cpmodel)
  */
 void spi_sclk_div(uint32_t SPIx, uint32_t spi_div)
 {
-    SPI_REG_B(SPI_CTRL(SPIx),1) = spi_div;
+    SYS_RWMEM_B(SPI_CTRL(SPIx)+1) = spi_div;
 }
 /*********************************************************************
  * @fn      spi_set_cs
@@ -48,9 +48,9 @@ void spi_sclk_div(uint32_t SPIx, uint32_t spi_div)
 void spi_set_cs(uint32_t SPIx, uint32_t spi_cs)
 {
     if (spi_cs == ENABLE)
-        SPI_REG(SPI_CTRL(SPIx)) |= 1 << 3;
+        SYS_RWMEM_W(SPI_CTRL(SPIx)) |= 1 << 3;
     else
-        SPI_REG(SPI_CTRL(SPIx)) &= ~(1 << 3);
+        SYS_RWMEM_W(SPI_CTRL(SPIx)) &= ~(1 << 3);
 }
 
 /*********************************************************************
@@ -66,8 +66,8 @@ void spi_set_cs(uint32_t SPIx, uint32_t spi_cs)
 void spi_send_byte(uint32_t SPIx, uint32_t data)
 {
     while (spi_busy_chk(SPIx)); //等待上一个操作结束
-    SPI_REG(SPI_DATA(SPIx)) = data;
-    SPI_REG(SPI_CTRL(SPIx)) |= 1 << 0; // spi en
+    SYS_RWMEM_W(SPI_DATA(SPIx)) = data;
+    SYS_RWMEM_W(SPI_CTRL(SPIx)) |= 1 << 0; // spi en
 }
 
 /*********************************************************************
@@ -83,10 +83,10 @@ void spi_send_byte(uint32_t SPIx, uint32_t data)
 uint8_t spi_sdrv_byte(uint32_t SPIx, uint32_t data)//SPI发送1字节接收1字节
 {
     while (spi_busy_chk(SPIx)); //等待上一个操作结束
-    SPI_REG(SPI_DATA(SPIx)) = data;
-    SPI_REG(SPI_CTRL(SPIx)) |= 1 << 0; // spi en
+    SYS_RWMEM_W(SPI_DATA(SPIx)) = data;
+    SYS_RWMEM_W(SPI_CTRL(SPIx)) |= 1 << 0; // spi en
     while (spi_busy_chk(SPIx)); //等待一次收发结束
-    return (uint8_t)(SPI_REG(SPI_DATA(SPIx)) & 0xff);//返回收到的数据
+    return (uint8_t)(SYS_RWMEM_W(SPI_DATA(SPIx)) & 0xff);//返回收到的数据
 }
 
 /*********************************************************************
@@ -100,7 +100,7 @@ uint8_t spi_sdrv_byte(uint32_t SPIx, uint32_t data)//SPI发送1字节接收1字�
  */
 uint32_t spi_busy_chk(uint32_t SPIx)//SPI状态检查
 {
-    return (SPI_REG(SPI_STATUS(SPIx)) & 0x1);
+    return (SYS_RWMEM_W(SPI_STATUS(SPIx)) & 0x1);
 }
 
 void spi_send_bytes(uint32_t SPIx, uint8_t data[], uint32_t len)

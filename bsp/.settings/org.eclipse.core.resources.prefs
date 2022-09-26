@@ -1,7 +1,7 @@
 eclipse.preferences.version=1
 encoding//app/main.c=UTF-8
+encoding//bootrom/main.c=GBK
 encoding//lib/include/debug.h=GBK
-encoding//lib/include/n25q_flash.h=GBK
 encoding//lib/include/trap.h=UTF-8
 encoding//lib/include/uart.h=UTF-8
 encoding//lib/include/utils.h=UTF-8

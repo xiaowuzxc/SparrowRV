@@ -21,7 +21,6 @@ module regs(
     // bus 
     input wire [`RegAddrBus] bus_raddr_i,  // 读寄存器地址
     output reg [`RegBus] bus_data_o       // 读寄存器数据
-
     );
 
     reg[`RegBus] regs[31:0];

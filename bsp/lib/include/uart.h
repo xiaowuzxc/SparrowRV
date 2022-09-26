@@ -15,7 +15,6 @@
 #define UART0 UART0_BASE
 #define UART1 UART1_BASE
 
-#define UART_REG(addr) (*((volatile uint32_t *)addr))
 
 void uart_enable_ctr(uint32_t UARTx, uint32_t uart_en);//串口使能控制
 void uart_band_ctr(uint32_t UARTx, uint32_t uart_band);//串口波特率控制

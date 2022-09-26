@@ -1,4 +1,4 @@
-#include "n25q_flash.h"
+#include "nor25_flash.h"
 
 
 

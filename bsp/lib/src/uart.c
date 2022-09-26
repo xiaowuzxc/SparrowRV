@@ -17,11 +17,11 @@ void uart_enable_ctr(uint32_t UARTx, uint32_t uart_en)
 {
     if(uart_en == ENABLE)
     {
-        UART_REG(UART_CTRL(UARTx)) = 0x3;
+        SYS_RWMEM_W(UART_CTRL(UARTx)) = 0x3;
     }
     else
     {
-        UART_REG(UART_CTRL(UARTx)) = 0x0;
+        SYS_RWMEM_W(UART_CTRL(UARTx)) = 0x0;
     }
 }
 
@@ -38,7 +38,7 @@ void uart_enable_ctr(uint32_t UARTx, uint32_t uart_en)
  */
 void uart_band_ctr(uint32_t UARTx, uint32_t uart_band)
 {
-    UART_REG(UART_BAUD(UARTx)) = SYS_FRE / uart_band ; //计算出分频器的值
+    SYS_RWMEM_W(UART_BAUD(UARTx)) = SYS_FRE / uart_band ; //计算出分频器的值
 }
 
 
@@ -54,8 +54,8 @@ void uart_band_ctr(uint32_t UARTx, uint32_t uart_band)
  */
 void uart_send_date(uint32_t UARTx, uint32_t uart_send)
 {
-    while (UART_REG(UART_STATUS(UARTx)) & 0x1); //等待上一个操作结束
-    UART_REG(UART_TXDATA(UARTx)) = uart_send;
+    while (SYS_RWMEM_W(UART_STATUS(UARTx)) & 0x1); //等待上一个操作结束
+    SYS_RWMEM_W(UART_TXDATA(UARTx)) = uart_send;
     write_csr(msprint, uart_send);//msprint
 }
 
@@ -71,8 +71,8 @@ void uart_send_date(uint32_t UARTx, uint32_t uart_send)
  */
 uint8_t uart_recv_date(uint32_t UARTx)
 {
-    UART_REG(UART_STATUS(UARTx)) &= ~0x2;//清除接收标志
-    return (UART_REG(UART_RXDATA(UARTx)) & 0xff);//返回串口接收到的数据
+    SYS_RWMEM_W(UART_STATUS(UARTx)) &= ~0x2;//清除接收标志
+    return (SYS_RWMEM_W(UART_RXDATA(UARTx)) & 0xff);//返回串口接收到的数据
 }
 
 
@@ -87,7 +87,7 @@ uint8_t uart_recv_date(uint32_t UARTx)
  */
 uint8_t uart_recv_flg(uint32_t UARTx)
 {
-    if (UART_REG(UART_STATUS(UARTx)) & 0x2)//有数据
+    if (SYS_RWMEM_W(UART_STATUS(UARTx)) & 0x2)//有数据
     {
         return 1;
     }
