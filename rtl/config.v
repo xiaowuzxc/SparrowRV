@@ -8,7 +8,7 @@
 `define IRam_KB 32 
 
 //sram数据存储器大小，单位为KB
-`define SRam_KB 32 
+`define SRam_KB 16
 
 //复位后从bootrom(1'b0) / appram(1'b1) 取指
 `define PW_BOOT 1'b0
@@ -35,9 +35,6 @@
  *--------------------------------*/
 //启用M扩展(乘法/除法)
 `define RV32_M_ISA
-
-//启用mcycle运行周期计数器
-`define CSR_MCYCLE_EN
 
 //启用minstret指令计数器
 `define CSR_MINSTRET_EN

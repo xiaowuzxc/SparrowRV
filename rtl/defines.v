@@ -148,14 +148,12 @@
 `define CSR_MPRINTS    12'h346//sim标准输出
 `define CSR_MENDS      12'h347//仿真结束
 
-`define CSR_MCYCLE     12'hB00
-`define CSR_MCYCLEH    12'hB80
-`define CSR_MINSTRET   12'hB02
-`define CSR_MINSTRETH  12'hB82
-`define CSR_MTIME      12'hB03
-`define CSR_MTIMEH     12'hB83
-`define CSR_MTIMECMP   12'hB04
-`define CSR_MTIMECMPH  12'hB84
+`define CSR_MINSTRET   12'hB02//
+`define CSR_MINSTRETH  12'hB82//
+`define CSR_MTIME      12'hB03//
+`define CSR_MTIMEH     12'hB83//
+`define CSR_MTIMECMP   12'hB04//
+`define CSR_MTIMECMPH  12'hB84//
 `define CSR_MCCTR      12'hB88//系统控制
 
 `define CSR_MVENDORID  12'hF11

@@ -20,7 +20,7 @@ genvar i;//for循环专用
 localparam GPIO_DIN = 8'h0;//输入数据
 localparam GPIO_OPT = 8'h4;//输出数据
 localparam GPIO_OEC = 8'h8;//输出使能
-localparam GPIO_OMD = 8'hc;//输出模式
+localparam GPIO_ODC = 8'hc;//开漏模式
 
 // 输入数据，只读
 // [31:0]对应GPIO0-31的当前的高低电平
@@ -31,8 +31,8 @@ reg [31:0] gpio_din;
 reg [31:0] gpio_opt;
 
 /* 端口模式，读写
- * GPIO_OEC与GPIO_OMD共同决定GPIOx端口模式
- * | GPIO_OEC  | GPIO_OMD  | GPIOx  
+ * GPIO_OEC与GPIO_ODC共同决定GPIOx端口模式
+ * | GPIO_OEC  | GPIO_ODC  | GPIOx  
  * |-----------|-----------|---------------
  * |     0     |     0     | 高阻输入
  * |     0     |     1     | 高阻输入且锁存
@@ -40,7 +40,7 @@ reg [31:0] gpio_opt;
  * |     1     |     1     | 开漏输出
  * |-----------|-----------|---------------*/
 reg [31:0] gpio_oec;
-reg [31:0] gpio_omd;
+reg [31:0] gpio_odc;
 
 
 // 总线接口 写
@@ -50,7 +50,7 @@ always @ (posedge clk) begin
                 GPIO_DIN: ;
                 GPIO_OPT: gpio_opt <= data_i;
                 GPIO_OEC: gpio_oec <= data_i;
-                GPIO_OMD: gpio_omd <= data_i;
+                GPIO_ODC: gpio_odc <= data_i;
                 default: ;
             endcase
         end 
@@ -63,10 +63,10 @@ end
 always @ (posedge clk) begin
     if (rd_i == 1'b1) begin
         case (raddr_i)
-                GPIO_DIN: data_o <= gpio_in_r;
+                GPIO_DIN: data_o <= gpio_din;
                 GPIO_OPT: data_o <= gpio_opt;
                 GPIO_OEC: data_o <= gpio_oec;
-                GPIO_OMD: data_o <= gpio_omd;
+                GPIO_ODC: data_o <= gpio_odc;
             default: begin
                 data_o <= 32'h0;
             end
@@ -81,23 +81,14 @@ end
 reg [31:0] gpio_in_r;
 always @(posedge clk) begin
 	gpio_in_r <= gpio_in;
+    gpio_din <= gpio_in_r;
 end
-generate
-for (i=0; i<32; i=i+1) begin
-    always @(posedge clk) begin
-        if({gpio_oec[i], gpio_omd[i]}==2'b01)//锁存上一次的输入
-            gpio_din[i] <= gpio_din[i];
-        else
-            gpio_din[i] <= gpio_in_r[i];
-    end
-end
-endgenerate
 
 //输出模式、使能
 generate
 for (i=0; i<32; i=i+1) begin
     always @(*) begin
-        case ({gpio_oec[i], gpio_omd[i]})
+        case ({gpio_oec[i], gpio_odc[i]})
             2'b00: begin
                 gpio_oe [i] = 1'b0;
                 gpio_out[i] = 1'bx;

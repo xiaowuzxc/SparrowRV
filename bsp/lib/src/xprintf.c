@@ -160,17 +160,16 @@ void xprintf (			/* Put a formatted string to the default device */
 // band = 25M/band
 void uart_init(uint32_t band)
 {
+	
     //配置波特率
-    SYS_RWMEM_W(UART_BAUD(UART0)) = SYS_FRE / band ;
+	uart_band_ctr(UART0,band);
     // enable tx and rx
-    SYS_RWMEM_W(UART_CTRL(UART0)) = 0x3;
+    uart_enable_ctr(UART0, ENABLE);
     //xprint
     xdev_out(uart_putc);
 }
 
 void uart_putc(uint32_t uart_send)
 {
-	while (SYS_RWMEM_W(UART_STATUS(UART0)) & 0x1);
-    SYS_RWMEM_W(UART_TXDATA(UART0)) = uart_send;
-    write_csr(msprint, uart_send);//msprint
+	uart_send_date(UART0,uart_send);
 }

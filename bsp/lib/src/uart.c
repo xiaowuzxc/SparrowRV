@@ -38,7 +38,7 @@ void uart_enable_ctr(uint32_t UARTx, uint32_t uart_en)
  */
 void uart_band_ctr(uint32_t UARTx, uint32_t uart_band)
 {
-    SYS_RWMEM_W(UART_BAUD(UARTx)) = SYS_FRE / uart_band ; //计算出分频器的值
+    SYS_RWMEM_W(UART_BAUD(UARTx)) = CPU_FREQ_HZ / uart_band ; //计算出分频器的值
 }
 
 
@@ -52,7 +52,7 @@ void uart_band_ctr(uint32_t UARTx, uint32_t uart_band)
  *
  * @return  无
  */
-void uart_send_date(uint32_t UARTx, uint32_t uart_send)
+void uart_send_date(uint32_t UARTx, uint8_t uart_send)
 {
     while (SYS_RWMEM_W(UART_STATUS(UARTx)) & 0x1); //等待上一个操作结束
     SYS_RWMEM_W(UART_TXDATA(UARTx)) = uart_send;

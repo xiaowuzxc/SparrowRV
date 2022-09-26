@@ -71,7 +71,7 @@ wire[`RegBus] mhartid   = `MHARTID_NUM;//线程编号
 
 //---自定义CSR---
 reg [4 :0] mcctr;//系统控制
-//[0]:mcycle使能
+//[0]:保留
 //[1]:minstret使能
 //[2]:mtime使能
 //[3]:soft_rst写1复位
@@ -114,27 +114,6 @@ always @(posedge clk or negedge rst_n) begin
     end
 end
 //---------------中断相关-------------------
-`ifdef CSR_MCYCLE_EN
-// mcycle
-always @ (posedge clk or negedge rst_n) begin
-    if (~rst_n) begin
-        mcycle <= 64'h0;
-    end 
-    else begin
-        if(idex_csr_we_i & (idex_csr_addr_i==`CSR_MCYCLE | idex_csr_addr_i==`CSR_MCYCLEH))
-            if(idex_csr_addr_i==`CSR_MCYCLE)
-                mcycle <= {mcycle[63:32] , idex_csr_wdata_i};
-            else 
-                if(idex_csr_addr_i==`CSR_MCYCLEH)
-                    mcycle <= {idex_csr_wdata_i , mcycle[31:0]};
-                else
-                    mcycle <= mcycle + 64'b1;
-        else
-            if(mcctr[0])
-                mcycle <= mcycle + 64'b1;
-    end
-end
-`endif
 
 `ifdef CSR_MINSTRET_EN
 // minstret
@@ -308,14 +287,6 @@ always @ (*) begin
         `CSR_MSIP: begin
             idex_csr_rdata_o = {31'd0, msip};
         end
-        `ifdef CSR_MCYCLE_EN
-        `CSR_MCYCLE: begin
-            idex_csr_rdata_o = mcycle[31:0];
-        end
-        `CSR_MCYCLEH: begin
-            idex_csr_rdata_o = mcycle[63:32];
-        end
-        `endif
         `ifdef CSR_MINSTRET_EN
         `CSR_MINSTRET: begin
             idex_csr_rdata_o = minstret[31:0];

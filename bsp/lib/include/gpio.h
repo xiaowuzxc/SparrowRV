@@ -7,13 +7,12 @@
 #define GPIO_DIN              (GPIO_BASE + (0x00))
 #define GPIO_OPT              (GPIO_BASE + (0x04))
 #define GPIO_OEC              (GPIO_BASE + (0x08))
-#define GPIO_OMD              (GPIO_BASE + (0x0c))
+#define GPIO_ODC              (GPIO_BASE + (0x0c))
 
 //定义GPIO模式
-#define GPIO_MODE_IN_HIZ      0x00  //高阻输入
-#define GPIO_MODE_IN_LAH      0x01  //高阻输入锁存
-#define GPIO_MODE_OUT_PP      0x02  //推挽输出
-#define GPIO_MODE_OUT_OD      0x03  //开漏输出
+#define GPO_MODE_HIGHZ      0x00  //高阻输入
+#define GPO_MODE_OE_PP      0x02  //推挽输出
+#define GPO_MODE_OE_OD      0x03  //开漏输出
 
 //定义GPIO端口
 #define GPIO_P0    0b1
@@ -49,11 +48,11 @@
 #define GPIO_P30   0b1000000000000000000000000000000
 #define GPIO_P31   0b10000000000000000000000000000000
 
-uint32_t gpio_get_data_in();//读取GPIO输入数据
-void gpio_send_data_out(uint32_t gpio_data_output);//写入GPIO输出数据
-uint32_t gpio_get_data_out();//读取GPIO输出数据
-void gpio_mode_ctr(uint32_t GPIO_Px, uint8_t gpio_mode);//配置GPIO模式
-uint64_t gpio_mode_read();//读取GPIO模式
+uint32_t gpio_gpi_data_in();
+void gpio_gpo_set_data(uint32_t gpio_opt_data);
+uint32_t gpio_gpo_get_data();
+void gpio_gpo_mode_ctr(uint32_t GPO_Px, uint8_t gpo_mode);
+uint64_t gpio_gpo_mode_read();
 
 
 #endif

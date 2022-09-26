@@ -14,14 +14,14 @@ all: $(TARGET)
 ASM_SRCS += ../lib/start.S
 ASM_SRCS += ../lib/trap/trap_entry.S
 
-C_SRCS += ${wildcard ../app/*.c}
+C_SRCS += ${wildcard ./*.c}
 C_SRCS += ${wildcard ../lib/*.c}
 C_SRCS += ${wildcard ../lib/trap/*.c}
 C_SRCS += ${wildcard ../lib/src/*.c}
 
 LINKER_SCRIPT := ../link.lds
 
-INCLUDES += -I../app
+INCLUDES += -I./
 INCLUDES += -I../lib
 INCLUDES += -I../lib/include
 INCLUDES += -I../lib/trap

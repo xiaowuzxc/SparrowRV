@@ -126,6 +126,7 @@ iverilog是仿真工具，gtkwave用于查看波形。
 - Windows下`make`建议使用Powershell，经测试Bash存在未知bug(实验性修复)   
 - (已修复)~~run_zh.bat是中文的启动器，但是由于`git CRLF`相关问题无法使用~~  
 - 若出现`WARNING: tb_core.sv:23: $readmemh(inst.txt):...`或`ERROR: tb_core.sv:24: $readmemh:`警告或错误信息，请忽略，它不会有任何影响  
+- 本项目基于Modelsim SE 2019.2进行环境搭建，此版本保证脚本的有效性；10.6d版本存在问题  
 
 
 

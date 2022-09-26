@@ -41,7 +41,10 @@ function integer clogb2;
 endfunction
 
 `ifdef EG4_FPGA //如果定义了宏
+integer i;
 initial begin
+	for(i=0;i<RAM_DEPTH;i=i+1)
+		BRAM[i] = 8'h0;
     $readmemh ("../../tb/btrm.txt", BRAM);
 end
 `endif

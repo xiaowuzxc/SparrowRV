@@ -1,4 +1,4 @@
-RISCV_PATH := ../../tools/RISC-V_Embedded_GCC
+RISCV_PATH := ../../../tools/RISC-V_Embedded_GCC
 RISCV_GCC     := $(abspath $(RISCV_PATH)/bin/riscv-none-embed-gcc)
 RISCV_AS      := $(abspath $(RISCV_PATH)/bin/riscv-none-embed-as)
 RISCV_GXX     := $(abspath $(RISCV_PATH)/bin/riscv-none-embed-g++)
@@ -11,20 +11,20 @@ TARGET = obj
 .PHONY: all
 all: $(TARGET)
 
-ASM_SRCS += ../lib/start.S
-ASM_SRCS += ../lib/trap/trap_entry.S
+ASM_SRCS += ../../lib/start.S
+ASM_SRCS += ../../lib/trap/trap_entry.S
 
 C_SRCS += ${wildcard ./*.c}
-C_SRCS += ${wildcard ../lib/*.c}
-C_SRCS += ${wildcard ../lib/trap/*.c}
-C_SRCS += ${wildcard ../lib/src/*.c}
+C_SRCS += ${wildcard ../../lib/*.c}
+C_SRCS += ${wildcard ../../lib/trap/*.c}
+C_SRCS += ${wildcard ../../lib/src/*.c}
 
-LINKER_SCRIPT := ../link.lds
+LINKER_SCRIPT := ../../link.lds
 
 INCLUDES += -I./
-INCLUDES += -I../lib
-INCLUDES += -I../lib/include
-INCLUDES += -I../lib/trap
+INCLUDES += -I../../lib
+INCLUDES += -I../../lib/include
+INCLUDES += -I../../lib/trap
 
 LDFLAGS += -T $(LINKER_SCRIPT) -nostartfiles -Wl,--gc-sections -Wl,--check-sections
 

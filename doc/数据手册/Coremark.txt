@@ -1,0 +1,17 @@
+Start Coremark
+2K performance run parameters for coremark.
+CoreMark Size    : 666
+Total ticks      : 227
+Total time (secs): 30
+Iterations/Sec   : 66
+Iterations       : 000
+Compiler version : GCC8.2.0
+Compiler flags   : -O2 -fno-common -funroll-loops -finline-functions --param max-inline-insns-auto=20 -falign-functions=4 -falign-jumps=4 -falign-loops=4
+Memory location  : STATIC
+seedcrc          : 0x0ff5
+[0]crclist       : 0x0114
+[0]crcmatrix     : 0x0dd7
+[0]crcstate      : 0x033a
+[0]crcfinal      : 0x0883
+Correct operation validated. See readme.txt for run and reporting rules.
+SparrowRV Coremark = 2.7777 CoreMark/MHz

@@ -29,7 +29,7 @@ vlog +incdir+./../rtl/  ./../rtl/*.v
 
 #
 vsim -voptargs=+acc work.tb_core
-
+#vsim -novopt work.tb_core
 
 
 # ==========================================================================

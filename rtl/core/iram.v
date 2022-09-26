@@ -52,12 +52,12 @@ module iram (
 */
 reg insts_sel_r,insts_sel_rr;//选择存储器打拍
 wire [31:0] rst_addr = `RstPC;//复位地址
-wire [clogb2(`IRamSize-1)-1:0]addra = iram_rstn_o ? rst_addr[clogb2(`IRamSize-1)-1+2:2] : pc_n_i[clogb2(`IRamSize-1)-1+2:2];
+wire [`MemAddrBus]addra = iram_rstn_o ? rst_addr[31:2] : pc_n_i[31:2];
 wire [`MemBus]douta,doutia;
 assign inst_o = insts_sel_rr?douta:doutia;
 
 //AXI4L总线交互
-reg [clogb2(`IRamSize-1)-1:0]addrb;
+reg [`MemAddrBus]addrb;
 reg web,enb;
 reg [3:0] wemb;
 wire [`MemBus]doutb,doutib;
@@ -70,6 +70,10 @@ always @(posedge clk) begin
     insts_sel_r  <= insts_sel_i;
     insts_sel_rr <= insts_sel_r;
 end
+/*
+always @(*)
+	insts_sel_rr <= 1'b0;
+*/
 //PC复位
 always @(posedge clk or negedge rst_n) begin
     if(~rst_n) begin
@@ -111,12 +115,12 @@ always @(*) begin
     enb = axi_whsk | axi_rhsk;
     wemb = iram_axi_wstrb;
     if(axi_whsk) begin//写握手
-        addrb = iram_axi_awaddr[clogb2(`IRamSize-1)-1+2:2];
+        addrb = iram_axi_awaddr[31:2];
         web = 1;//AXI写iram
     end
     else begin
         web = 0;
-        addrb = iram_axi_araddr[clogb2(`IRamSize-1)-1+2:2];
+        addrb = iram_axi_araddr[31:2];
     end
 end
 
@@ -129,7 +133,7 @@ end
 dpram #(
     .RAM_DEPTH(`IRamSize),
     .RAM_SEL(RAM_SEL),
-    .BRAM_EN("32K")
+    .BRAM_EN("9K")
 ) inst_appram (
     .clk    (clk),
     .addra  (addra[clogb2(`IRamSize-1)-1:0]),
@@ -148,16 +152,16 @@ dpram #(
 
 
 bootrom #(
-    .RAM_DEPTH(1024)
+    .RAM_DEPTH(1024*8)
 ) inst_bootrom (
     .clk   (clk),
     .wen   (1'b0),
     .din   (32'h0),
     .ena   (iram_rd_i | iram_rstn_o),
-    .addra (addra[clogb2(1024-1)-1:0]),
+    .addra (addra[clogb2(1024*8-1)-1:0]),
     .douta (doutia),
     .enb   (enb),
-    .addrb (addrb[clogb2(1024-1)-1:0]),
+    .addrb (addrb[clogb2(1024*8-1)-1:0]),
     .doutb (doutib)
 );
 
