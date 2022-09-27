@@ -41,7 +41,7 @@ El Dorado Hills, CA, 95762
 #include <stdio.h>
 #endif
 #if HAS_PRINTF
-#define ee_printf xprintf
+#define ee_printf printf
 #endif
 
 /* Actual benchmark execution in iterate */

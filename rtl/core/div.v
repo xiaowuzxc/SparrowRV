@@ -194,7 +194,15 @@ module div(
         end
     end
 
+wire [31:0]div_res,div_rem;
+wire err_flg;
+assign div_res=dividend_i/divisor_i;
+assign div_rem=dividend_i%divisor_i;
+assign err_flg=((div_res!=div_result || div_rem!=div_remain) && start_i && ready_o)?1:0;
+
+
 endmodule
+
 
 /*
 "div.v is licensed under Apache-2.0 (http://www.apache.org/licenses/LICENSE-2.0)

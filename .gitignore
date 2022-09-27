@@ -12,6 +12,8 @@
 /tb/vlog.opt
 /tb/transcript
 /tb/work
+/tb/modelsim.ini
+/tb/btrm.txt
 
 /rtl/perips/sm3/tb/tb
 /rtl/perips/sm3/tb/tb_sm3_core_top.sv

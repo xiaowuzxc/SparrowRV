@@ -83,7 +83,7 @@ end
 
 initial begin
 `ifndef MODELSIM
-    #300000;//iverilog
+    #600000;//iverilog
 `else 
     #3000000;//modeslsim
 `endif

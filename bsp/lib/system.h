@@ -2,10 +2,9 @@
 #define SYSTEM_H_
 
 #include <stdint.h>
-//#include <stdio.h>
 #include "utils.h"
 #include "trap.h"
-#include "xprintf.h"
+#include "printf.h"
 #include "uart.h"
 #include "spi.h"
 #include "fpioa.h"

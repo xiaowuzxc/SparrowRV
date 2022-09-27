@@ -1,7 +1,7 @@
 #include <stdint.h>
-#include "xprintf.h"
+#include "printf.h"
 
 void trap_handler(uint32_t mcause, uint32_t mepc)
 {
-    xprintf("%s", "\n EX trap in \n");
+    printf("%s", "\n EX trap in \n");
 }

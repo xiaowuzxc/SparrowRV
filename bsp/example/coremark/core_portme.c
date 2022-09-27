@@ -50,9 +50,6 @@ secs_ret time_in_secs(CORE_TICKS ticks)
 
 void portable_init(core_portable *p, int *argc, char *argv[])
 {
-    fpioa_perips_in_set(UART0_RX,0);
-    fpioa_perips_out_set(1,UART0_TX);
-    uart_init(9600);
-    //uart_init(25000000);
+    init_uart0_printf(115200);
     ee_printf("Start Coremark\n");
 }
