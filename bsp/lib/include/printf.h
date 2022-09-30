@@ -40,6 +40,14 @@
 extern "C" {
 #endif
 
+//关闭%f浮点功能
+//#define PRINTF_DISABLE_SUPPORT_FLOAT
+
+//关闭%e%g科学计数法浮点功能
+#define PRINTF_DISABLE_SUPPORT_EXPONENTIAL
+
+//关闭%t数据类型ptrdiff_t功能
+#define PRINTF_DISABLE_SUPPORT_PTRDIFF_T
 
 /**
  * printf模板
@@ -50,7 +58,7 @@ extern "C" {
  * printf("%c", 'a');		
  * printf("%f", 10.0);   
  * 
- * 输出数据格式：d u b o x f 
+ * 输出数据格式：d u b o x f
  * 
  * 对于gcc 32bit riscv，数据位宽关系:
  * %[]   数据类型    声明类型
