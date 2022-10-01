@@ -39,6 +39,9 @@
 //启用M扩展(乘法/除法)
 `define RV32_M_ISA
 
+//单周期乘法器，会降低最大频率
+//`define SGCY_MUL
+
 //启用minstret指令计数器
 `define CSR_MINSTRET_EN
 

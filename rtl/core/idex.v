@@ -79,11 +79,15 @@ wire [`RegBus] add2_res = add2_in1 + add2_in2;//加法器2结果
 reg signed[32:0] mul_in1,mul_in1r;//乘法器有符号33位输入1
 reg signed[32:0] mul_in2,mul_in2r;//乘法器有符号33位输入2
 wire signed[65:0]mul_res;//乘法器有符号66位结果
+`ifdef SGCY_MUL
+assign mul_res=mul_in1*mul_in2;
+`else 
 assign mul_res=mul_in1r*mul_in2r;
 always @(posedge clk) begin
     mul_in1r <= mul_in1;
     mul_in2r <= mul_in2;
 end
+`endif
 
 wire [`RegBus]mul_resl=mul_res[31: 0];//乘法器低32位结果
 wire [`RegBus]mul_resh=mul_res[63:32];//乘法器高32位结果
@@ -285,28 +289,44 @@ always @ (*) begin
                 7'b0000001: begin
                     case (funct3)
                         `INST_MUL: begin//rs1*rs2的低32位
+                            `ifdef SGCY_MUL
+                            mult_inst_o = 0;
+                            `else 
                             mult_inst_o = 1;
+                            `endif
                             reg_we_o = 1;
                             reg_waddr_o = rd;
                             reg_wdata_o = mul_resl;
                             pc_n_o = pc_n4;//PC+4
                         end
                         `INST_MULHU: begin//无符号rs1*rs2的高32位
+                            `ifdef SGCY_MUL
+                            mult_inst_o = 0;
+                            `else 
                             mult_inst_o = 1;
+                            `endif
                             reg_we_o = 1;
                             reg_waddr_o = rd;
                             reg_wdata_o = mul_resh;
                             pc_n_o = pc_n4;//PC+4
                         end
                         `INST_MULH: begin//有符号rs1*rs2的高32位
+                            `ifdef SGCY_MUL
+                            mult_inst_o = 0;
+                            `else 
                             mult_inst_o = 1;
+                            `endif
                             reg_we_o = 1;
                             reg_waddr_o = rd;
                             reg_wdata_o = mul_resh;
                             pc_n_o = pc_n4;//PC+4
                         end
                         `INST_MULHSU: begin//有符号rs1*无符号rs2的高32位
+                            `ifdef SGCY_MUL
+                            mult_inst_o = 0;
+                            `else 
                             mult_inst_o = 1;
+                            `endif
                             reg_we_o = 1;
                             reg_waddr_o = rd;
                             reg_wdata_o = mul_resh;
