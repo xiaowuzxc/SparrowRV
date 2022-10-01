@@ -229,11 +229,9 @@ div inst_div
     .divisor_i   (div_divisor),
     .start_i     (div_start & (~trap_in)),//发生中断，立即停止除法
     .op_i        (div_op),
-    .reg_waddr_i (5'b0),
     .result_o    (div_result),
-    .ready_o     (div_ready),
-    .busy_o      (),
-    .reg_waddr_o ()
+    .res_valid_o (div_ready),
+    .res_ready_i (hx_valid)
 );
 
 csr inst_csr
