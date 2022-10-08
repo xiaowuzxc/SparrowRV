@@ -29,7 +29,7 @@ else if %cmchc% == 6 (python tools/isa_test.py vsim_bin & goto cmsl)^
 else if %cmchc% == 7 (python tools/isa_test.py vsim_isa & goto cmsl)^
 else if %cmchc% == 8 (python tools/isa_test.py tsr_isp & goto cmsl)^
 else if %cmchc% == 9 (python tools/isa_test.py sim_isp & goto cmsl)^
-else if %cmchc% == c (del tb *.lxt *.vcd inst.txt transcript vlog.opt vsim.wlf *.vstf & rd /s/q work & @echo 缓存文件已清理 & goto cmsl)^
+else if %cmchc% == c (del tb *.lxt *.vcd inst.txt transcript vlog.opt vsim.wlf *.vstf modelsim.ini & rd /s/q work & @echo 缓存文件已清理 & goto cmsl)^
 else (echo Err 0: 命令未找到 & goto cmsl)
 
 

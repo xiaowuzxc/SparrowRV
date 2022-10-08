@@ -10,7 +10,7 @@
 #include <stddef.h>
 #include "system.h"
 
-#define HAS_FLOAT 0
+#define HAS_FLOAT 1
 #define HAS_TIME_H 1
 #define USE_CLOCK 1
 #define HAS_STDIO 1

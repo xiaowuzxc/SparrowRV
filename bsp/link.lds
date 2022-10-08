@@ -11,7 +11,7 @@ MEMORY
 
 SECTIONS
 {
-   __stack_size = DEFINED(__stack_size) ? __stack_size : 8K; /*堆栈区大小*/
+   __stack_size = DEFINED(__stack_size) ? __stack_size : 4K; /*堆栈区大小*/
 
   .init           :
   {

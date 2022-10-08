@@ -350,13 +350,7 @@ MAIN_RETURN_TYPE main(int argc, char *argv[]) {
 #endif
 	/* And last call any target specific code for finalizing */
 	portable_fini(&(results[0].port));
-	msg_temp = default_num_contexts*results[0].iterations;
-	sparrowrv_coremark_num = msg_temp/(time_in_secs(total_time)*CPU_FREQ_MHZ);
-	ee_printf("SparrowRV Coremark = %d.",sparrowrv_coremark_num);
-	sparrowrv_coremark_num = 10*msg_temp/(time_in_secs(total_time)*CPU_FREQ_MHZ);
-	ee_printf("%d",sparrowrv_coremark_num%10);
-	sparrowrv_coremark_num = 100*msg_temp/(time_in_secs(total_time)*CPU_FREQ_MHZ);
-	ee_printf("%d CoreMark/MHz",sparrowrv_coremark_num%10);
+	ee_printf("SparrowRV Coremark = %f CoreMark/MHz\n",default_num_contexts*results[0].iterations/time_in_secs(total_time)/CPU_FREQ_MHZ);
 	return MAIN_RETURN_VAL;	
 }
 

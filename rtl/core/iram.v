@@ -9,8 +9,6 @@ module iram (
 
     output reg iram_rstn_o,//iram模块阻塞
 
-    input wire insts_sel_i,//选择从bootrom(1'b0) / iram(1'b1) 取指
-
     //AXI4-Lite总线接口 Slave
     //AW写地址
     input wire [`MemAddrBus]    iram_axi_awaddr ,//写地址
@@ -50,11 +48,10 @@ module iram (
  * 用途: 复位后PC指向此处，完成数据搬移、UART烧录
  * 
 */
-reg insts_sel_r,insts_sel_rr;//选择存储器打拍
 wire [31:0] rst_addr = `RstPC;//复位地址
 wire [`MemAddrBus]addra = iram_rstn_o ? rst_addr[31:2] : pc_n_i[31:2];
 wire [`MemBus]douta,doutia;
-assign inst_o = insts_sel_rr?douta:doutia;
+assign inst_o = douta;
 
 //AXI4L总线交互
 reg [`MemAddrBus]addrb;
@@ -65,15 +62,6 @@ reg [`MemBus]dinb;
 wire axi_whsk = iram_axi_awvalid & iram_axi_wvalid;//写通道握手
 wire axi_rhsk = iram_axi_arvalid & (~iram_axi_rvalid | (iram_axi_rvalid & iram_axi_rready)) & ~axi_whsk;//读通道握手,没有读响应
 
-//选择存储器打拍
-always @(posedge clk) begin
-    insts_sel_r  <= insts_sel_i;
-    insts_sel_rr <= insts_sel_r;
-end
-/*
-always @(*)
-	insts_sel_rr <= 1'b0;
-*/
 //PC复位
 always @(posedge clk or negedge rst_n) begin
     if(~rst_n) begin
@@ -106,7 +94,7 @@ end
 always @(*) begin
     iram_axi_awready = axi_whsk;//写地址数据同时准备好
     iram_axi_wready = axi_whsk;//写地址数据同时准备好
-    iram_axi_rdata = insts_sel_rr?doutb:doutib;//读数据
+    iram_axi_rdata = doutb;//读数据
     iram_axi_arready = axi_rhsk;//读地址握手
     iram_axi_bvalid = 1'b1;
     iram_axi_bresp = 2'b00;//响应
@@ -117,6 +105,7 @@ always @(*) begin
     if(axi_whsk) begin//写握手
         addrb = iram_axi_awaddr[31:2];
         web = 1;//AXI写iram
+        //web = iram_axi_awaddr>= 100 ?1'b1:1'b0;//AXI写iram
     end
     else begin
         web = 0;
@@ -133,7 +122,8 @@ end
 dpram #(
     .RAM_DEPTH(`IRamSize),
     .RAM_SEL(RAM_SEL),
-    .BRAM_EN("9K")
+    .BRAM_EN("9K(FAST)"),
+    .INIT_FILE("../../bsp/obj/SparrowRV.mif")
 ) inst_appram (
     .clk    (clk),
     .addra  (addra[clogb2(`IRamSize-1)-1:0]),
@@ -149,22 +139,6 @@ dpram #(
     .douta  (douta),
     .doutb  (doutb)
 );
-
-
-bootrom #(
-    .RAM_DEPTH(1024*8)
-) inst_bootrom (
-    .clk   (clk),
-    .wen   (1'b0),
-    .din   (32'h0),
-    .ena   (iram_rd_i | iram_rstn_o),
-    .addra (addra[clogb2(1024*8-1)-1:0]),
-    .douta (doutia),
-    .enb   (enb),
-    .addrb (addrb[clogb2(1024*8-1)-1:0]),
-    .doutb (doutib)
-);
-
 
 
 function integer clogb2;

@@ -15,7 +15,7 @@ module gpio (
 	output reg [31:0]gpio_out,//输出数据
     input wire [31:0]gpio_in//输入数据
 );
-genvar i;//for循环专用
+
 // 寄存器(偏移)地址
 localparam GPIO_DIN = 8'h0;//输入数据
 localparam GPIO_OPT = 8'h4;//输出数据
@@ -85,6 +85,7 @@ always @(posedge clk) begin
 end
 
 //输出模式、使能
+genvar i;
 generate
 for (i=0; i<32; i=i+1) begin
     always @(*) begin

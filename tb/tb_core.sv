@@ -32,7 +32,6 @@ wire mends = `CorePath.inst_csr.mends;//仿真结束标志
 // 读入程序
 initial begin
     $readmemh ("inst.txt", `CorePath.inst_iram.inst_appram.BRAM);
-    $readmemh ("btrm.txt", `CorePath.inst_iram.inst_bootrom.BRAM);
 end
 
 // 生成clk

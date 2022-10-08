@@ -81,7 +81,8 @@ end
 dpram #(
     .RAM_DEPTH(`SRamSize),
     .RAM_SEL(RAM_SEL),
-    .BRAM_EN("9K")
+    .BRAM_EN("32K"),
+    .MODE("SP")
 ) inst_sram (
     .clk    (clk),
     .addra  (addr),

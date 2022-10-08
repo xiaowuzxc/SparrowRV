@@ -69,8 +69,6 @@ wire [127:0]perips_in,perips_oe,perips_ot;//外设端口输入数据，输出使
 localparam Enable = 1'b1;//开启
 localparam Disable = 1'b0;//关闭
 
-genvar i,j;//for循环指示变量
-
 
 
 // 总线接口 写
@@ -154,10 +152,12 @@ always @ (posedge clk) begin
 end
 
 //---------FPIOA数据交互-------------
+genvar i;
 generate//perips_ot,perips_oe连接至fpioa_ot,fpioa_oe
 for ( i=0 ; i<32 ; i=i+1 ) begin
     assign fpioa_ot[i] = perips_ot[fpioa_ot_reg[i]];//mux选择输出数据来源
     assign fpioa_oe[i] = perips_oe[fpioa_ot_reg[i]];//mux选择输出使能来源
+    assign fpioa[i] = fpioa_oe[i] ? fpioa_ot[i] : 1'bz;//选择端口模式 输入输出控制
 end
 endgenerate
 
@@ -168,12 +168,7 @@ for ( i=0 ; i<128 ; i=i+1 ) begin
 end
 endgenerate
 
-//输入输出控制
-generate
-for ( i=0 ; i<32 ; i=i+1 ) begin
-    assign fpioa[i] = fpioa_oe[i] ? fpioa_ot[i] : 1'bz;//选择端口模式
-end
-endgenerate
+
 
 
 /*------------------------------

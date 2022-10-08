@@ -11,7 +11,9 @@ module dpram #(
     localparam RAM_WIDTH = 32,//RAM数据位宽
     parameter RAM_DEPTH = 2048, //RAM深度
     parameter RAM_SEL = "RTL_MODEL", //选择模型
-    parameter BRAM_EN = "32K" //选择模型
+    parameter BRAM_EN = "32K", //选择模型
+    parameter MODE = "DP",
+    parameter INIT_FILE = "NONE"
 ) (
     input [clogb2(RAM_DEPTH-1)-1:0] addra,  // Port A address bus, width determined from RAM_DEPTH
     input [clogb2(RAM_DEPTH-1)-1:0] addrb,  // Port B address bus, width determined from RAM_DEPTH
@@ -88,7 +90,7 @@ generate
                 .WRITEMODE_B("NORMAL"),
                 .RESETMODE("SYNC"),
                 .IMPLEMENT(BRAM_EN),
-                .INIT_FILE("NONE"),
+                .INIT_FILE(INIT_FILE),
                 .FILL_ALL("NONE"))
             inst(
                 .dia(dina),
