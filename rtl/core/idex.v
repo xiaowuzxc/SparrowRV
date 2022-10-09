@@ -371,9 +371,9 @@ always @ (*) begin
         end
 
         `INST_TYPE_L: begin
+            mem_addr_o = reg_rdata1_i + imm12i;//访问内存地址，复用读
             case (funct3)
                 `INST_LB: begin//多周期，等数据
-                    mem_addr_o = reg_rdata1_i + imm12i;//访问内存地址，复用读
                     mem_we_o = 0;//写内存使能
                     mem_en_o = 1;//访问内存使能，复用读
                     reg_we_o = 1;
@@ -395,7 +395,6 @@ always @ (*) begin
                     pc_n_o = pc_n4;//PC+4
                 end
                 `INST_LH: begin//多周期，等数据
-                    mem_addr_o = reg_rdata1_i + imm12i;//访问内存地址，复用读
                     mem_we_o = 0;//写内存使能
                     mem_en_o = 1;//访问内存使能，复用读
                     reg_we_o = 1;
@@ -408,7 +407,6 @@ always @ (*) begin
                     pc_n_o = pc_n4;//PC+4
                 end
                 `INST_LW: begin//多周期，等数据
-                    mem_addr_o = reg_rdata1_i + imm12i;//访问内存地址，复用读
                     mem_we_o = 0;//写内存使能
                     mem_en_o = 1;//访问内存使能，复用读
                     reg_we_o = 1;
@@ -417,7 +415,6 @@ always @ (*) begin
                     pc_n_o = pc_n4;//PC+4
                 end
                 `INST_LBU: begin//多周期，等数据
-                    mem_addr_o = reg_rdata1_i + imm12i;//访问内存地址，复用读
                     mem_we_o = 0;//写内存使能
                     mem_en_o = 1;//访问内存使能，复用读
                     reg_we_o = 1;
@@ -439,7 +436,6 @@ always @ (*) begin
                     pc_n_o = pc_n4;//PC+4
                 end
                 `INST_LHU: begin//多周期，等数据
-                    mem_addr_o = reg_rdata1_i + imm12i;//访问内存地址，复用读
                     mem_we_o = 0;//写内存使能
                     mem_en_o = 1;//访问内存使能，复用读
                     reg_we_o = 1;
@@ -458,9 +454,9 @@ always @ (*) begin
         end
 
         `INST_TYPE_S: begin
+            mem_addr_o = reg_rdata1_i + imm12s;//访问内存地址，复用读
             case (funct3)
                 `INST_SB: begin
-                    mem_addr_o = reg_rdata1_i + imm12s;//访问内存地址，复用读
                     mem_we_o = 1;//写内存使能
                     mem_en_o = 1;//访问内存使能，复用读
                     case (mem_addr_o[1:0])
@@ -484,7 +480,6 @@ always @ (*) begin
                     pc_n_o = pc_n4;//PC+4
                 end
                 `INST_SH: begin
-                    mem_addr_o = reg_rdata1_i + imm12s;//访问内存地址，复用读
                     mem_we_o = 1;//写内存使能
                     mem_en_o = 1;//访问内存使能，复用读
                     if (mem_addr_o[1:0]==2'b00) begin
@@ -497,7 +492,6 @@ always @ (*) begin
                     pc_n_o = pc_n4;//PC+4
                 end
                 `INST_SW: begin
-                    mem_addr_o = reg_rdata1_i + imm12s;//访问内存地址，复用读
                     mem_we_o = 1;//写内存使能
                     mem_en_o = 1;//访问内存使能，复用读
                     mem_wdata_o = reg_rdata2_i;
