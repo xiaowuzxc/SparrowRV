@@ -105,7 +105,7 @@ always @(*) begin
     if(axi_whsk) begin//写握手
         addrb = iram_axi_awaddr[31:2];
         web = 1;//AXI写iram
-        //web = iram_axi_awaddr>= 100 ?1'b1:1'b0;//AXI写iram
+        //web = (iram_axi_awaddr >= `BRamSize) ?1'b1:1'b0;//AXI写iram
     end
     else begin
         web = 0;

@@ -111,11 +111,55 @@ void core_sim_end()
     write_csr(mends,1);
 }
 
+uint32_t sm3_accl_in_busy()
+{
+    uint32_t temp;
+    temp = read_csr(msm3ct);
+    temp = temp & 0b010000;
+    if(temp)
+        return 0;
+    else
+        return 1;
+}
 
+uint32_t sm3_accl_res_wait()
+{
+    uint32_t temp;
+    temp = read_csr(msm3ct);
+    temp = temp & 0b100000;
+    if(temp)
+        return 0;
+    else
+        return 1;
+}
+
+uint32_t sm3_accl_res_data(uint32_t sm3_res_sel)
+{
+    uint32_t temp;
+    write_csr(msm3ct, (sm3_res_sel & 0b000111));
+    temp = read_csr(msm3in);
+    return temp;
+}
+
+void sm3_accl_in_lst(uint32_t sm3_lst_ctr)
+{
+    if (sm3_lst_ctr == ENABLE) //EN
+        set_csr(msm3ct, 0b1000);
+    else //DIS
+        clear_csr(msm3ct, 0b1000);
+}
+
+void sm3_accl_in_data(uint32_t sm3_data)
+{
+    while(sm3_accl_in_busy());
+    write_csr(msm3in, sm3_data);
+}
+
+/*
 void inst_mem_switch(uint8_t mem_sel)
 {
     if(mem_sel == BOOT_ROM)
         clear_csr(mcctr, 0b10000);
     else //APP_RAM
         set_csr(mcctr, 0b10000);
-}
+}*/

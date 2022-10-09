@@ -32,7 +32,9 @@
 //[1]:minstret使能
 //[2]:mtime使能
 //[3]:soft_rst写1复位
-//[4]:从bootrom 0 / appram 1 取指
+//[4]:
+#define msm3in     0x348  //sm3数据输入输出
+#define msm3ct     0x349  //sm3控制
 
 #define SYS_RWMEM_W(addr) (*((volatile uint32_t *)(addr)))   //必须4字节对齐访问(低2位为0)
 #define SYS_RWMEM_B(addr) (*((volatile uint8_t  *)(addr)))   //允许访问4G地址空间任意字节，但是部分外设不支持字节寻址写

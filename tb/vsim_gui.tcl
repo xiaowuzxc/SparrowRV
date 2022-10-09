@@ -24,6 +24,7 @@ vlog +incdir+./../rtl/  ./../rtl/core/*.v
 vlog +incdir+./../rtl/  ./../rtl/soc/*.v
 vlog +incdir+./../rtl/  ./../rtl/perips/*.v
 vlog +incdir+./../rtl/  ./../rtl/perips/sysio/*.v
+vlog +incdir+./../rtl/  ./../rtl/perips/sm3/*.v
 vlog +incdir+./../rtl/  ./../rtl/jtag/*.v
 vlog +incdir+./../rtl/  ./../rtl/*.v
 

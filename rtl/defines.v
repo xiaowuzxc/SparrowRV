@@ -3,6 +3,7 @@
 `define IRamSize (`IRam_KB*1024/4) //kB->B->4B
 `define SRamSize (`SRam_KB*1024/4) //kB->B->4B
 `define RstPC 32'h0000_0000 //复位后PC值在0000
+`define BRamSize (`BRam_KB*1024/4) //kB->B->4B
 
 `define RstEnable 1'b0
 `define RstDisable 1'b1
@@ -143,6 +144,8 @@
 `define CSR_MSIP       12'h345
 `define CSR_MPRINTS    12'h346//sim标准输出
 `define CSR_MENDS      12'h347//仿真结束
+`define CSR_MSM3IN     12'h348//sm3数据输入输出
+`define CSR_MSM3CT     12'h349//sm3控制
 
 `define CSR_MINSTRET   12'hB02//
 `define CSR_MINSTRETH  12'hB82//

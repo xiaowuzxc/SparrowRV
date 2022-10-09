@@ -77,7 +77,26 @@ reg [4 :0] mcctr;//系统控制
 //---仿真模式专用---
 reg [7:0] mprints;//仿真标准输出
 reg mends;//仿真结束
+`ifdef SM3_ACCL
+//---SM3---
+reg [3:0] msm3ct;//sm3控制
+//[2:0]:寻址256bit结果的32bit部分
+//[3]:最后一个消息写入标志，手动清零
+//[4]:消息输入准备好RO
+//[5]:杂凑结果输出有效RO
 
+//SM3
+reg [31:0] msg_inpt_d;//消息数据32bit
+wire [3:0] msg_inpt_vld_byte=4'b1111;//消息字节使能
+wire msg_inpt_rdy;//消息输入准备好
+reg msg_inpt_vld;//消息输入有效
+reg msg_inpt_lst;//消息输入最后一个数据
+wire [255:0] cmprss_otpt_res;//杂凑结果256bit
+wire cmprss_otpt_vld;//杂凑结果输出有效
+reg [31:0] cmprss_res_r[7:0];//杂凑结果锁存
+reg cmprss_res_valid;////杂凑结果有效
+wire [31:0] cmprss_res_w;//32b杂凑结果
+`endif
 //---生成信号---
 assign tcmp_trap_valid = (mtime >= mtimecmp) ? 1'b1 : 1'b0;//生成定时器中断标志
 assign soft_trap_valid = msip;//生成软件中断标志
@@ -166,6 +185,9 @@ always @ (posedge clk or negedge rst_n) begin
         mends <= 0;
         mtimecmp <= 64'hffff_ffff_ffff_ffff;//比较器复位为最大值，防止误触发
         mcctr[4:0] <= 5'h0;
+`ifdef SM3_ACCL
+        msm3ct <= 4'h0;
+`endif
     end else begin
         if (idex_csr_we_i) begin //优先idex写
             case (idex_csr_addr_i)
@@ -208,9 +230,14 @@ always @ (posedge clk or negedge rst_n) begin
                 `CSR_MTIMECMPH: begin
                     mtimecmp[63:32] <= idex_csr_wdata_i;
                 end
+`ifdef SM3_ACCL
                 `CSR_MCCTR: begin
                     mcctr <= idex_csr_wdata_i[4:0];
                 end
+                `CSR_MSM3CT: begin
+                    msm3ct <= idex_csr_wdata_i[3:0];
+                end
+`endif
 
                 default: begin
 
@@ -312,6 +339,14 @@ always @ (*) begin
         `CSR_MHARTID: begin
             idex_csr_rdata_o = mhartid;
         end 
+`ifdef SM3_ACCL
+        `CSR_MSM3CT: begin
+            idex_csr_rdata_o = {cmprss_res_valid, msg_inpt_rdy, msm3ct};
+        end 
+        `CSR_MSM3IN: begin
+            idex_csr_rdata_o = cmprss_res_w;
+        end 
+`endif
         default: begin
             idex_csr_rdata_o = 32'h0;
         end
@@ -343,8 +378,63 @@ always @ (*) begin
     endcase
 end
 
+//printf -> 仿真器
 always @(posedge clk) begin
-    if(idex_csr_we_i & (idex_csr_addr_i == `CSR_MPRINTS))
+    if(idex_csr_we_i && (idex_csr_addr_i == `CSR_MPRINTS))
         $write("%c", idex_csr_wdata_i);
 end
+`ifdef SM3_ACCL
+//SM3
+always @(*) begin
+    msg_inpt_d = idex_csr_wdata_i;
+    if(idex_csr_we_i && (idex_csr_addr_i == `CSR_MSM3IN)) begin
+        msg_inpt_vld = 1'b1;
+        msg_inpt_lst = msm3ct[3];
+    end
+    else begin
+        msg_inpt_vld = 1'b0;
+        msg_inpt_lst = 1'b0;
+    end
+end
+
+always @(posedge clk or negedge rst_n) begin
+    if(~rst_n) begin
+        cmprss_res_valid <= 1'b0;
+    end
+    else begin
+        if(cmprss_otpt_vld) begin
+            cmprss_res_valid <= 1'b1;
+            cmprss_res_r[0] <= cmprss_otpt_res[(0+1)*32-1: 0*32];
+            cmprss_res_r[1] <= cmprss_otpt_res[(1+1)*32-1: 1*32];
+            cmprss_res_r[2] <= cmprss_otpt_res[(2+1)*32-1: 2*32];
+            cmprss_res_r[3] <= cmprss_otpt_res[(3+1)*32-1: 3*32];
+            cmprss_res_r[4] <= cmprss_otpt_res[(4+1)*32-1: 4*32];
+            cmprss_res_r[5] <= cmprss_otpt_res[(5+1)*32-1: 5*32];
+            cmprss_res_r[6] <= cmprss_otpt_res[(6+1)*32-1: 6*32];
+            cmprss_res_r[7] <= cmprss_otpt_res[(7+1)*32-1: 7*32];
+        end
+        else begin
+            if(msg_inpt_vld)
+                cmprss_res_valid <= 1'b0;
+            else
+                cmprss_res_valid <= cmprss_res_valid;
+        end
+    end
+end
+
+assign cmprss_res_w = cmprss_res_r[msm3ct[2:0]];
+
+sm3_core_top inst_sm3_core_top(
+    .clk                (clk              ),
+    .rst_n              (rst_n            ),
+    .msg_inpt_d         (msg_inpt_d       ),
+    .msg_inpt_vld_byte  (msg_inpt_vld_byte),
+    .msg_inpt_vld       (msg_inpt_vld     ),
+    .msg_inpt_lst       (msg_inpt_lst     ),
+    .msg_inpt_rdy       (msg_inpt_rdy     ),
+    .cmprss_otpt_res    (cmprss_otpt_res  ),
+    .cmprss_otpt_vld    (cmprss_otpt_vld  )
+);
+`endif
+
 endmodule

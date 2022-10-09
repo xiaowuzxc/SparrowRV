@@ -14,6 +14,7 @@ vlog +incdir+./../rtl/  +define+INSTS_SEL=1'b1            ./../rtl/core/*.v
 vlog +incdir+./../rtl/                                    ./../rtl/soc/*.v
 vlog +incdir+./../rtl/                                    ./../rtl/perips/*.v
 vlog +incdir+./../rtl/                                    ./../rtl/perips/sysio/*.v
+vlog +incdir+./../rtl/                                    ./../rtl/perips/sm3/*.v
 vlog +incdir+./../rtl/                                    ./../rtl/jtag/*.v
 
 

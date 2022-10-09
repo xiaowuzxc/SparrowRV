@@ -41,7 +41,7 @@ extern "C" {
 #endif
 
 //关闭%f浮点功能
-//#define PRINTF_DISABLE_SUPPORT_FLOAT
+#define PRINTF_DISABLE_SUPPORT_FLOAT
 
 //关闭%e%g科学计数法浮点功能
 #define PRINTF_DISABLE_SUPPORT_EXPONENTIAL

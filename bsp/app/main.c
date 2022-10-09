@@ -1,20 +1,29 @@
 #include "system.h"
-
+uint8_t cnt;
+uint32_t sm3_tmp;
 //测试
 int main()
 {
     init_uart0_printf(25000000);
     printf("%s", "Hello world SparrowRV\n");
-    mtime_en_ctr(DISABLE);
-    mtime_value_set((uint64_t)0x10000000000);
-    mtime_en_ctr(ENABLE);
-    printf("float=%f\n", 114.514F);
-    uint64_t mtime_temp=12345678912345;
-    mtime_temp = mtime_value_get();
+    cnt =0;
+    sm3_tmp =0;
+    while (cnt<63)
+    {
+        sm3_accl_in_data(sm3_tmp);
+        sm3_tmp +=5;
+        cnt++;
+    }
+    sm3_accl_in_lst(ENABLE);
+    sm3_accl_in_data(sm3_tmp);
+    sm3_accl_in_lst(DISABLE);
+    while(sm3_accl_res_wait());
+    for(cnt=0; cnt<8; cnt++)
+    {
+        printf("sm3 res[%d] = %lx \n", cnt, sm3_accl_res_data(cnt));
+    }
+    
 
-    printf("mtime_temp=%llu\n", mtime_temp);
-    printf("mtime_temp=%llu\n", 11451419198100LLU);
-    printf("mtime_temp=%llu\n", 10000000000000LLU);
 
 
 

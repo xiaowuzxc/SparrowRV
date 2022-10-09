@@ -38,10 +38,13 @@ void minstret_en_ctr(uint8_t minstret_en);
 void delay_sys_wait(uint32_t us);
 void core_reset_enable();
 void core_sim_end();
+uint32_t sm3_accl_in_busy();
+uint32_t sm3_accl_res_wait();
+uint32_t sm3_accl_res_data(uint32_t sm3_res_sel);
+void sm3_accl_in_lst(uint32_t sm3_lst_ctr);
+void sm3_accl_in_data(uint32_t sm3_data);
 
-#define BOOT_ROM 0
-#define APP_RAM  1
-void inst_mem_switch(uint8_t mem_sel);
+
 
 
 #endif

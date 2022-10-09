@@ -10,6 +10,9 @@
 //sram数据存储器大小，单位为KB
 `define SRam_KB 16
 
+//bootrom区域大小，单位为KB
+`define BRam_KB 8
+
 //Vendor ID
 `define MVENDORID_NUM 32'h0
 
@@ -41,6 +44,9 @@
 
 //启用minstret指令计数器
 `define CSR_MINSTRET_EN
+
+//启用硬件加速SM3杂凑算法
+`define SM3_ACCL
 
 //启用安路EG4 FPGA原语生成BRAM
 //`define EG4_FPGA 
