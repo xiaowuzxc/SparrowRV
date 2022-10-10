@@ -16,6 +16,7 @@ list:
 	@echo 2: .bin file turn into inst.txt
 	@echo 3: load .bin file and sim rtl----iverilog   
 	@echo 4: show last wave file-----------gtkwave
+	@echo t: UART write iram
 	@echo c: clean tb file
 	@echo ==============================
 #-------------------------------------------------------------------------------------------------------
@@ -38,6 +39,10 @@ list:
 .PHONY : 4
 4 : 
 	python3 gtkwave tb.lxt
+
+.PHONY : t
+t : 
+	python3 tools/isa_test.py tsr_app
 
 #-------------------------------------------------------------------------------------------------------
 .PHONY : c

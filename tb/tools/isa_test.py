@@ -14,7 +14,7 @@ def 找到所有bin文件(path):
 
     return 找到的文件列表
 
-def bin文件转换(输入文件, 输出文件):
+def bin文件转换(输入文件, 输出文件, 数据位宽):
     bin文件 = open(输入文件, 'rb')
     文本文件 = open(输出文件, 'w')
     字节索引 = 0
@@ -23,25 +23,31 @@ def bin文件转换(输入文件, 输出文件):
     b2 = 0
     b3 = 0
     bin文件内容 = bin文件.read(os.path.getsize(输入文件))
-    for b in  bin文件内容:
-        if 字节索引 == 0:
-            b0 = b
-            字节索引 = 字节索引 + 1
-        elif 字节索引 == 1:
-            b1 = b
-            字节索引 = 字节索引 + 1
-        elif 字节索引 == 2:
-            b2 = b
-            字节索引 = 字节索引 + 1
-        elif 字节索引 == 3:
-            b3 = b
-            字节索引 = 0
-            一条指令 = []
-            一条指令.append(b3)
-            一条指令.append(b2)
-            一条指令.append(b1)
-            一条指令.append(b0)
-            文本文件.write(bytearray(一条指令).hex() + '\n')
+    if 数据位宽=='32位':
+        for b in  bin文件内容:
+            if 字节索引 == 0:
+                b0 = b
+                字节索引 = 字节索引 + 1
+            elif 字节索引 == 1:
+                b1 = b
+                字节索引 = 字节索引 + 1
+            elif 字节索引 == 2:
+                b2 = b
+                字节索引 = 字节索引 + 1
+            elif 字节索引 == 3:
+                b3 = b
+                字节索引 = 0
+                一条指令 = []
+                一条指令.append(b3)
+                一条指令.append(b2)
+                一条指令.append(b1)
+                一条指令.append(b0)
+                文本文件.write(bytearray(一条指令).hex() + '\n')
+    elif 数据位宽=='8位' :
+        for b in  bin文件内容:
+            文本文件.write('%02x' % b +'\n')#str(hex(b)[2:])
+    else :
+        print('bin转换位宽错误')
     bin文件.close()
     文本文件.close()
 
@@ -81,24 +87,32 @@ def modelsim命令行仿真():
     return 仿真输出
 
 def ISA测试(测试程序):
-    bin文件转换(测试程序, 'inst.txt')
+    bin文件转换(测试程序, 'inst.txt', '32位')
     return 编译并仿真()
 
 def modelsim_ISA测试(测试程序):
-    bin文件转换(测试程序, 'inst.txt')
+    bin文件转换(测试程序, 'inst.txt', '32位')
     return modelsim命令行仿真()
 
 def bin文件转文本():
     待转换的文件路径=filedialog.askopenfilename()
     if 待转换的文件路径:
         print(待转换的文件路径)
-        bin文件转换(待转换的文件路径, 'inst.txt')
+        bin文件转换(待转换的文件路径, 'inst.txt', '32位')
 
 def isp文件转文本():
     待转换的文件路径=filedialog.askopenfilename()
     if 待转换的文件路径:
         print(待转换的文件路径)
-        bin文件转换(待转换的文件路径, 'btrm.txt')
+        bin文件转换(待转换的文件路径, 'btrm.txt', '32位')
+
+def bin文件转串口烧录():
+    待转换的文件路径=filedialog.askopenfilename()
+    if 待转换的文件路径:
+        print(待转换的文件路径)
+        bin文件转换(待转换的文件路径, 'uart.txt', '8位')
+
+
 
 def 启动modelsim仿真():
     仿真进程 = os.popen(r'vsim -do vsim_gui.tcl')
@@ -179,6 +193,8 @@ if __name__ == '__main__':
         sys.exit(启动modelsim仿真())
     elif sys.argv[1] == 'vsim_isa':
         sys.exit(modelsim指令集测试())
+    elif sys.argv[1] == 'tsr_app':
+        sys.exit(bin文件转串口烧录())
     else:
         print(r'isa_test.py找不到指令')
         print(sys.argv[1])

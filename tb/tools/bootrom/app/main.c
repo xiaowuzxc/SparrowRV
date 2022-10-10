@@ -4,11 +4,22 @@ uint32_t sm3_tmp;
 //测试
 int main()
 {
-    init_uart0_printf(25000000);
-    printf("%s", "Hello world SparrowRV\n");
+    fpioa_perips_in_set(GPI0, 2);
+    fpioa_perips_in_set(GPI1, 3);
+    {
+        uint32_t boot_key;//启动模式设置
+        boot_key = gpio_gpi_data_in();
+        boot_key = boot_key & 0x00000003;
+    }
     sm3_tmp=read_csr(mimpid);
-    printf("mimpid l=%lu\n",sm3_tmp&0x0000FFFF);
-    printf("mimpid h=%lu\n",sm3_tmp>>16);
+    fpioa_perips_in_set(UART0_RX, 0);
+    fpioa_perips_out_set(UART0_TX, 1);
+
+    //配置波特率
+    uart_band_ctr(UART0,115200);
+    // enable tx and rx
+    uart_enable_ctr(UART0, ENABLE);
+    printf("%s", "Hello world SparrowRV\n");
     cnt =0;
     sm3_tmp =0;
     while (cnt<63)

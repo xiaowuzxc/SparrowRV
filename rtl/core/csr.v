@@ -64,7 +64,10 @@ reg [63:0] mtime;//定时器
 reg [63:0] mtimecmp;//定时器比较
 wire[`RegBus] mvendorid = `MVENDORID_NUM;//Vendor ID
 wire[`RegBus] marchid   = `MARCHID_NUM;//微架构编号
-wire[`RegBus] mimpid    = `MIMPID_NUM;//硬件实现编号
+//硬件实现编号
+wire [15:0]CPU_FRED1W = `CPU_CLOCK_HZ/10000;
+wire SM3_ACCL_EN = `SM3_ACCL;
+wire[`RegBus] mimpid    = {15'h0, SM3_ACCL_EN, CPU_FRED1W};
 wire[`RegBus] mhartid   = `MHARTID_NUM;//线程编号
 
 //---自定义CSR---

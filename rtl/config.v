@@ -19,9 +19,6 @@
 //微架构编号
 `define MARCHID_NUM 32'd1
 
-//硬件实现编号
-`define MIMPID_NUM 32'd1
-
 //线程编号
 `define MHARTID_NUM 32'd0
 
@@ -37,22 +34,22 @@
  *          开关配置区           
  *--------------------------------*/
 //启用M扩展(乘法/除法)
-`define RV32_M_ISA
+`define RV32_M_ISA 1'b1
 
 //单周期乘法器，会降低最大频率
-//`define SGCY_MUL
+//`define SGCY_MUL 1'b1
 
 //启用minstret指令计数器
-`define CSR_MINSTRET_EN
+`define CSR_MINSTRET_EN 1'b1
 
 //启用硬件加速SM3杂凑算法
-`define SM3_ACCL
+`define SM3_ACCL 1'b1
 
 //启用安路EG4 FPGA原语生成BRAM
-//`define EG4_FPGA 
+//`define EG4_FPGA 1'b1
 
 //启用w25模型，会降低仿真速度
-//`define Flash25 
+//`define Flash25 1'b1
 
 /*--------------------------------
  *          开关配置区           

@@ -5,6 +5,11 @@
 `define RstPC 32'h0000_0000 //复位后PC值在0000
 `define BRamSize (`BRam_KB*1024/4) //kB->B->4B
 
+//硬件实现编号 MIMPID_NUM 
+//[15:0] CPU_CLOCK_HZ / 10_000
+//[16] 1:启用SM3
+//[31:17] 保留
+
 `define RstEnable 1'b0
 `define RstDisable 1'b1
 `define ZeroWord 32'h0

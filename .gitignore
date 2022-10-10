@@ -4,6 +4,7 @@
 /tb/*.lxt
 /tb/*.vcd
 /tb/inst.txt
+/tb/uart.txt
 /tb/MEM.TXT
 /tb/SFDP.TXT
 /tb/SREG.TXT
@@ -23,7 +24,7 @@
 /syn
 /tools/*
 /bsp/obj/*
-/isp/obj/*
+/tb/tools/bootrom/obj/*
 #/rtl/W25Q128JVxIM.v
 
 /.vscode
