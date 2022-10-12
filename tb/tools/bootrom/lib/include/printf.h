@@ -49,6 +49,7 @@ extern "C" {
 //关闭%t数据类型ptrdiff_t功能
 #define PRINTF_DISABLE_SUPPORT_PTRDIFF_T
 
+#define PRINTF_DISABLE_SUPPORT_LONG_LONG
 /**
  * printf模板
  * printf("%d", xxx);		

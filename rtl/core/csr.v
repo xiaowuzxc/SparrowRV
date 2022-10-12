@@ -65,9 +65,11 @@ reg [63:0] mtimecmp;//定时器比较
 wire[`RegBus] mvendorid = `MVENDORID_NUM;//Vendor ID
 wire[`RegBus] marchid   = `MARCHID_NUM;//微架构编号
 //硬件实现编号
-wire [15:0]CPU_FRED1W = `CPU_CLOCK_HZ/10000;
-wire SM3_ACCL_EN = `SM3_ACCL;
-wire[`RegBus] mimpid    = {15'h0, SM3_ACCL_EN, CPU_FRED1W};
+wire [14:0] CPU_FRED1W = `CPU_CLOCK_HZ/10000;
+wire SM3_ACCL_EN = `SM3_ACCL_EN;
+wire [7:0] CPU_IRAM_SIZEK = `IRam_KB;
+wire [7:0] CPU_SRAM_SIZEK = `SRam_KB;
+wire[`RegBus] mimpid    = {CPU_SRAM_SIZEK, CPU_IRAM_SIZEK, SM3_ACCL_EN, CPU_FRED1W};
 wire[`RegBus] mhartid   = `MHARTID_NUM;//线程编号
 
 //---自定义CSR---

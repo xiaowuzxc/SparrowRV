@@ -11,25 +11,23 @@ module sm3_core_top (
     input                       msg_inpt_vld,//消息输入有效
     input                       msg_inpt_lst,//消息输入最后一个数据
     
-    output                      msg_inpt_rdy,//消息输入准备好
+    output        wire          msg_inpt_rdy,//消息输入准备好
 
-    output[255:0]               cmprss_otpt_res,//杂凑结果256bit
-    output                      cmprss_otpt_vld//杂凑结果输出有效
+    output wire   [255:0]       cmprss_otpt_res,//杂凑结果256bit
+    output        wire          cmprss_otpt_vld//杂凑结果输出有效
 );
 
 //interface
-logic                       pad_otpt_ena;
-logic [`INPT_DW1:0]         pad_otpt_d;
-logic                       pad_otpt_lst;
-logic                       pad_otpt_vld;
+wire                       pad_otpt_ena;
+wire [`INPT_DW1:0]         pad_otpt_d;
+wire                       pad_otpt_lst;
+wire                       pad_otpt_vld;
 
-logic [`INPT_DW1:0]         expnd_otpt_wj; 
-logic [`INPT_DW1:0]         expnd_otpt_wjj; 
-logic                       expnd_otpt_lst;
-logic                       expnd_otpt_vld; 
+wire [`INPT_DW1:0]         expnd_otpt_wj; 
+wire [`INPT_DW1:0]         expnd_otpt_wjj; 
+wire                       expnd_otpt_lst;
+wire                       expnd_otpt_vld; 
 
-logic [255:0]               cmprss_otpt_res;
-logic                       cmprss_otpt_vld;
 
 sm3_pad_core U_sm3_pad_core(
 

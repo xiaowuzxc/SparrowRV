@@ -431,12 +431,6 @@ initial begin
 end
 
 
-function integer clogb2;//计算log2
-    input integer depth;
-        for (clogb2=0; depth>0; clogb2=clogb2+1)
-            depth = depth >> 1;
-endfunction
-
         end
         "SIM_DIV": begin
 wire [`RegBus] res_u= (divisor_i==0)?-1:dividend_i/divisor_i;
@@ -459,6 +453,10 @@ end
     endcase
 endgenerate
 
-
+function integer clogb2;//计算log2
+    input integer depth;
+        for (clogb2=0; depth>0; clogb2=clogb2+1)
+            depth = depth >> 1;
+endfunction
 endmodule
 

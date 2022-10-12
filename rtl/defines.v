@@ -9,6 +9,16 @@
 //[15:0] CPU_CLOCK_HZ / 10_000
 //[16] 1:启用SM3
 //[31:17] 保留
+`ifdef SM3_ACCL
+`define SM3_ACCL_EN 1'b1
+`else
+`define SM3_ACCL_EN 1'b0
+`endif
+
+`define BOOT_JP_STAR 2'b00 //直接启动
+`define BOOT_RF_STAR 2'b01 //读取Flash后启动
+`define BOOT_UART_WI 2'b10 //串口烧写appram
+`define BOOT_UART_WF 2'b11 //串口烧写Flash
 
 `define RstEnable 1'b0
 `define RstDisable 1'b1

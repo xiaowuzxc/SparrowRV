@@ -24,9 +24,10 @@
 #define READ_LOCK_REG_CMD   		0xE8
 #define READ_ID_CMD 				0x9F
 
-uint32_t n25q_spi_sel;
+#define N25_SPI_SEL SPI0
 
-void n25q_init(uint32_t SPIx, uint32_t spi_div);
+
+void n25q_init();
 void n25q_read_id(uint8_t data[], uint8_t len);
 void n25q_read_data(uint8_t data[], uint32_t len, uint32_t addr);
 void n25q_subsector_erase(uint32_t subsector);

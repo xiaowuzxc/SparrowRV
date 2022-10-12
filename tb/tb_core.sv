@@ -10,16 +10,18 @@ logic core_ex_trap_valid, core_ex_trap_ready;//外部中断线
 logic JTAG_TCK,JTAG_TMS,JTAG_TDI,JTAG_TDO;//jtag
 wire spi0_miso;
 wire [31:0]fpioa;
+
+assign fpioa[3:2] = `BOOT_RF_STAR;
 wire uart0_rx=1'b1;//fpioa[0]
 assign fpioa[0]=uart0_rx;
 wire uart0_tx=fpioa[1];//fpioa[1]
-wire spi0_cs=fpioa[2];//fpioa[2]
-assign fpioa[3]=spi0_miso;//fpioa[3]
-wire spi0_mosi=fpioa[4];//fpioa[4]
-wire spi0_clk=fpioa[5];//fpioa[5]
+assign fpioa[4]=spi0_miso;
+wire spi0_mosi=fpioa[5];
+wire spi0_clk=fpioa[6];
+wire spi0_cs=fpioa[7];
 
-assign fpioa[20] = 1'b0;
-assign fpioa[21] = 1'b1;
+
+
 assign fpioa[31] = 1'b1;
 
 integer r;//计数工具人

@@ -14,7 +14,7 @@
 `define BRam_KB 8
 
 //Vendor ID
-`define MVENDORID_NUM 32'h0
+`define MVENDORID_NUM 32'h114514
 
 //微架构编号
 `define MARCHID_NUM 32'd1
@@ -49,7 +49,7 @@
 //`define EG4_FPGA 1'b1
 
 //启用w25模型，会降低仿真速度
-//`define Flash25 1'b1
+`define Flash25 1'b1
 
 /*--------------------------------
  *          开关配置区           
