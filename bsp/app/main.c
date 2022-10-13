@@ -9,6 +9,7 @@ int main()
     sm3_tmp=read_csr(mimpid);
     printf("mimpid l=%lu\n",sm3_tmp&0x0000FFFF);
     printf("mimpid h=%lu\n",sm3_tmp>>16);
+    /*
     cnt =0;
     sm3_tmp =0;
     while (cnt<63)
@@ -25,5 +26,6 @@ int main()
     {
         printf("sm3 res[%d] = %lx \n", cnt, sm3_accl_res_data(cnt));
     }
+    */
     
 }

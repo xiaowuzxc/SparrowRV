@@ -328,15 +328,15 @@ endspecify
 
 parameter 	tCLQV =  7;			// Time to DO output valid.
 parameter	tSHQZ =  7;			// Data output disable time.
-parameter	tW =     1000;		// Write Status Register Write Time
-parameter 	tRES1 =  30000;			// Release from power down time 1
-parameter	tRES2 =  30000;			// Release from power down time 2
-parameter	tDP =    3000;			// Time for device to enter deep power down.
-parameter	tPP =    100000;		// Page Program Time
-parameter	tSE =    200000;		// Sector Erase Time.
-parameter 	tBE1 =   120000000;		// Block Erase Time. 32KB
-parameter 	tBE2 =   150000000;		// Block Erase Time. 64KB
-parameter	tCE_40 = 1000000000;		// Chip Erase Time. This constant should be repeated 40 times.
+parameter	tW =     100;		// Write Status Register Write Time
+parameter 	tRES1 =  3000;			// Release from power down time 1
+parameter	tRES2 =  3000;			// Release from power down time 2
+parameter	tDP =    300;			// Time for device to enter deep power down.
+parameter	tPP =    10000;		// Page Program Time
+parameter	tSE =    20000;		// Sector Erase Time.
+parameter 	tBE1 =   120000;		// Block Erase Time. 32KB
+parameter 	tBE2 =   150000;		// Block Erase Time. 64KB
+parameter	tCE_40 = 1000000;		// Chip Erase Time. This constant should be repeated 40 times.
 
 /******************************************************************************
 The following code is the initialization code run at the beginning of the

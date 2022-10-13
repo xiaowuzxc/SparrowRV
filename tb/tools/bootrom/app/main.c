@@ -8,7 +8,7 @@ uint32_t cpu_sram_size;//数据存储器大小kb
 uint32_t vendorid;//Vendor ID
 
 uint8_t flash_data[256];//Flash读写缓冲区
-uint32_t inst_addr = 8192;//指令指针
+uint32_t inst_addr = app_start_addr;//指令指针
 uint32_t sm3_hash[8];//SM3杂凑值256bit
 
 /*
@@ -25,7 +25,7 @@ int main()
     fpioa_perips_out_set(UART0_TX, 1);
     fpioa_perips_in_set(GPI0, 2);
     fpioa_perips_in_set(GPI1, 3);
-    {//读取BOOT[1:0]，系统频率，SM3状态
+    {//读取BOOT[1:0]，系统频率，SM3状态，vendor id
         uint32_t tmp;//读取启动模式
         tmp = gpio_gpi_data_in();
         tmp = tmp & 0x00000003;
@@ -91,6 +91,7 @@ int main()
                 }
             }
             spi_set_cs(SPI0,DISABLE);
+            
             //SM3校验内容
             if(sm3_accl_flag)//SM3
             {
@@ -153,13 +154,96 @@ int main()
     //烧写
     else
     {
-        //读串口到appram区域
+        uint32_t i,j;
+        uint8_t tmp;
+        mtime_value_set(0);
+        mtime_en_ctr(ENABLE);
+        printf("please send app data from uart\n");
+        printf("uart_recv_flg=%x\n",uart_recv_flg(UART0));
+        uart_recv_date(UART0);
+        
+        while (!uart_recv_flg(UART0));//等待第一个数据
+        tmp = uart_recv_date(UART0);
+        SYS_RWMEM_B(inst_addr) = tmp;
+        //printf("addr=%lu, data=%x\n",inst_addr,tmp);
+        inst_addr++;
+        write_csr(mtime, 0);
+        
+        while(read_csr(mtime)<20000000)//太长时间没收到，结束
+        {
+            if(uart_recv_flg(UART0))
+            {
+                tmp = uart_recv_date(UART0);
+                SYS_RWMEM_B(inst_addr) = tmp;
+                //printf("addr=%lu, data=%x\n",inst_addr,tmp);
+                inst_addr++;
+                write_csr(mtime, 0);
+            }
+        }
+        printf("uart send timeout, end\n");
+        //使用0填充高位
+        while(inst_addr<cpu_iram_size)
+        {
+            SYS_RWMEM_B(inst_addr)=0;
+            inst_addr++;
+        }
+        
         if(boot_key_flag[0] == 1)//写flash
         {
+            uint32_t tmp32;
             printf("%s", "SparrowRV BOOT_UART_WF\n");
+            //擦flash
+            printf("%s", "Erase 25 norFlash\n");
+            j=cpu_iram_size/(64*1024)+1;
+            for( i=0 ; i<j ; i++)
+            {
+                printf("Erase sector %lu\n",i);
+                n25q_sector_erase(i);
+            }
+            printf("%s", "Erase Finish\n");
             //写flash
-            //sm3
-            //while(1);
+            inst_addr = app_start_addr;
+            while(inst_addr<cpu_iram_size)
+            {
+                n25q_write_enable(1);
+                spi_set_cs(N25_SPI_SEL,ENABLE);
+                spi_send_byte(N25_SPI_SEL, PAGE_PROGRAM_CMD);
+                spi_send_byte(N25_SPI_SEL, (inst_addr >> 16) & 0xff);
+                spi_send_byte(N25_SPI_SEL, (inst_addr >> 8) & 0xff);
+                spi_send_byte(N25_SPI_SEL, inst_addr & 0xff);
+                for (i = 0; i < 256; i++)
+                    spi_send_byte(SPI0, SYS_RWMEM_B(inst_addr+i));
+                while (spi_busy_chk(N25_SPI_SEL)); //等待一次收发结束
+                spi_set_cs(N25_SPI_SEL,DISABLE);
+                while (n25q_is_busy());
+                n25q_write_enable(0);
+                inst_addr = inst_addr + 256;
+            }
+            //生成并写入SM3校验内容
+            if(sm3_accl_flag)
+            {
+                printf("SM3 prog in Flash\n");
+                inst_addr = app_start_addr;
+                while(inst_addr<cpu_iram_size)
+                {
+                    sm3_accl_in_data(SYS_RWMEM_W(inst_addr));
+                    inst_addr = inst_addr + 4;
+                }
+                sm3_accl_in_lst(ENABLE);
+                sm3_accl_in_data(vendorid);
+                sm3_accl_in_lst(DISABLE);
+                while(sm3_accl_res_wait());
+                for(i=0; i<8; i++)
+                    sm3_hash[i] = sm3_accl_res_data(i);
+                printf("SM3 current =");
+                for(i=7; i<8; i--)
+                {
+                    printf("%lx",sm3_hash[i]);
+                }
+                printf("\n");
+                n25q_page_program(sm3_hash, 32, 0);
+            }
+            while(1);
         }
         else//串口烧写appram
         {
@@ -167,24 +251,12 @@ int main()
         }
     }
     //从appram启动
+    //跳转至PC=8k
     printf("%s", "SparrowRV Startup\n");
+    asm volatile (
+		"jr %[app_sa]"
+        :
+    	:[app_sa]"rm"(8192)
+	);
 
-    /*
-    cnt =0;
-    sm3_tmp =0;
-    while (cnt<63)
-    {
-        sm3_accl_in_data(sm3_tmp);
-        sm3_tmp +=5;
-        cnt++;
-    }
-    sm3_accl_in_lst(ENABLE);
-    sm3_accl_in_data(sm3_tmp);
-    sm3_accl_in_lst(DISABLE);
-    while(sm3_accl_res_wait());
-    for(cnt=0; cnt<8; cnt++)
-    {
-        printf("sm3 res[%d] = %lx \n", cnt, sm3_accl_res_data(cnt));
-    }
-    */
 }

@@ -1,18 +1,23 @@
 `timescale 1ns/1ns
 `include "defines.v"
-
 module tb_core(); 
+
 `define CorePath inst_sparrow_soc.inst_core
+
+
 //测试用信号
 logic clk;
+logic randem;
 logic rst_n;
 logic core_ex_trap_valid, core_ex_trap_ready;//外部中断线
 logic JTAG_TCK,JTAG_TMS,JTAG_TDI,JTAG_TDO;//jtag
 wire spi0_miso;
 wire [31:0]fpioa;
 
-assign fpioa[3:2] = `BOOT_RF_STAR;
-wire uart0_rx=1'b1;//fpioa[0]
+logic [63:0] sim_cycle_cnt = '0;//仿真周期计数器
+
+assign fpioa[3:2] = `BOOT_UART_WF;
+wire uart0_rx= (sim_cycle_cnt>21045 && sim_cycle_cnt<50000)?randem:1'b1;//1'b1;//fpioa[0]
 assign fpioa[0]=uart0_rx;
 wire uart0_tx=fpioa[1];//fpioa[1]
 assign fpioa[4]=spi0_miso;
@@ -33,7 +38,11 @@ wire mends = `CorePath.inst_csr.mends;//仿真结束标志
 
 // 读入程序
 initial begin
-    $readmemh ("inst.txt", `CorePath.inst_iram.inst_appram.BRAM);
+    for(r=0; r<`IRamSize; r=r+1) begin
+        `CorePath.inst_iram.inst_appram.BRAM[r] = 32'h0;
+    end
+    $readmemh ("btrm.txt", `CorePath.inst_iram.inst_appram.BRAM,0,(8192/4)-1);
+    $readmemh ("inst.txt", `CorePath.inst_iram.inst_appram.BRAM,(8192/4));
 end
 
 // 生成clk
@@ -41,8 +50,19 @@ initial begin
     clk = '0;
     forever #(5) clk = ~clk;
 end
+// 生成异步信号
+initial begin
+    randem = '0;
+    forever #(7) randem = ~randem;
+end
 
-//启动测试
+
+always @(posedge clk) 
+    sim_cycle_cnt <= sim_cycle_cnt+1;
+
+
+
+//启动仿真流程
 initial begin
     sysrst();//复位系统
     #10;
@@ -90,8 +110,10 @@ initial begin
 `endif
 `ifdef ISA_TEST
     $display("*Sim tool:ISA_TEST Timeout, Err");//ISA测试超时
+    $display("*Sim tool:Sim cycle = %d", sim_cycle_cnt);
 `else 
     $display("*Sim tool:Normal Sim Timeout");//普通仿真超时
+    $display("*Sim tool:Sim cycle = %d", sim_cycle_cnt);
 `endif
     $stop;
 end
@@ -100,6 +122,7 @@ initial begin
     #30;
     wait(mends === 1'b1)//软件控制仿真结束
     $display("*Sim tool:CSR MENDS END, stop sim");
+    $display("*Sim tool:Sim cycle = %d", sim_cycle_cnt);
     #10;
     $stop;
 end
@@ -131,10 +154,17 @@ generate
     end
 endgenerate
 
+always @(posedge clk) begin//显示printf时间
+    if(`CorePath.inst_csr.printf_valid && (`CorePath.inst_csr.idex_csr_wdata_i[7:0]=="\n")) begin
+        #1;
+        //$display("*Sim tool:Sim cycle = %d", sim_cycle_cnt);
+    end
+    
+end
 
 initial begin
     wait(rst_n===1'b1);
-    if(`CorePath.inst_iram.inst_appram.BRAM[0][0]===1'bx) begin//如果inst.txt读入失败，停止仿真
+    if(`CorePath.inst_iram.inst_appram.BRAM[0]==32'h0) begin//如果inst.txt读入失败，停止仿真
         $display("*Sim tool:Inst load error");
         #10;
         $stop;

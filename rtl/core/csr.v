@@ -383,9 +383,10 @@ always @ (*) begin
     endcase
 end
 
+wire printf_valid = idex_csr_we_i && (idex_csr_addr_i == `CSR_MPRINTS);
 //printf -> 仿真器
 always @(posedge clk) begin
-    if(idex_csr_we_i && (idex_csr_addr_i == `CSR_MPRINTS))
+    if(printf_valid)
         $write("%c", idex_csr_wdata_i);
 end
 `ifdef SM3_ACCL

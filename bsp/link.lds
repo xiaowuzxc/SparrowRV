@@ -1,17 +1,24 @@
 OUTPUT_ARCH( "riscv" )
 ENTRY(_start)
 
+/*以下可修改*/
+_cpu_iram_size = 32K; /*iram指令存储器大小*/
+_cpu_sram_size = 16K; /*sram数据存储器大小*/
+_cpu_stack_size = 4K; /*堆栈区大小*/
+/*以上可修改*/
+
+_iram_app_size = _cpu_iram_size - 8K; /*用户程序可用空间 = _cpu_iram_size - 8K */
 
 MEMORY
 {
-  iram (wxa!ri) : ORIGIN = 0x00000000, LENGTH = 32K /*iram指令存储器基地址，大小*/
-  sram (wxa!ri) : ORIGIN = 0x10000000, LENGTH = 16K /*sram存储器基地址，大小*/
+  iram (wxa!ri) : ORIGIN = 0x00002000, LENGTH = _iram_app_size /*iram指令存储器基地址，大小*/
+  sram (wxa!ri) : ORIGIN = 0x10000000, LENGTH = _cpu_sram_size /*sram存储器基地址，大小*/
 }
 
 
 SECTIONS
 {
-   __stack_size = DEFINED(__stack_size) ? __stack_size : 4K; /*堆栈区大小*/
+   __stack_size = DEFINED(__stack_size) ? __stack_size : _cpu_stack_size; /*堆栈区大小*/
 
   .init           :
   {

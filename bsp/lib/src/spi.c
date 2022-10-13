@@ -86,6 +86,7 @@ uint8_t spi_sdrv_byte(uint32_t SPIx, uint32_t data)//SPI发送1字节接收1字�
     SYS_RWMEM_W(SPI_DATA(SPIx)) = data;
     SYS_RWMEM_W(SPI_CTRL(SPIx)) |= 1 << 0; // spi en
     cpu_nop;
+    cpu_nop;
     while (spi_busy_chk(SPIx)); //等待一次收发结束
     return (uint8_t)(SYS_RWMEM_W(SPI_DATA(SPIx)) & 0xff);//返回收到的数据
 }
