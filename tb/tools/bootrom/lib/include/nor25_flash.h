@@ -33,5 +33,7 @@ void n25q_read_data(uint8_t data[], uint32_t len, uint32_t addr);
 void n25q_subsector_erase(uint32_t subsector);
 void n25q_sector_erase(uint32_t sector);
 void n25q_page_program(uint8_t data[], uint32_t len, uint32_t page);
+void n25q_write_enable(uint8_t en);
+uint8_t n25q_is_busy();
 
 #endif

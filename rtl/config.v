@@ -23,7 +23,7 @@
 `define MHARTID_NUM 32'd0
 
 //除法器模式，支持"HF_DIV" "HP_DIV" "SIM_DIV"
-`define DIV_MODE "HF_DIV"
+`define DIV_MODE "HP_DIV"
 
 /*--------------------------------
  *          参数配置区           
@@ -37,19 +37,19 @@
 `define RV32_M_ISA 1'b1
 
 //单周期乘法器，会降低最大频率
-//`define SGCY_MUL 1'b1
+`define SGCY_MUL 1'b1
 
 //启用minstret指令计数器
 `define CSR_MINSTRET_EN 1'b1
 
 //启用硬件加速SM3杂凑算法
-`define SM3_ACCL 1'b1
+//`define SM3_ACCL 1'b1
 
 //启用安路EG4 FPGA原语生成BRAM
 //`define EG4_FPGA 1'b1
 
 //启用w25模型，会降低仿真速度
-`define Flash25 1'b1
+//`define Flash25 1'b1
 
 /*--------------------------------
  *          开关配置区           

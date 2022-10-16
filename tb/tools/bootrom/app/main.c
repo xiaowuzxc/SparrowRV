@@ -38,29 +38,28 @@ int main()
         cpu_sram_size = (tmp >> 24)*1024;
         vendorid = read_csr(mvendorid);
     }
-    //配置波特率
-    uart_band_ctr(UART0,25000000);//----115200
-    uart_enable_ctr(UART0, ENABLE);
-    uart_recv_date(UART0);
+    //初始化串口0
+    SYS_RWMEM_W(UART_BAUD(UART0)) = cpu_csr_freq / 115200 ; //配置波特率，计算出分频器的值
+    SYS_RWMEM_W(UART_CTRL(UART0)) = 0x3;//启动
+    uart_recv_date(UART0);//清空缓冲区
     //打印基本信息
-    printf("%s", "Hello world SparrowRV\n");
-    printf("boot key = %u %u \n",boot_key_flag[1],boot_key_flag[0]);
+    printf("%s", "SparrowRV Bootload\n");
+    printf("boot = %u %u \n",boot_key_flag[1],boot_key_flag[0]);
     printf("sys freq = %lu \n",cpu_csr_freq);
     printf("sm3 en = %d \n",sm3_accl_flag);
     printf("cpu_iram_size = %lu \n",cpu_iram_size);
     printf("cpu_sram_size = %lu \n",cpu_sram_size);
     printf("Vendor ID = %lx \n",vendorid);
-    if(boot_key_flag[0] == 1)//初始化25Flash
-    {
-        uint8_t nor25_id_data[3];
-        fpioa_perips_in_set(SPI0_MISO, 4);//配置Flash必要引脚
-        fpioa_perips_out_set(SPI0_MOSI, 5);
-        fpioa_perips_out_set(SPI0_SCK, 6);
-        fpioa_perips_out_set(SPI0_CS, 7);
-        n25q_init();//初始化
-        n25q_read_id(nor25_id_data, 3);//读取JEDEC ID
-        printf("Flash JEDEC ID = %x %x %x\n", nor25_id_data[0], nor25_id_data[1], nor25_id_data[2]);
-    }
+
+    uint8_t nor25_id_data[3];
+    fpioa_perips_in_set(SPI0_MISO, 4);//配置Flash必要引脚
+    fpioa_perips_out_set(SPI0_MOSI, 5);
+    fpioa_perips_out_set(SPI0_SCK, 6);
+    fpioa_perips_out_set(SPI0_CS, 7);
+    n25q_init();//初始化
+    n25q_read_id(nor25_id_data, 3);//读取JEDEC ID
+    printf("Flash JEDEC ID = %x %x %x\n", nor25_id_data[0], nor25_id_data[1], nor25_id_data[2]);
+
     //
     if(boot_key_flag[1] == 0)//启动
     {
@@ -91,7 +90,7 @@ int main()
                 }
             }
             spi_set_cs(SPI0,DISABLE);
-            
+            printf("Flash data read end\n");
             //SM3校验内容
             if(sm3_accl_flag)//SM3
             {
@@ -159,38 +158,37 @@ int main()
         mtime_value_set(0);
         mtime_en_ctr(ENABLE);
         printf("please send app data from uart\n");
-        printf("uart_recv_flg=%x\n",uart_recv_flg(UART0));
         uart_recv_date(UART0);
+        inst_addr = app_start_addr;//指令指针
         
         while (!uart_recv_flg(UART0));//等待第一个数据
         tmp = uart_recv_date(UART0);
         SYS_RWMEM_B(inst_addr) = tmp;
-        //printf("addr=%lu, data=%x\n",inst_addr,tmp);
         inst_addr++;
-        write_csr(mtime, 0);
-        
-        while(read_csr(mtime)<20000000)//太长时间没收到，结束
+
+
+        j=0;
+        while(j<200000)//太长时间没收到，结束
         {
             if(uart_recv_flg(UART0))
             {
                 tmp = uart_recv_date(UART0);
                 SYS_RWMEM_B(inst_addr) = tmp;
-                //printf("addr=%lu, data=%x\n",inst_addr,tmp);
                 inst_addr++;
-                write_csr(mtime, 0);
+                j=0;
             }
+            j++;
         }
-        printf("uart send timeout, end\n");
+        printf("uart send timeout\n");
         //使用0填充高位
         while(inst_addr<cpu_iram_size)
         {
             SYS_RWMEM_B(inst_addr)=0;
             inst_addr++;
         }
-        
+        printf("fill idle mem with 0\n");
         if(boot_key_flag[0] == 1)//写flash
         {
-            uint32_t tmp32;
             printf("%s", "SparrowRV BOOT_UART_WF\n");
             //擦flash
             printf("%s", "Erase 25 norFlash\n");
@@ -203,6 +201,7 @@ int main()
             printf("%s", "Erase Finish\n");
             //写flash
             inst_addr = app_start_addr;
+            
             while(inst_addr<cpu_iram_size)
             {
                 n25q_write_enable(1);
@@ -219,6 +218,8 @@ int main()
                 n25q_write_enable(0);
                 inst_addr = inst_addr + 256;
             }
+            
+            printf("Flash data write end\n");
             //生成并写入SM3校验内容
             if(sm3_accl_flag)
             {
@@ -241,9 +242,13 @@ int main()
                     printf("%lx",sm3_hash[i]);
                 }
                 printf("\n");
-                n25q_page_program(sm3_hash, 32, 0);
+                n25q_page_program((uint8_t*)sm3_hash, 32, 0);
+                printf("Flash sm3 write end\n");
             }
-            while(1);
+            while(1)
+            {
+                printf("Flash end,restart!\n");
+            }
         }
         else//串口烧写appram
         {
@@ -252,11 +257,12 @@ int main()
     }
     //从appram启动
     //跳转至PC=8k
-    printf("%s", "SparrowRV Startup\n");
+    printf("%s", "SparrowRV Startup Success\n");
+    printf("%s", "Jump to app\n--\n--\n--\n\n\n");
     asm volatile (
 		"jr %[app_sa]"
         :
-    	:[app_sa]"rm"(8192)
+    	:[app_sa]"rm"(app_start_addr)
 	);
 
 }

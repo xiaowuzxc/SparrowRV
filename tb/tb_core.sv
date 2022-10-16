@@ -16,7 +16,7 @@ wire [31:0]fpioa;
 
 logic [63:0] sim_cycle_cnt = '0;//仿真周期计数器
 
-assign fpioa[3:2] = `BOOT_UART_WF;
+assign fpioa[3:2] = `BOOT_UART_WI;
 wire uart0_rx= (sim_cycle_cnt>21045 && sim_cycle_cnt<50000)?randem:1'b1;//1'b1;//fpioa[0]
 assign fpioa[0]=uart0_rx;
 wire uart0_tx=fpioa[1];//fpioa[1]
@@ -41,8 +41,12 @@ initial begin
     for(r=0; r<`IRamSize; r=r+1) begin
         `CorePath.inst_iram.inst_appram.BRAM[r] = 32'h0;
     end
+`ifdef ISA_TEST
+    $readmemh ("inst.txt", `CorePath.inst_iram.inst_appram.BRAM);
+`else 
     $readmemh ("btrm.txt", `CorePath.inst_iram.inst_appram.BRAM,0,(8192/4)-1);
     $readmemh ("inst.txt", `CorePath.inst_iram.inst_appram.BRAM,(8192/4));
+`endif
 end
 
 // 生成clk

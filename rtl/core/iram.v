@@ -104,8 +104,7 @@ always @(*) begin
     wemb = iram_axi_wstrb;
     if(axi_whsk) begin//写握手
         addrb = iram_axi_awaddr[31:2];
-        web = 1;//AXI写iram
-        //web = (iram_axi_awaddr >= `BRamSize) ?1'b1:1'b0;//AXI写iram
+        web = 1'b1;//AXI写iram
     end
     else begin
         web = 0;
@@ -123,6 +122,7 @@ dpram #(
     .RAM_DEPTH(`IRamSize),
     .RAM_SEL(RAM_SEL),
     .BRAM_EN("9K(FAST)"),
+    //.INIT_FILE("../../tb/tools/bootrom/obj/bootrom.mif")
     .INIT_FILE("../../bsp/obj/SparrowRV.mif")
 ) inst_appram (
     .clk    (clk),

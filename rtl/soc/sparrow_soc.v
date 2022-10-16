@@ -12,6 +12,9 @@ module sparrow_soc (
 
     inout wire [31:0] fpioa,//处理器IO接口
 
+    output wire NorFlash_WP,//25Flash WP引脚拉高
+    output wire NorFlash_Hold,//25Flash Hold引脚拉高
+
     input wire core_ex_trap_valid,//外部中断
     output wire core_ex_trap_ready
 );
@@ -521,5 +524,6 @@ rstc inst_rstc
     .rst_n       (rst_n)
 );
 
-
+assign NorFlash_WP = 1'b1;
+assign NorFlash_Hold = 1'b1;
 endmodule

@@ -45,7 +45,7 @@ def bin文件转换(输入文件, 输出文件, 数据位宽):
                 文本文件.write(bytearray(一条指令).hex() + '\n')
     elif 数据位宽=='8位' :
         for b in  bin文件内容:
-            文本文件.write('%02x' % b +'\n')#str(hex(b)[2:])
+            文本文件.write('%02x' % b +' ')#str(hex(b)[2:])
     else :
         print('bin转换位宽错误')
     bin文件.close()
