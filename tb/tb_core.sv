@@ -44,6 +44,8 @@ initial begin
 `ifdef ISA_TEST
     $readmemh ("inst.txt", `CorePath.inst_iram.inst_appram.BRAM);
 `else 
+    `CorePath.inst_iram.inst_appram.BRAM[0] = 32'h000027b7;
+    `CorePath.inst_iram.inst_appram.BRAM[1] = 32'h00078067;//无启动文件，跳转至0x2000
     $readmemh ("btrm.txt", `CorePath.inst_iram.inst_appram.BRAM,0,(8192/4)-1);
     $readmemh ("inst.txt", `CorePath.inst_iram.inst_appram.BRAM,(8192/4));
 `endif

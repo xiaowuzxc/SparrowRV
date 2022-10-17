@@ -181,9 +181,9 @@ SparrowRV
 4. 点击`构建项目`，编译并生成bin文件
 
 ## 致谢
-本项目借鉴了[tinyriscv](https://gitee.com/liangkangnan/tinyriscv)的RTL设计和Python脚本。tinyriscv使用[Apache-2.0](http://www.apache.org/licenses/LICENSE-2.0)协议。    
-本项目借鉴了[SM3_core](https://gitee.com/ljgibbs/sm3_core)的设计内容。SM3_core使用MIT协议。    
-本项目借鉴了[printf](https://github.com/mpaland/printf)的精简printf实现。printf使用MIT协议。    
+本项目借鉴了[tinyriscv](https://gitee.com/liangkangnan/tinyriscv)的RTL设计和Python脚本。**tinyriscv**使用[Apache-2.0](http://www.apache.org/licenses/LICENSE-2.0)协议。    
+本项目借鉴了**[SM3_core](https://gitee.com/ljgibbs/sm3_core)**的设计内容。**SM3_core**使用MIT协议。    
+本项目使用了**[printf](https://github.com/mpaland/printf)**的轻量化printf实现。**printf**使用MIT协议。    
 感谢先驱者为我们提供的灵感  
 感谢众多开源软件提供的好用的工具  
 感谢MRS开发工具提供的便利   
