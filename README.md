@@ -3,9 +3,10 @@
 [![teelogo](/doc/图库/Readme/giteetj.bmp)Gitee推荐项目](https://gitee.com/explore/risc-v)  
 [![book](/doc/图库/Readme/book.png)处理器文档导航页](/doc/文档导航.md)
 ## 简介
-小麻雀处理器(SparrowRV)是一款单周期32位，支持RV32IM指令集的嵌入式处理器。它的控制逻辑简单，没有复杂的流水线控制结构，没有冗余的线网连接，代码注释完备，适合用于学习。  
+小麻雀处理器(SparrowRV)是一款RISC-V架构的32位单周期两级流水线处理器。它的控制逻辑简单，没有复杂的流水线控制结构，代码注释完备，配有易上手的仿真环境和软件开发环境，适合用于学习。  
 此项目处于开发阶段，master分支更新频繁，稳定版请参阅[release发行版](https://gitee.com/xiaowuzxc/SparrowRV/releases)  
 **设计指标：**  
+- 顺序两级流水线结构(IF -> ID+EX+MEM+WB)  
 - 兼容RV32I基础指令集和M、Zicsr、Zifencei扩展  
 - 支持固定入口中断，仅支持机器模式  
 - 哈佛结构，指令存储器映射至存储器空间  
@@ -13,6 +14,9 @@
 - 支持AXI4-Lite总线  
 - 支持JTAG调试  
 - 支持片外Flash(25系列)启动  
+
+**2级流水线**  
+![流水线](/doc/图库/Readme/流水线.svg)  
 
 **系统功能框图**  
 ![soc架构](/doc/图库/Readme/soc架构.svg)  
@@ -181,9 +185,9 @@ SparrowRV
 4. 点击`构建项目`，编译并生成bin文件
 
 ## 致谢
-本项目借鉴了[tinyriscv](https://gitee.com/liangkangnan/tinyriscv)的RTL设计和Python脚本。**tinyriscv**使用[Apache-2.0](http://www.apache.org/licenses/LICENSE-2.0)协议。    
-本项目借鉴了**[SM3_core](https://gitee.com/ljgibbs/sm3_core)**的设计内容。**SM3_core**使用MIT协议。    
-本项目使用了**[printf](https://github.com/mpaland/printf)**的轻量化printf实现。**printf**使用MIT协议。    
+本项目借鉴了[tinyriscv](https://gitee.com/liangkangnan/tinyriscv)的RTL设计和Python脚本。tinyriscv使用[Apache-2.0](http://www.apache.org/licenses/LICENSE-2.0)协议。    
+本项目借鉴了[SM3_core](https://gitee.com/ljgibbs/sm3_core)的设计内容。SM3_core使用MIT协议。    
+本项目使用了[printf](https://github.com/mpaland/printf)的轻量化printf实现。printf使用MIT协议。    
 感谢先驱者为我们提供的灵感  
 感谢众多开源软件提供的好用的工具  
 感谢MRS开发工具提供的便利   
