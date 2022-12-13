@@ -11,10 +11,10 @@ _iram_app_size = _cpu_iram_size - 8K; /*用户程序可用空间 = _cpu_iram_siz
 
 MEMORY
 {
-  iram (wxa!ri) : ORIGIN = 0x00002000, LENGTH = _iram_app_size /*iram指令存储器基地址，大小*/
-  sram (wxa!ri) : ORIGIN = 0x10000000, LENGTH = _cpu_sram_size /*sram存储器基地址，大小*/
+  iram (rx) : ORIGIN = 0x00002000, LENGTH = _iram_app_size /*iram指令存储器基地址，大小*/
+  sram (rw) : ORIGIN = 0x10000000, LENGTH = _cpu_sram_size /*sram存储器基地址，大小*/
 }
-
+/*r只读 w可写 x可执行 a可分配 i已初始化段 l类似于i !反转其后面的所有属性*/
 
 SECTIONS
 {
