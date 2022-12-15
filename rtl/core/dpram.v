@@ -8,7 +8,7 @@ dpram生成一个双端口RAM，数据位宽为32位，en使能，we写使能，
 调用了32K BRAM，因此最大深度为16*1k，即生成64kB的存储器
 */
 module dpram #(
-    localparam RAM_WIDTH = 32,//RAM数据位宽
+    parameter RAM_WIDTH = 32,//RAM数据位宽
     parameter RAM_DEPTH = 2048, //RAM深度
     parameter RAM_SEL = "RTL_MODEL", //选择模型
     parameter BRAM_EN = "32K", //选择模型

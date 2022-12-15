@@ -701,11 +701,14 @@ assign master_axi_rvalid = rbus_sel[0] & s0_axi_rvalid
 //多余端口处理
 wire valid = 1'b1;
 
-assign m0_axi_bresp  = 2'b00;
-assign m0_axi_bvalid = valid;
-assign m0_axi_rresp  = 2'b00;
-assign m1_axi_bresp  = 2'b00;
-assign m1_axi_bvalid = valid;
-assign m1_axi_rresp  = 2'b00;
+always @(*) begin
+    m0_axi_bresp  = 2'b00;
+    m0_axi_bvalid = valid;
+    m0_axi_rresp  = 2'b00;
+    m1_axi_bresp  = 2'b00;
+    m1_axi_bvalid = valid;
+    m1_axi_rresp  = 2'b00;
+end
+
 
 endmodule
