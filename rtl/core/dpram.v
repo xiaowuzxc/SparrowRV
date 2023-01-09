@@ -1,11 +1,11 @@
 /*
-dpram生成一个双端口RAM，数据位宽为32位，en使能，we写使能，wem字节写使能
+dpram生成一个不完全的双端口RAM，数据位宽为32位，en使能，we写使能，wem字节写使能
+端口a只读，端口b可读可写
 提供两种实现方式
 1. 行为级建模
 例化参数 RAM_SEL = "RTL_MODEL"，由综合器推断，推荐仿真环境/vivado使用
-2. 原语例化
-例化参数 RAM_SEL = "EG4_32K"，适用安路EG4S20 FPGA
-调用了32K BRAM，因此最大深度为16*1k，即生成64kB的存储器
+2.自定义例化模板
+3.安路EG4S20 FPGA原语例化
 */
 module dpram #(
     parameter RAM_WIDTH = 32,//RAM数据位宽
@@ -30,6 +30,7 @@ module dpram #(
     output [RAM_WIDTH-1:0] doutb          // Port B RAM output data
 );
 reg [RAM_WIDTH-1:0] BRAM [0:RAM_DEPTH-1];
+
 generate
     case(RAM_SEL)
         "RTL_MODEL": begin
@@ -52,6 +53,7 @@ generate
                         ram_data_a <= BRAM[addra];
                     end
                 end
+
             always @(posedge clk)
                 if (enb) begin
                     if (web) begin
@@ -71,6 +73,36 @@ generate
             assign douta = ram_data_a;
             assign doutb = ram_data_b;
         end
+
+        "SYN_DPR": begin
+/*
+请在这里例化相应FPGA平台的双端口BRAM，并与端口连接
+基本参数：
+双端口RAM
+数据位宽都为32
+深度为RAM_DEPTH参数
+地址线宽度为clogb2(RAM_DEPTH-1)
+需要有字节写选通功能，即wem[3:0]选通32位的4个字节
+不需要输出寄存器打一拍
+工作模式建议设置为普通模式，不要使用写穿模式！
+
+将下面端口与BRAM连接
+clk：时钟输入
+addra：地址输入a，位宽由存储器深度决定
+addrb：地址输入b，位宽由存储器深度决定b
+dina：数据输入a，位宽32
+dinb：数据输入b，位宽32
+wea：写使能输入a，高电平才能写入数据
+web：写使能输入b，高电平才能写入数据
+wema：写字节选通a，位宽4，每位对应一个字节(8位)的写选通，高电平才能写入对应字节
+wemb：写字节选通b，位宽4，每位对应一个字节(8位)的写选通，高电平才能写入对应字节
+ena：端口a使能/片选输入，高电平才能让其他信号起作用，低电平则输出信号保持不变
+enb：端口b使能/片选输入，高电平才能让其他信号起作用，低电平则输出信号保持不变
+douta：数据输出a，位宽32
+doutb：数据输出a，位宽32
+*/
+        end
+
 
         "EG4_32K": begin
             EG_LOGIC_BRAM #( 

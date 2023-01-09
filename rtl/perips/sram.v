@@ -72,31 +72,25 @@ always @(*) begin
     wem = sram_axi_wstrb;
 end
 
-`ifdef EG4_FPGA //如果定义了宏
-    localparam RAM_SEL="EG4_32K";//启用EG4原语
-`else 
-    localparam RAM_SEL="RTL_MODEL";//否则使用行为级建模
-`endif
-
 dpram #(
     .RAM_DEPTH(`SRamSize),
-    .RAM_SEL(RAM_SEL),
+    .RAM_SEL(`SRAM_MODEL),
     .BRAM_EN("32K"),
     .MODE("SP")
 ) inst_sram (
     .clk    (clk),
-    .addra  (addr),
-    .addrb  (addr_zero0),
-    .dina   (din),
-    .dinb   (32'h0),
-    .wea    (we),
-    .web    (1'b0),
-    .wema   (wem),
-    .wemb   (4'h0),
-    .ena    (en),
-    .enb    (1'b0),
-    .douta  (dout),
-    .doutb  ()
+    .addra  (addr_zero0),
+    .addrb  (addr),
+    .dina   (32'h0),
+    .dinb   (din),
+    .wea    (1'b0),
+    .web    (we),
+    .wema   (4'h0),
+    .wemb   (wem),
+    .ena    (1'b0),
+    .enb    (en),
+    .douta  (),
+    .doutb  (dout)
 );
 
 function integer clogb2;

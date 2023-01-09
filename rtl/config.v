@@ -25,6 +25,9 @@
 //除法器模式，支持"HF_DIV" "HP_DIV" "SIM_DIV"
 `define DIV_MODE "HF_DIV"
 
+//SRAM模式配置，支持"RTL_MODEL" "SYN_DPR" "EG4_32K"
+`define SRAM_MODEL "RTL_MODEL"
+
 /*--------------------------------
  *          参数配置区           
  *--------------------------------*/
@@ -44,9 +47,6 @@
 
 //启用硬件加速SM3杂凑算法
 //`define SM3_ACCL 1'b1
-
-//启用安路EG4 FPGA原语生成BRAM
-//`define EG4_FPGA 1'b1
 
 //启用w25模型，会降低仿真速度
 //`define Flash25 1'b1

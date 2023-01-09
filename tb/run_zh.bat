@@ -24,7 +24,7 @@
 else if %cmchc% == 1 (python tools/isa_test.py all_isa & goto cmsl)^
 else if %cmchc% == 2 (python tools/isa_test.py tsr_bin & goto cmsl)^
 else if %cmchc% == 3 (python tools/isa_test.py sim_bin & goto cmsl)^
-else if %cmchc% == 4 (gtkwave tb.lxt & goto cmsl)^
+else if %cmchc% == 4 (gtkwave tb.vcd & goto cmsl)^
 else if %cmchc% == 5 (python tools/isa_test.py vsim_rtl & goto cmsl)^
 else if %cmchc% == 6 (python tools/isa_test.py vsim_bin & goto cmsl)^
 else if %cmchc% == 7 (python tools/isa_test.py vsim_isa & goto cmsl)^

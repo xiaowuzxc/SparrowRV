@@ -112,15 +112,9 @@ always @(*) begin
     end
 end
 
-`ifdef EG4_FPGA //如果定义了宏
-    localparam RAM_SEL="EG4_32K";//启用EG4原语
-`else 
-    localparam RAM_SEL="RTL_MODEL";//否则使用行为级建模
-`endif
-
 dpram #(
     .RAM_DEPTH(`IRamSize),
-    .RAM_SEL(RAM_SEL),
+    .RAM_SEL(`SRAM_MODEL),
     .BRAM_EN("9K(FAST)"),
     //.INIT_FILE("../../tb/tools/bootrom/obj/bootrom.mif")
     .INIT_FILE("../../bsp/obj/SparrowRV.mif")
