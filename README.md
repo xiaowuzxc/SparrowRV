@@ -1,7 +1,6 @@
 # 小麻雀处理器
 [![rvlogo](/doc/图库/Readme/rvlogo.bmp)RISC-V官网收录](https://riscv.org/exchange/?_sf_s=sparrowrv)  
 [![teelogo](/doc/图库/Readme/giteetj.bmp)Gitee推荐项目](https://gitee.com/explore/risc-v)  
-**2022全国大学生嵌入式芯片与系统设计竞赛 FPGA创新设计竞赛 全国一等奖**  
 [![book](/doc/图库/Readme/book.png)处理器文档导航页](/doc/文档导航.md)  
 ## 简介
 小麻雀处理器(SparrowRV)是一款RISC-V架构的32位单周期两级流水线处理器。它的控制逻辑简单，没有复杂的流水线控制结构，代码注释完备，配有易上手的仿真环境和软件开发环境，适合用于学习。  
@@ -13,8 +12,8 @@
 - 哈佛结构，指令存储器映射至存储器空间  
 - 支持C语言，有配套BSP  
 - 支持AXI4-Lite总线  
-- 支持JTAG调试  
-- 支持片外Flash(25系列)启动  
+- 支持JTAG调试(有BUG)  
+- 支持片外Flash(25系列)启动(待开发)  
 
 **2级流水线**  
 ![流水线](/doc/图库/Readme/流水线.svg)  
