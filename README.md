@@ -73,7 +73,7 @@ Linux下仅支持iverilog
 Debian系(Ubuntu、Debian、Deepin)执行以下命令：  
 ```
 sudo apt install make git python3 python3-tk gtkwave gcc g++ bison flex gperf autoconf
-git clone -b v11_0 --depth=1 https://gitee.com/xiaowuzxc/iverilog/
+git clone -b v12-branch --depth=1 https://gitee.com/xiaowuzxc/iverilog/
 cd iverilog
 sh autoconf.sh
 ./configure
